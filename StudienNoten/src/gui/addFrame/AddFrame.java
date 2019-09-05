@@ -101,6 +101,7 @@ public class AddFrame extends JFrame {
 				 */
 			}
 		});
+		
 		btnApply.setBounds(265, 94, 90, 23);
 		contentPane.add(btnApply);
 
