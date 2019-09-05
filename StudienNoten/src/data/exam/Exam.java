@@ -7,7 +7,7 @@ public class Exam {
 	private int semester, leistungsPunkte, id; 
 	private double note; 
 	private String name;
-	//private String matrNr; 
+	private String matrNr; 
 	
 	
 	public Exam(int semester, String name, int leistungsPunkte, double note) throws IllegalInputException {
@@ -16,17 +16,17 @@ public class Exam {
 			this.setLeistungsPunkte(leistungsPunkte); 
 			this.setNote(note); 
 			this.id = idCounter++; 
-			//this.setMatrNr(matrNr); 
+			this.setMatrNr(matrNr); 
 		
 	}
 	
-	/*private void setMatrNr(String matrNr2) throws IllegalInputException {
+	private void setMatrNr(String matrNr2) throws IllegalInputException {
 		// TODO Auto-generated method stub
 		if (!matrNr2.matches("[0-9]^10)")) {
 			throw new IllegalInputException("MatrNr nicht korrekt"); 
 		}
 		this.matrNr = matrNr2; 
-	}*/
+	}
 
 	private void setNote(double note2) throws IllegalInputException {
 		// TODO Auto-generated method stub
