@@ -10,7 +10,6 @@ import java.io.ObjectOutputStream;
 import data.exam.Exam;
 import data.exam.ExamAlreadyExistsException;
 import data.exam.ExamContainer;
-import gui.mainFrame.IllegalInputException;
 
 public class ExamStore implements DataManagement {
 
