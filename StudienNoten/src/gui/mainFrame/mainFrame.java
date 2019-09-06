@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -16,6 +17,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+
+import gui.addFrame.AddFrame;
 
 public class mainFrame extends JFrame {
 
@@ -115,8 +118,8 @@ public class mainFrame extends JFrame {
 		panel.add(btnAdd);
 		
 		btnAdd.addActionListener(e -> {
-			((tableExams) allExams).add(); 
-			
+			JDialog addDia = new AddFrame(this, "Neue Prüfung hinzufügen"); 	
+			addDia.setVisible(true);
 		});
 		
 		JButton btnDel = new JButton("Pr\u00FCfung l\u00F6schen ");
