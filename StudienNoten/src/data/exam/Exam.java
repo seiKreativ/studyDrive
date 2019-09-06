@@ -1,8 +1,9 @@
 package data.exam;
 
-import gui.mainFrame.IllegalInputException;
+import store.StoreException;
 
 public class Exam {
+
 	static private int idCounter = 0; 
 	private int semester, leistungsPunkte, id; 
 	private double note; 
@@ -14,41 +15,45 @@ public class Exam {
 			this.setSemester(semester); 
 			this.setLeistungsPunkte(leistungsPunkte); 
 			this.setNote(note); 
-			this.id = idCounter++; 
-		
+			this.id = idCounter++;
 	}
 	
 
 	private void setNote(double note2) throws IllegalInputException {
-		// TODO Auto-generated method stub
 		if (note2 < 1.0 || note2 > 5.0) {
-			throw new IllegalInputException("Note ist nicht korrekt"); 
+			throw new IllegalInputException("Grade not correct");
 		}
 		this.note = note2; 
 	}
 
 	private void setLeistungsPunkte(int leistungsPunkte2) throws IllegalInputException{
-		// TODO Auto-generated method stub
 		if (leistungsPunkte2 < 2 || leistungsPunkte > 30) {
-			throw new IllegalInputException("Leistungspunkte sind nicht korrekt");
+			throw new IllegalInputException("Leistungspunkte not correct");
 		}
-		this.leistungsPunkte = leistungsPunkte2; 
-	
+		this.leistungsPunkte = leistungsPunkte2;
 	}
 
 	private void setSemester(int semester2) throws IllegalInputException{
-		// TODO Auto-generated method stub
-		if (semester2 < 1 || semester2 > 8) {
-			throw new IllegalInputException("Semester ist nicht korrekt");
+		if (semester2 < 1 || semester2 > 12) {
+			throw new IllegalInputException("Semester not correct");
 		}
 		this.semester = semester2; 
 	}
 
 	private void setName(String name2) throws IllegalInputException{
-		// TODO Auto-generated method stub
-		// hier noch schauen ob name in der user liste ist 
+		try {
+			ExamContainer container = ExamContainer.instance();
+			for (Exam e : container) {
+				if (e.getName().equals(name2))
+						throw new IllegalInputException("name already exists");
+			}
+		} catch (StoreException e) {
+			/*
+			there won't by an exception because the ExamContainer unique alredy exists
+			 */
+		}
 		if (name2.length() < 1) {
-			throw new IllegalInputException("Name nicht gültig"); 
+			throw new IllegalInputException("Name not correct");
 		}
 		this.name = name2; 
 	}

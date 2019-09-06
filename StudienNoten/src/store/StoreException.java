@@ -2,6 +2,7 @@ package store;
 
 @SuppressWarnings("serial")
 public class StoreException extends Exception {
+
 	public StoreException(String message, Exception cause) {
 		super(message, cause);
 	}
@@ -12,4 +13,5 @@ public class StoreException extends Exception {
 		else
 			return getCause().getClass() + ", " + getCause().getMessage();
 	}
+
 }
