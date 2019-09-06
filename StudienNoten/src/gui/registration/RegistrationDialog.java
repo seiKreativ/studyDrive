@@ -18,6 +18,10 @@ import javax.swing.border.EmptyBorder;
 
 public class RegistrationDialog extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2685194346838147846L;
 	private JPanel contentPane;
 	private JTextField usernameTextfield;
 	private JTextField emailTextField;
@@ -44,7 +48,6 @@ public class RegistrationDialog extends JDialog {
 	*/
 	public RegistrationDialog() {
 		setBackground(Color.WHITE);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 343, 386);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
