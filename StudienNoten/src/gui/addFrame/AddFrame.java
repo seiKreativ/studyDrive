@@ -1,5 +1,11 @@
 package gui.addFrame;
 
+import data.exam.Exam;
+import data.exam.ExamAlreadyExistsException;
+import data.exam.ExamContainer;
+import data.exam.IllegalInputException;
+import store.StoreException;
+
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -24,6 +30,8 @@ public class AddFrame extends JDialog {
 	private JPanel contentPane;
 	private JTextField textField;
 	private JTextField textField_1;
+	private JComboBox<String> comboBoxSem, comboBoxNoten;
+	private ExamContainer container;
 
 	/*
 	
@@ -69,13 +77,12 @@ public class AddFrame extends JDialog {
 		lblNote.setBounds(600, 11, 90, 14);
 		contentPane.add(lblNote);
 
-		JComboBox<String> comboBoxSem = new JComboBox<String>();
+		comboBoxSem = new JComboBox<String>();
 		comboBoxSem.setBackground(Color.LIGHT_GRAY);
 		for (int i = 1; i <= 12; i++) {
 			comboBoxSem.addItem(Integer.toString(i));
 		}
-		comboBoxSem.addItem("-?-");
-		comboBoxSem.setSelectedItem("-?-");
+		comboBoxSem.setSelectedItem("1");
 		comboBoxSem.setBounds(20, 36, 50, 20);
 		contentPane.add(comboBoxSem);
 
@@ -89,7 +96,7 @@ public class AddFrame extends JDialog {
 		textField_1.setBounds(190, 36, 380, 20);
 		contentPane.add(textField_1);
 
-		JComboBox<String> comboBoxNoten = new JComboBox<String>();
+		comboBoxNoten = new JComboBox<String>();
 		comboBoxNoten.setBackground(Color.LIGHT_GRAY);
 		for (int i = 1; i <= 4; i++) {
 			comboBoxNoten.addItem(Integer.toString(i) + ".0");
@@ -104,13 +111,7 @@ public class AddFrame extends JDialog {
 
 		JButton btnApply = new JButton("Apply");
 		btnApply.setBackground(Color.GRAY);
-		btnApply.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				/*
-				 * 	hier noch eventhandling einf¸gen
-				 */
-			}
-		});
+		btnApply.addActionListener(e -> onAdd());
 		
 		btnApply.setBounds(265, 94, 90, 23);
 		contentPane.add(btnApply);
@@ -128,5 +129,22 @@ public class AddFrame extends JDialog {
 		);
 		btnClose.setBounds(365, 94, 90, 23);
 		contentPane.add(btnClose);
+
+		try {
+			container = ExamContainer.instance();
+		} catch (StoreException e) {
+			// Dieser Fehler kann an der Stelle nicht auftreten
+		}
+	}
+
+	private void onAdd() {
+		try {
+			Exam exam = new Exam(Integer.parseInt((String) comboBoxSem.getSelectedItem()), textField_1.getText(), Integer.parseInt(textField.getText()), Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
+			container.linkExam(exam);
+			//Aber wie man das Exam jetzt zu diser Vektorliste/Tabelle hinzuf√ºgt habe ich keine Ahnung
+			dispose();
+		} catch (StoreException | ExamAlreadyExistsException | IllegalInputException e) {
+			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }

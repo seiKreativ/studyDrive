@@ -81,7 +81,9 @@ public class ExamContainer implements Iterable<Exam> {
 		return exams.iterator();
 	}
 
-	public void close() {
+	public void close() throws StoreException {
 		store.close();
+		Student.close();
+		store = null;
 	}
 }

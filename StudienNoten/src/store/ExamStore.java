@@ -13,7 +13,7 @@ public class ExamStore implements DataManagement {
 	is just use my databse, that can be changed easily. The database has to have the
 	tables "Users" and "Exams" with the attributs (which can be changed to if necessary)
 	Users: "username" (varchar(20)) and "password" (varchar(20)), primary key: username
-	Exams: "id" (int), "name" (varchar(30)), "semester" (int), "leistungspunkte" (int), "note" (double), "username" (varchar(10)), primary key: username, id
+	Exams: "id" (int), "name" (varchar(30)), "semester" (int), "leistungspunkte" (int), "note" (double), "username" (varchar(20)), primary key: username, id
 	*/
 
 	private final static String connection = "jdbc:mysql://www.remotemysql.com:3306/Rjb9OP2iXT";
@@ -76,7 +76,7 @@ public class ExamStore implements DataManagement {
 			abfrage.executeUpdate(befehl2);
 			this.username = username;
 		} catch (SQLException e1) {
-			throw new StoreException("Error while adding exam " + e1.getMessage(), e1);
+			throw new StoreException("Error: " + e1.getMessage(), e1);
 		}
 	}
 
@@ -88,11 +88,15 @@ public class ExamStore implements DataManagement {
 		 */
 		String befehl = "select * from Users;";
 		ResultSet ergebnis = abfrage.executeQuery(befehl);
+		boolean tmp = false;
 		while (ergebnis.next()) {
-			if (ergebnis.getString("username").equals(username) && ergebnis.getString("password").equals(password))
+			if (ergebnis.getString("username").equals(username) && ergebnis.getString("password").equals(password)) {
 				this.username = username;
+				tmp = true;
+			}
 		}
-		throw new StoreException("Username or password wrong", null);
+		if (!tmp)
+			throw new StoreException("Username or password wrong", null);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding exam " + e1.getMessage(), e1);
 		}
@@ -101,7 +105,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void add(Exam e) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "INSERT INTO Exams VALUES ('" + e.getId() + "','" + e.getName() + "', '" + e.getSemester() + "','" + e.getLeistungpunkte() + "', '" + username + "');";
+			String befehl = "INSERT INTO Exams VALUES ('" + e.getId() + "','" + e.getName() + "', '" + e.getSemester() + "','" + e.getLeistungpunkte() + "', '" + e.getNote() + "', '" + username + "');";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding exam " + e1.getMessage(), e1);
@@ -113,7 +117,7 @@ public class ExamStore implements DataManagement {
 			String befehl = "DELETE FROM Exams WHERE username = '" + username + "' and id = '" + e.getId() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
-			throw new StoreException("Error while adding exam " + e1.getMessage(), e1);
+			throw new StoreException("Error while deleting exam " + e1.getMessage(), e1);
 		}
     }
 
@@ -129,12 +133,12 @@ public class ExamStore implements DataManagement {
     }
 
 	@Override
-	public void close() {
+	public void close() throws StoreException {
 		try {
 			if (con != null)
 				con.close();
 		} catch (SQLException e) {
-			System.out.println("Database error on closing");
+			throw new StoreException("Error while closing: " + e.getMessage(), e);
 		}
 	}
 

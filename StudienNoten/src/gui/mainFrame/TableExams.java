@@ -42,12 +42,7 @@ public class TableExams extends JPanel {
 		this.add(new JScrollPane(table));
 	}
 	
-	public void add() {
-		try {
-			model.addExam(new Exam(4, "Medizin", 4, 1.0));
-		} catch (IllegalInputException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void add(Exam e) {
+		model.addExam(e);
 	}
 }

@@ -4,21 +4,19 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import data.exam.ExamContainer;
+import data.exam.Student;
 import gui.addFrame.AddFrame;
+import gui.registration.SignUpDialog;
+import store.ExamStore;
+import store.StoreException;
 
 public class MainFrame extends JFrame {
 
@@ -28,7 +26,7 @@ public class MainFrame extends JFrame {
 	private static final long serialVersionUID = -5724418947028211664L;
 	private JPanel contentPane;
 	private JTextField durchschnittsnote;
-	private Student stud; 
+	private ExamContainer container;
 	
 	/**
 	 
@@ -47,10 +45,10 @@ public class MainFrame extends JFrame {
 
 	
 	 */
-	public MainFrame(Student stud) {
+	public MainFrame() {
 		setTitle("Studium Noten Manager");
 		setResizable(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		Border emptyBorder = javax.swing.BorderFactory.createEmptyBorder();
 		setBounds(100, 100, 800, 431);
 		
@@ -61,6 +59,7 @@ public class MainFrame extends JFrame {
 		menuBar.add(mnAllgemein);
 		
 		JMenuItem mntmLogOut = new JMenuItem("Log out");
+		mntmLogOut.addActionListener(e -> onLogOut());
 		mnAllgemein.add(mntmLogOut);
 		
 		JMenuItem mntmSave = new JMenuItem("Save");
@@ -117,7 +116,7 @@ public class MainFrame extends JFrame {
 		panel.add(btnAdd);
 		
 		btnAdd.addActionListener(e -> {
-			JDialog addDia = new AddFrame(this, "Neue Prüfung hinzufügen"); 	
+			JDialog addDia = new AddFrame(this, "Neue Prï¿½fung hinzufï¿½gen"); 	
 			addDia.setVisible(true);
 		});
 		
@@ -130,6 +129,35 @@ public class MainFrame extends JFrame {
 		btnMod.setBackground(Color.GRAY);
 		btnMod.setBounds(10, 109, 319, 41);
 		panel.add(btnMod);
-		
+
+		try {
+			container = ExamContainer.instance();
+		} catch (StoreException e) {
+			//Fehler tritt hier nicht auf
+		}
+
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				try {
+					container.close();
+				} catch (StoreException ex) {
+					System.out.println("Database Error: closing failed " + ex.getMessage());
+				}
+				System.exit(0);
+			}
+		});
+
+		setVisible(true);
+	}
+
+	private void onLogOut() {
+		try {
+			container.close();
+			dispose();
+			new SignUpDialog();
+		} catch (StoreException e) {
+			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }
