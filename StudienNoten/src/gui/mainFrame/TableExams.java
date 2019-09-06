@@ -8,8 +8,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import data.exam.Exam;
+import data.exam.IllegalInputException;
 
-public class tableExams extends JPanel {
+public class TableExams extends JPanel {
 
 	/**
 	 * 
@@ -19,7 +20,7 @@ public class tableExams extends JPanel {
 	public Model model;
 	public JTable table; 
 
-	public tableExams() {
+	public TableExams() {
  
 		super();
 		model = new Model();

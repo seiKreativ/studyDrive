@@ -20,7 +20,7 @@ import javax.swing.border.EmptyBorder;
 
 import gui.addFrame.AddFrame;
 
-public class mainFrame extends JFrame {
+public class MainFrame extends JFrame {
 
 	/**
 	 * 
@@ -28,15 +28,15 @@ public class mainFrame extends JFrame {
 	private static final long serialVersionUID = -5724418947028211664L;
 	private JPanel contentPane;
 	private JTextField durchschnittsnote;
+	private Student stud; 
 	
 	/**
-	 * Launch the application.
-	 */
+	 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					mainFrame frame = new mainFrame();
+					MainFrame frame = new MainFrame();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -45,10 +45,9 @@ public class mainFrame extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
+	
 	 */
-	public mainFrame() {
+	public MainFrame(Student stud) {
 		setTitle("Studium Noten Manager");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -75,7 +74,7 @@ public class mainFrame extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JPanel allExams = new tableExams();
+		JPanel allExams = new TableExams();
 		allExams.setBackground(Color.WHITE);
 		allExams.setForeground(Color.WHITE);
 		allExams.setBounds(359, 34, 427, 329);
