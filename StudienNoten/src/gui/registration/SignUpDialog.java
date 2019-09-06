@@ -2,6 +2,7 @@ package gui.registration;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
 
 import javax.swing.JButton;
@@ -20,13 +21,13 @@ public class SignUpDialog extends JDialog {
 	private JTextField txtUsername;
 	private JTextField txtPassword;
 
-	/**
+	
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					signUpDialog dialog = new signUpDialog();
+					SignUpDialog dialog = new SignUpDialog();
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dialog.setVisible(true);
 				} catch (Exception e) {
@@ -42,6 +43,7 @@ public class SignUpDialog extends JDialog {
 	public SignUpDialog() {
 		setBounds(100, 100, 397, 255);
 		getContentPane().setLayout(new BorderLayout(0, 0));
+		this.setIconImage(null);
 		
 		JLabel lblSignIn = new JLabel("Sign In");
 		lblSignIn.setFont(new Font("Arial Nova Light", Font.PLAIN, 26));
@@ -95,7 +97,7 @@ public class SignUpDialog extends JDialog {
 			 * Falls user noch nicht mitglied ist muss er sich erst neu anmelden
 			 */
 			this.dispose(); 
-			RegistrationDialog dia = new RegistrationDialog(); 
+			JDialog dia = new RegistrationDialog(); 
 			dia.setVisible(true);
 		});
 		Options.add(btnRegisterNow);
