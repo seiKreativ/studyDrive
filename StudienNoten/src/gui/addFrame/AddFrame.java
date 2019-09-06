@@ -1,31 +1,37 @@
 package gui.addFrame;
 
-import java.awt.EventQueue;
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import java.awt.Color;
 
-public class AddFrame extends JFrame {
+public class AddFrame extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8023202796137170626L;
 	private JPanel contentPane;
 	private JTextField textField;
 	private JTextField textField_1;
 
 	/*
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					AddFrame frame = new AddFrame();
+					AddFrame frame = new AddFrame(null, "adding");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -33,12 +39,16 @@ public class AddFrame extends JFrame {
 			}
 		});
 	}
-	 */
-	public AddFrame() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 717, 128);
+	
+	*/
+	 
+	public AddFrame(JFrame owner, String title) {
+		super(owner, title, true); 
+		this.setBounds(300, 400, 717, 128);
 		this.setUndecorated(true);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.LIGHT_GRAY);
+		contentPane.setForeground(Color.LIGHT_GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
