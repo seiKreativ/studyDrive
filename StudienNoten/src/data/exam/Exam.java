@@ -57,6 +57,10 @@ public class Exam {
 		}
 		this.name = name2; 
 	}
+	
+	public void setIdCounter(int id) {
+		idCounter = id; 
+	}
 
 	public String getName(){ return this.name; }
 	public int getLeistungpunkte(){ return this.leistungsPunkte; }
