@@ -1,17 +1,15 @@
 package gui.registration;
 
+import data.exam.IllegalInputException;
+import data.exam.Student;
+import gui.mainFrame.MainFrame;
+import store.StoreException;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 public class SignUpDialog extends JDialog {
 	/**
@@ -21,7 +19,7 @@ public class SignUpDialog extends JDialog {
 	private JTextField txtUsername;
 	private JTextField txtPassword;
 
-	
+	/**
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -36,14 +34,13 @@ public class SignUpDialog extends JDialog {
 			}
 		});
 	}
-
 	/**
 	 * Create the dialog.
 	 */
 	public SignUpDialog() {
 		setBounds(100, 100, 397, 255);
 		getContentPane().setLayout(new BorderLayout(0, 0));
-		this.setIconImage(null);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
 		JLabel lblSignIn = new JLabel("Sign In");
 		lblSignIn.setFont(new Font("Arial Nova Light", Font.PLAIN, 26));
@@ -85,6 +82,7 @@ public class SignUpDialog extends JDialog {
 		btnSignIn.setForeground(Color.WHITE);
 		btnSignIn.setFont(new Font("Arial Nova Light", Font.PLAIN, 13));
 		btnSignIn.setBorderPainted(false);
+		btnSignIn.addActionListener(e -> onSignIn());
 		Options.add(btnSignIn);
 		
 		JButton btnRegisterNow = new JButton("Register Now");
@@ -97,10 +95,21 @@ public class SignUpDialog extends JDialog {
 			 * Falls user noch nicht mitglied ist muss er sich erst neu anmelden
 			 */
 			this.dispose(); 
-			JDialog dia = new RegistrationDialog(); 
-			dia.setVisible(true);
+			RegistrationDialog dia = new RegistrationDialog();
 		});
 		Options.add(btnRegisterNow);
 
+		this.setVisible(true);
+
+	}
+
+	private void onSignIn() {
+		try {
+			new Student(txtUsername.getText(), txtPassword.getText(), false);
+			dispose();
+			new MainFrame();
+		} catch (StoreException | IllegalInputException e) {
+			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }

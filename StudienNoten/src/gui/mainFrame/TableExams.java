@@ -8,7 +8,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import data.exam.Exam;
-import data.exam.IllegalInputException;
 
 public class TableExams extends JPanel {
 
@@ -42,12 +41,11 @@ public class TableExams extends JPanel {
 		this.add(new JScrollPane(table));
 	}
 	
-	public void add() {
-		try {
-			model.addExam(new Exam(4, "Medizin", 4, 1.0));
-		} catch (IllegalInputException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void addExam(Exam e) {
+		model.addExam(e);
+	}
+	
+	public void removeExam(Exam e) {
+		model.removeExam(e);
 	}
 }
