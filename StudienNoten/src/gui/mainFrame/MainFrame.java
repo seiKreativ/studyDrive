@@ -20,14 +20,11 @@ import store.StoreException;
 
 public class MainFrame extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5724418947028211664L;
 	private JPanel contentPane;
 	private JTextField durchschnittsnote;
 	private ExamContainer container;
-	
+	private JButton btnAdd, btnDel, btnMod;
 	/**
 	 
 	public static void main(String[] args) {
@@ -110,25 +107,23 @@ public class MainFrame extends JFrame {
 		contentPane.add(panel);
 		panel.setLayout(null);
 		
-		JButton btnAdd = new JButton("Pr\u00FCfung hinzuf\u00FCgen ");
+		btnAdd = new JButton("Pr\u00FCfung hinzuf\u00FCgen ");
 		btnAdd.setBackground(Color.GRAY);
 		btnAdd.setBounds(10, 5, 319, 41);
 		panel.add(btnAdd);
+		btnAdd.addActionListener(e -> onAdd());
 		
-		btnAdd.addActionListener(e -> {
-			JDialog addDia = new AddFrame(this, "Neue Pr�fung hinzuf�gen"); 	
-			addDia.setVisible(true);
-		});
-		
-		JButton btnDel = new JButton("Pr\u00FCfung l\u00F6schen ");
+		btnDel = new JButton("Pr\u00FCfung l\u00F6schen ");
 		btnDel.setBackground(Color.GRAY);
 		btnDel.setBounds(10, 57, 319, 41);
 		panel.add(btnDel);
+		btnDel.addActionListener(e -> onDel());
 		
-		JButton btnMod = new JButton("Pr\u00FCfung ver\u00E4ndern");
+		btnMod = new JButton("Pr\u00FCfung ver\u00E4ndern");
 		btnMod.setBackground(Color.GRAY);
 		btnMod.setBounds(10, 109, 319, 41);
 		panel.add(btnMod);
+		btnMod.addActionListener(e -> onModify());
 
 		try {
 			container = ExamContainer.instance();
@@ -149,6 +144,20 @@ public class MainFrame extends JFrame {
 		});
 
 		setVisible(true);
+	}
+
+	private void onModify() {
+		//Prüfung verändern
+	}
+
+	private void onAdd() {
+		//Prüfung hinzufügen
+		JDialog addDia = new AddFrame(this, "Neue Pr�fung hinzuf�gen");
+		addDia.setVisible(true);
+	}
+
+	private void onDel() {
+		// Prüfung löschen
 	}
 
 	private void onLogOut() {
