@@ -137,7 +137,9 @@ public class ExamStore implements DataManagement {
 		try {
 			if (con != null)
 				con.close();
+			unique = null;
 		} catch (SQLException e) {
+			unique = null;
 			throw new StoreException("Error while closing: " + e.getMessage(), e);
 		}
 	}

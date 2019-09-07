@@ -83,7 +83,5 @@ public class ExamContainer implements Iterable<Exam> {
 
 	public void close() throws StoreException {
 		store.close();
-		Student.close();
-		store = null;
 	}
 }

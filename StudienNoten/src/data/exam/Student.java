@@ -32,8 +32,4 @@ public class Student {
         this.password = password;
     }
 
-    public static void close() throws StoreException {
-        store.close();
-        store = null;
-    }
 }
