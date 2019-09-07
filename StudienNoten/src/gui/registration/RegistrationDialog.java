@@ -30,7 +30,7 @@ public class RegistrationDialog extends JDialog {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					registration frame = new registration();
+					RegistrationDialog frame = new RegistrationDialog();
 					frame.setUndecorated(true); 
 					frame.setVisible(true);
 				} catch (Exception e) {
