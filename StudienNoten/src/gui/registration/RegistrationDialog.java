@@ -1,16 +1,19 @@
 package gui.registration;
 
-import data.exam.IllegalInputException;
-import data.exam.Student;
-import gui.mainFrame.MainFrame;
-import store.StoreException;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 public class RegistrationDialog extends JDialog {
