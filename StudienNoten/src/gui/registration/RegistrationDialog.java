@@ -1,8 +1,6 @@
-<<<<<<< HEAD
 package gui.registration;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,11 +17,16 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import data.exam.IllegalInputException;
+import data.exam.Student;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
 
 public class RegistrationDialog extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3198864217046720627L;
 	private JPanel contentPane;
 	private JTextField usernameTextfield;
 	private JTextField emailTextField;
@@ -31,20 +34,6 @@ public class RegistrationDialog extends JDialog {
 	private JTextField repeatPasswordTextfield;
 
 	
-	 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					RegistrationDialog frame = new RegistrationDialog();
-					frame.setUndecorated(true); 
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 	
 	
 	public RegistrationDialog() {
@@ -144,7 +133,7 @@ public class RegistrationDialog extends JDialog {
 		lblX.setBounds(298, 16, 21, 32);
 		contentPane.add(lblX);
 
-		setUndecorated(true);
+		setUndecorated(true); 
 		setVisible(true);
 	}
 
@@ -162,5 +151,3 @@ public class RegistrationDialog extends JDialog {
 			JOptionPane.showMessageDialog(this, "Error: passwords not the same", "Error", JOptionPane.ERROR_MESSAGE);
 	}
 }
-=======
->>>>>>> branch 'master' of https://github.com/seiKreativ/studyDrive.git

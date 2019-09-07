@@ -38,12 +38,12 @@ public class ExamStore implements DataManagement {
 			unique = new ExamStore();
 		return unique;
 	}
-
+ 
 	@Override
 	public void load(ExamContainer container) throws StoreException {
 		try (Statement abfrage = con.createStatement()){
-			String befehl = "select * from Exams where username = '" + username + "';";
-			ResultSet ergebnis = abfrage.executeQuery(befehl);
+			String befehl = "SELECT distinct id, name, semester, leistungspunkte, note FROM Exams WHERE username = '" + username + "'";
+			ResultSet ergebnis = abfrage.executeQuery(befehl); 
 			while (ergebnis.next()) {
 				try {
 					Exam e = new Exam(ergebnis.getInt("semester"), ergebnis.getString("name"), ergebnis.getInt("leistungspunkte"), ergebnis.getDouble("note"));
@@ -114,7 +114,7 @@ public class ExamStore implements DataManagement {
 
     public void delete(Exam e) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "DELETE FROM Exams WHERE username = '" + username + "' and id = '" + e.getId() + "';";
+			String befehl = "DELETE FROM Exams WHERE username = '" + username + "' and semester = " + Integer.toString(e.getSemester()) + " AND name = '"+ e.getName() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while deleting exam " + e1.getMessage(), e1);

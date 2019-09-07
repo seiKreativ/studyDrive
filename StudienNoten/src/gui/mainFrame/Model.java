@@ -7,10 +7,15 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import data.exam.Exam;
+import data.exam.ExamContainer;
 
-class Model implements TableModel {
-	private Vector<Exam> exams = new Vector<Exam>();
+public class Model implements TableModel {
+	private Vector<Exam> exams; 
 	private Vector<TableModelListener> listeners = new Vector<TableModelListener>();
+	
+	public Model(ExamContainer container) {
+		super(); 
+	}
 
 	public void addExam(Exam exam) {
 		int index = exams.size();
@@ -22,7 +27,7 @@ class Model implements TableModel {
 		}
 	}
 
-	public void removeExam(Exam exam){
+	public void removeExam(Exam exam) {
 		int index = exams.size() - 1;
 		exams.remove(exam);
 		TableModelEvent e = new TableModelEvent(this, index, index, TableModelEvent.ALL_COLUMNS,
