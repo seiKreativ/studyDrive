@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package gui.registration;
 
 import data.exam.IllegalInputException;
@@ -113,3 +114,5 @@ public class SignUpDialog extends JDialog {
 		}
 	}
 }
+=======
+>>>>>>> branch 'master' of https://github.com/seiKreativ/studyDrive.git

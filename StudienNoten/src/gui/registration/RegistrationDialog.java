@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package gui.registration;
 
 import java.awt.Color;
@@ -161,3 +162,5 @@ public class RegistrationDialog extends JDialog {
 			JOptionPane.showMessageDialog(this, "Error: passwords not the same", "Error", JOptionPane.ERROR_MESSAGE);
 	}
 }
+=======
+>>>>>>> branch 'master' of https://github.com/seiKreativ/studyDrive.git
