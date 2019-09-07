@@ -23,6 +23,6 @@ public interface DataManagement {
 
     public void modify(Exam eold, Exam enew) throws StoreException;
 
-    public void close();
+    public void close() throws StoreException;
 
 }
