@@ -1,25 +1,22 @@
 package gui.addFrame;
 
-import data.exam.Exam;
-import data.exam.ExamAlreadyExistsException;
-import data.exam.ExamContainer;
-import data.exam.IllegalInputException;
-import store.StoreException;
-
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+
+import data.exam.Exam;
+import data.exam.ExamAlreadyExistsException;
+import data.exam.ExamContainer;
+import data.exam.IllegalInputException;
+import gui.mainFrame.MainFrame;
+import store.StoreException;
 
 public class AddFrame extends JDialog {
 
@@ -28,30 +25,23 @@ public class AddFrame extends JDialog {
 	 */
 	private static final long serialVersionUID = 8023202796137170626L;
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField txtLeistungspunkte;
+	private JTextField txtName;
 	private JComboBox<String> comboBoxSem, comboBoxNoten;
-	private ExamContainer container;
+	private ExamContainer container = null;
+	private JButton btnClose;
 
 	/*
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					AddFrame frame = new AddFrame(null, "adding");
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
-	*/
-	 
-	public AddFrame(JFrame owner, String title) {
-		super(owner, title, true); 
+	 * 
+	 * public static void main(String[] args) { EventQueue.invokeLater(new
+	 * Runnable() { public void run() { try { AddFrame frame = new AddFrame(null,
+	 * "adding"); frame.setVisible(true); } catch (Exception e) {
+	 * e.printStackTrace(); } } }); }
+	 * 
+	 */
+
+	public AddFrame(MainFrame owner, String title) {
+		super(owner, title, true);
 		this.setBounds(300, 400, 717, 128);
 		this.setUndecorated(true);
 		contentPane = new JPanel();
@@ -86,15 +76,15 @@ public class AddFrame extends JDialog {
 		comboBoxSem.setBounds(20, 36, 50, 20);
 		contentPane.add(comboBoxSem);
 
-		textField = new JTextField();
-		textField.setBounds(108, 36, 50, 20);
-		contentPane.add(textField);
-		textField.setColumns(10);
+		txtLeistungspunkte = new JTextField();
+		txtLeistungspunkte.setBounds(108, 36, 50, 20);
+		contentPane.add(txtLeistungspunkte);
+		txtLeistungspunkte.setColumns(10);
 
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(190, 36, 380, 20);
-		contentPane.add(textField_1);
+		txtName = new JTextField();
+		txtName.setColumns(10);
+		txtName.setBounds(190, 36, 380, 20);
+		contentPane.add(txtName);
 
 		comboBoxNoten = new JComboBox<String>();
 		comboBoxNoten.setBackground(Color.LIGHT_GRAY);
@@ -112,21 +102,20 @@ public class AddFrame extends JDialog {
 		JButton btnApply = new JButton("Apply");
 		btnApply.setBackground(Color.GRAY);
 		btnApply.addActionListener(e -> onAdd());
-		
+
 		btnApply.setBounds(265, 94, 90, 23);
 		contentPane.add(btnApply);
 
-		JButton btnClose = new JButton("Close");
+		btnClose = new JButton("Close");
 		btnClose.setBackground(Color.GRAY);
 		btnClose.addActionListener(e -> {
-				if (JOptionPane.showConfirmDialog(null, "Soll ohne die Werte zu speichern wirklich geschlossen werden?",
-						"Warnung!", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-					this.dispose(); // yes option
-				} else {
-					
-				}
+			if (JOptionPane.showConfirmDialog(null, "Soll ohne die Werte zu speichern wirklich geschlossen werden?",
+					"Warnung!", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+				this.dispose(); // yes option
+			} else {
+
 			}
-		);
+		});
 		btnClose.setBounds(365, 94, 90, 23);
 		contentPane.add(btnClose);
 
@@ -137,14 +126,26 @@ public class AddFrame extends JDialog {
 		}
 	}
 
+	public void setData(int sem, String name, int lp, double note) {
+		this.txtLeistungspunkte.setText(Integer.toString(lp));
+		this.comboBoxNoten.setSelectedItem(Double.toString(note));
+		this.comboBoxSem.setSelectedItem(Integer.toString(sem));
+		this.txtName.setText(name);
+	}
+
+	public void setCancelButtonActivated(boolean stat) {
+		btnClose.setEnabled(stat);
+	}
+
 	private void onAdd() {
 		try {
-			Exam exam = new Exam(Integer.parseInt((String) comboBoxSem.getSelectedItem()), textField_1.getText(), Integer.parseInt(textField.getText()), Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
-			container.linkExam(exam);
-			//Aber wie man das Exam jetzt zu diser Vektorliste/Tabelle hinzufügt habe ich keine Ahnung
-			dispose();
-		} catch (StoreException | ExamAlreadyExistsException | IllegalInputException e) {
+			Exam exam = new Exam(Integer.parseInt((String) comboBoxSem.getSelectedItem()),
+					txtName.getText().replace("'", ""), Integer.parseInt(txtLeistungspunkte.getText()),
+					Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
+			container.linkExam(exam); 
+		} catch (NumberFormatException | StoreException | ExamAlreadyExistsException | IllegalInputException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
+		dispose(); 
 	}
 }

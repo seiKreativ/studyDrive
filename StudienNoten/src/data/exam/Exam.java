@@ -1,10 +1,7 @@
 package data.exam;
 
-import store.StoreException;
-
 public class Exam {
 
-	static private int idCounter = 0; 
 	private int semester, leistungsPunkte, id; 
 	private double note; 
 	private String name;
@@ -14,8 +11,7 @@ public class Exam {
 			this.setName(name);
 			this.setSemester(semester); 
 			this.setLeistungsPunkte(leistungsPunkte); 
-			this.setNote(note); 
-			this.id = idCounter++;
+			this.setNote(note);
 	}
 	
 
@@ -41,30 +37,43 @@ public class Exam {
 	}
 
 	private void setName(String name2) throws IllegalInputException{
-		try {
+		/*try {
 			ExamContainer container = ExamContainer.instance();
 			for (Exam e : container) {
 				if (e.getName().equals(name2))
 						throw new IllegalInputException("name already exists");
 			}
 		} catch (StoreException e) {
-			/*
-			there won't by an exception because the ExamContainer unique alredy exists
-			 */
-		}
+			
+		}*/
 		if (name2.length() < 1) {
 			throw new IllegalInputException("Name not correct");
 		}
 		this.name = name2; 
-	}
-	
-	public void setIdCounter(int id) {
-		idCounter = id; 
 	}
 
 	public String getName(){ return this.name; }
 	public int getLeistungpunkte(){ return this.leistungsPunkte; }
 	public double getNote() { return this.note; }
 	public int getSemester() { return this.semester; }
-	public int getId() {return this.id; }
+	
+	@Override
+	public String toString() {
+		return "Exam [semester=" + semester + ", leistungsPunkte=" + leistungsPunkte + ", note=" + note
+				+ ", name=" + name + "]";
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false; 
+		} else if (!(o instanceof Exam)) {
+			return false; 
+		} 
+		Exam e = (Exam) o; 
+		if (e.getLeistungpunkte() == this.getLeistungpunkte() && e.getNote() == this.getNote()  && e.getName().equals(this.getName()) && e.getSemester() == this.getSemester()) {
+			return true; 
+		}
+		return false;
+	}
 }
