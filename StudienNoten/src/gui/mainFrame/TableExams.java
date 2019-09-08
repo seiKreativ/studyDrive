@@ -1,12 +1,18 @@
 package gui.mainFrame;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import data.exam.Exam;
 import data.exam.ExamContainer;
@@ -21,11 +27,13 @@ public class TableExams extends JPanel{
 	public Model model;
 	public JTable tblTaskList;
 	private DefaultTableModel dm;
+	private ExamContainer container; 
 
+	@SuppressWarnings("serial")
 	public TableExams(ExamContainer container) {
 
 		super();
-
+		this.container = container; 
 		tblTaskList = new JTable();
 		tblTaskList.setShowVerticalLines(true);
 		tblTaskList.setCellSelectionEnabled(false);
@@ -44,16 +52,17 @@ public class TableExams extends JPanel{
 		String header[] = new String[] { "Semester", "LPs", "Name", "Note" };
 		dm.setColumnIdentifiers(header);
 		tblTaskList.setModel(dm);
+		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(tblTaskList.getModel()); 
+		tblTaskList.setRowSorter(sorter);
+		sorter.setSortsOnUpdates(true);
+		
+		List<RowSorter.SortKey> sortKeys = new ArrayList<>(25); 
+		sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING)); 
+		sortKeys.add(new RowSorter.SortKey(1, SortOrder.DESCENDING));
+		sortKeys.add(new RowSorter.SortKey(2, SortOrder.ASCENDING)); 
+		sorter.setSortKeys(sortKeys);
 
-		for (int count = 1; count <= container.getSize(); count++) {
-			Vector<String> data = new Vector<String>();
-			Exam e = container.getExamByIndex(count - 1);
-			data.add(Integer.toString(e.getSemester()));
-			data.add(Integer.toString(e.getLeistungpunkte()));
-			data.add(e.getName());
-			data.add(Double.toString(e.getNote()));
-			dm.addRow(data);
-		}
+		load(); 
 
 		tblTaskList.getColumn("Semester").setPreferredWidth(20);
 		tblTaskList.getColumn("Name").setPreferredWidth(200); 
@@ -86,7 +95,22 @@ public class TableExams extends JPanel{
 		 * dataTable.getColumn("Note").setPreferredWidth(10); this.setLayout(new
 		 * BorderLayout()); this.add(new JScrollPane(dataTable));
 		 */
-	
+	public void load() {
+		while(dm.getRowCount() > 0)
+		{
+		    dm.removeRow(0);
+		}
+		for (int count = 1; count <= container.getSize(); count++) {
+			Vector<String> data = new Vector<String>();
+			Exam e = container.getExamByIndex(count - 1);
+			data.add(Integer.toString(e.getSemester()));
+			data.add(Integer.toString(e.getLeistungpunkte()));
+			data.add(e.getName());
+			data.add(Double.toString(e.getNote()));
+			dm.addRow(data);
+		}
+		 revalidate();
+	}
 
 	public DefaultTableModel getDefaultTableModel() {
 		return dm;

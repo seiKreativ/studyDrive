@@ -39,7 +39,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 	private ExamContainer container;
 	private JButton btnAdd, btnDel, btnMod;
 	private TableExams allExams;
-	private double durchschnitt; 
+	private double durchschnitt;
 
 	/**
 	 * 
@@ -67,10 +67,10 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		mntmLogOut.addActionListener(e -> onLogOut());
 		mnAllgemein.add(mntmLogOut);
 
-		JMenuItem mntmSave = new JMenuItem("Save");
-		mnAllgemein.add(mntmSave);
-
 		JMenuItem mntmInformation = new JMenuItem("Information");
+		mntmInformation.addActionListener(e -> {
+			JOptionPane.showMessageDialog(this, "Version 1.1.1.1.1.0");
+		});
 		mnAllgemein.add(mntmInformation);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
@@ -132,7 +132,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		} catch (StoreException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		} 
+		}
 		container.addPropertyChangeListener(this);
 
 		allExams = new TableExams(container);
@@ -152,71 +152,80 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 				System.exit(0);
 			}
 		});
-		calcDurchschnitt(); 
+		calcDurchschnitt();
 		setVisible(true);
 	}
 
 	private void calcDurchschnitt() {
 		// TODO Auto-generated method stub
-		int sumLp = 0; 
-		double sumNoten = 0; 
+		int sumLp = 0;
+		double sumNoten = 0;
 		for (int i = 0; i < container.getSize(); i++) {
-			sumLp += container.getExamByIndex(i).getLeistungpunkte(); 
-			sumNoten += container.getExamByIndex(i).getNote() * container.getExamByIndex(i).getLeistungpunkte(); 
+			sumLp += container.getExamByIndex(i).getLeistungpunkte();
+			sumNoten += container.getExamByIndex(i).getNote() * container.getExamByIndex(i).getLeistungpunkte();
 		}
-		durchschnitt = sumNoten / (double) sumLp; 
+		durchschnitt = sumNoten / (double) sumLp;
 		durchschnittsnote.setText(new DecimalFormat("0.00").format(durchschnitt));
 	}
 
 	private void onModify() {
 		// Prüfung verändern
 		if (allExams.getTable().getSelectedRow() == -1) {
-			JOptionPane.showMessageDialog(this, "Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
-		} else { 
-			JTable tb = allExams.getTable(); 
+			JOptionPane.showMessageDialog(this,
+					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+		} else {
+			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
 			try {
-				Exam e = new Exam(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2), Integer.valueOf((String) tb.getValueAt(row, 1)), Double.valueOf((String)tb.getValueAt(row, 3)));
+				int tempSem = Integer.valueOf((String) tb.getValueAt(row, 0));
+				String tempName = (String) tb.getValueAt(row, 2);
+				int tempLp = Integer.valueOf((String) tb.getValueAt(row, 1));
+				double tempNote = Double.valueOf((String) tb.getValueAt(row, 3));
+				Exam e = new Exam(tempSem, tempName, tempLp, tempNote);
 				container.unlinkExam(e);
-				AddFrame addDia = new AddFrame(this, "Prüfung ändern", allExams); 
-				addDia.setData(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2), Integer.valueOf((String) tb.getValueAt(row, 1)), Double.valueOf((String)tb.getValueAt(row, 3))); 
-				allExams.getDefaultTableModel().removeRow(row);
+				AddFrame addDia = new AddFrame(this, "Prüfung ändern");
+				addDia.setData(tempSem, tempName, tempLp, tempNote);
 				addDia.setCancelButtonActivated(false);
-				addDia.setVisible(true); 
+				addDia.setVisible(true);
 				calcDurchschnitt();
+				allExams.load(); 
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-		 	} 
+			}
 		}
 	}
 
 	private void onAdd() {
 		// Prüfung hinzufügen
-		AddFrame addDia = new AddFrame(this, "Neue Prüfung hinzufügen", allExams); 
-		addDia.setVisible(true); 
+		AddFrame addDia = new AddFrame(this, "Neue Prüfung hinzufügen");
+		addDia.setVisible(true);
 		calcDurchschnitt();
-		
+		allExams.load(); 
+
 	}
 
 	private void onDel() {
 		// Prüfung löschen
 		if (allExams.getTable().getSelectedRow() == -1) {
-			JOptionPane.showMessageDialog(this, "Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
-		} else { 
-			JTable tb = allExams.getTable(); 
+			JOptionPane.showMessageDialog(this,
+					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+		} else {
+			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
 			try {
-				Exam e = new Exam(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2), Integer.valueOf((String) tb.getValueAt(row, 1)), Double.valueOf((String)tb.getValueAt(row, 3)));
+				Exam e = new Exam(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
+						Integer.valueOf((String) tb.getValueAt(row, 1)),
+						Double.valueOf((String) tb.getValueAt(row, 3)));
 				container.unlinkExam(e);
-				allExams.getDefaultTableModel().removeRow(row);
+				allExams.load(); 
 				calcDurchschnitt();
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-		 	} 
+			}
 		}
-		
+
 	}
 
 	private void onLogOut() {
@@ -232,6 +241,14 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	public JTable getTable() {
+		return this.allExams.getTable();
+	}
+
+	public TableExams getTableExams() {
+		return this.allExams;
 	}
 }
