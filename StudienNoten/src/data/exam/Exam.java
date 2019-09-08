@@ -71,7 +71,7 @@ public class Exam {
 			return false; 
 		} 
 		Exam e = (Exam) o; 
-		if (e.getLeistungpunkte() == this.getLeistungpunkte() && e.getNote() == this.getNote()  && e.getName() == this.getName()  && e.getSemester() == this.getSemester()) {
+		if (e.getLeistungpunkte() == this.getLeistungpunkte() && e.getNote() == this.getNote()  && e.getName().equals(this.getName()) && e.getSemester() == this.getSemester()) {
 			return true; 
 		}
 		return false;

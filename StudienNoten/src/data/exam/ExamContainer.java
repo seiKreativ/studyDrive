@@ -28,7 +28,14 @@ public class ExamContainer implements Iterable<Exam> {
 	}
 
 	public void linkExam(Exam e) throws ExamAlreadyExistsException, StoreException {
-		if (exams.contains(e))
+		boolean temp = false;
+		for (Exam etemp : exams) {
+			if (etemp.equals(e)) {
+				temp = true;
+				break;
+			}
+		}
+		if (temp)
 			throw new ExamAlreadyExistsException(e.getName());
 		store.add(e);
 		exams.add(e);
@@ -36,7 +43,14 @@ public class ExamContainer implements Iterable<Exam> {
 	}
 
 	public void unlinkExam(Exam e) throws ExamNotFoundException, StoreException {
-		if (!exams.contains(e))
+		boolean temp = false;
+		for (Exam etemp : exams) {
+			if (etemp.equals(e)) {
+				temp = true;
+				break;
+			}
+		}
+		if (!temp)
 			throw new ExamNotFoundException(e.getName());
 		store.delete(e);
 		exams.remove(e);

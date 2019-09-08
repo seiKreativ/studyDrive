@@ -17,6 +17,7 @@ import data.exam.Exam;
 import data.exam.ExamAlreadyExistsException;
 import data.exam.ExamContainer;
 import data.exam.IllegalInputException;
+import gui.mainFrame.Model;
 import gui.mainFrame.TableExams;
 import store.StoreException;
 
@@ -154,16 +155,15 @@ public class AddFrame extends JDialog {
 		try {
 			Exam exam = new Exam(Integer.parseInt((String) comboBoxSem.getSelectedItem()), txtName.getText().replace("'", ""), Integer.parseInt(txtLeistungspunkte.getText()), Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
 			//Aber wie man das Exam jetzt zu diser Vektorliste/Tabelle hinzufügt habe ich keine Ahnung
-			Vector<String> temp = new Vector<String>(); 
+			Vector<String> temp = new Vector<String>();
 			temp.add((String) comboBoxSem.getSelectedItem()); 
 			temp.add(txtLeistungspunkte.getText()); 
 			temp.add(txtName.getText().replace("'", "")); 
 			temp.add((String) comboBoxNoten.getSelectedItem()); 
 			container.linkExam(exam);
 			table.getDefaultTableModel().addRow(temp);
-			
 			dispose();
-		} catch (StoreException | ExamAlreadyExistsException | IllegalInputException e) {
+		} catch (NumberFormatException | StoreException | ExamAlreadyExistsException | IllegalInputException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}

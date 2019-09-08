@@ -28,15 +28,20 @@ public class TableExams extends JPanel{
 
 		tblTaskList = new JTable();
 		tblTaskList.setShowVerticalLines(true);
-		tblTaskList.setCellSelectionEnabled(true);
-		tblTaskList.setColumnSelectionAllowed(true);
-		// tblTaskList.setBorder(new LineBorder(null));
+		tblTaskList.setCellSelectionEnabled(false);
+		tblTaskList.setRowSelectionAllowed(true);
 
 		((JPanel) this).add(tblTaskList);
 
 		// create object of table and table model
-		dm = new DefaultTableModel(0, 0);
-		String header[] = new String[] { "Semester", "Leistungspunkte", "Name", "Note" };
+		dm = new DefaultTableModel(0, 0){
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				//all cells false
+				return false;
+			}
+		};
+		String header[] = new String[] { "Semester", "LPs", "Name", "Note" };
 		dm.setColumnIdentifiers(header);
 		tblTaskList.setModel(dm);
 
@@ -52,7 +57,7 @@ public class TableExams extends JPanel{
 
 		tblTaskList.getColumn("Semester").setPreferredWidth(20);
 		tblTaskList.getColumn("Name").setPreferredWidth(200); 
-		tblTaskList.getColumn("Leistungspunkte").setPreferredWidth(10);
+		tblTaskList.getColumn("LPs").setPreferredWidth(10);
 		tblTaskList.getColumn("Note").setPreferredWidth(10);
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(tblTaskList));
@@ -90,4 +95,5 @@ public class TableExams extends JPanel{
 	public JTable getTable() {
 		return tblTaskList; 
 	}
+
 }
