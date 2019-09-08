@@ -17,6 +17,7 @@ import data.exam.Exam;
 import data.exam.ExamAlreadyExistsException;
 import data.exam.ExamContainer;
 import data.exam.IllegalInputException;
+import gui.ExceptionMessage;
 import gui.mainFrame.Model;
 import gui.mainFrame.TableExams;
 import store.StoreException;
@@ -122,8 +123,7 @@ public class AddFrame extends JDialog {
 		btnClose = new JButton("Close");
 		btnClose.setBackground(Color.GRAY);
 		btnClose.addActionListener(e -> {
-				if (JOptionPane.showConfirmDialog(null, "Soll ohne die Werte zu speichern wirklich geschlossen werden?",
-						"Warnung!", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+				if (ExceptionMessage.jaNeinDialog(null, "Bestätigen", "Wirklich abbrechen?") == 0) {
 					this.dispose(); // yes option
 				} else {
 					
@@ -164,7 +164,8 @@ public class AddFrame extends JDialog {
 			table.getDefaultTableModel().addRow(temp);
 			dispose();
 		} catch (NumberFormatException | StoreException | ExamAlreadyExistsException | IllegalInputException e) {
-			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			new ExceptionMessage(null, "Error", "Error: " + e.getMessage());
+			//JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

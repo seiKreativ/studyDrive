@@ -27,6 +27,7 @@ import data.exam.Exam;
 import data.exam.ExamContainer;
 import data.exam.ExamNotFoundException;
 import data.exam.IllegalInputException;
+import gui.ExceptionMessage;
 import gui.addFrame.AddFrame;
 import gui.registration.SignUpDialog;
 import store.StoreException;
@@ -171,7 +172,8 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 	private void onModify() {
 		// Prüfung verändern
 		if (allExams.getTable().getSelectedRow() == -1) {
-			JOptionPane.showMessageDialog(this, "Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+			new ExceptionMessage(this, "Error", "Um eine Prüfung zu löschen, muss zuerst eine Prüfung ausgewählt werden");
+			//JOptionPane.showMessageDialog(this, "Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
 		} else { 
 			JTable tb = allExams.getTable(); 
 			int row = allExams.getTable().getSelectedRow();
@@ -202,7 +204,8 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 	private void onDel() {
 		// Prüfung löschen
 		if (allExams.getTable().getSelectedRow() == -1) {
-			JOptionPane.showMessageDialog(this, "Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+			new ExceptionMessage(this, "Error", "Um eine Prüfung zu löschen, muss zuerst eine Prüfung ausgewählt werden");
+			//JOptionPane.showMessageDialog(this, "Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
 		} else { 
 			JTable tb = allExams.getTable(); 
 			int row = allExams.getTable().getSelectedRow();
@@ -225,7 +228,8 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			dispose();
 			new SignUpDialog();
 		} catch (StoreException e) {
-			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			new ExceptionMessage(this, "Error", "Error: " + e.getMessage());
+			//JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
