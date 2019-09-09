@@ -30,6 +30,7 @@ import data.exam.IllegalInputException;
 import gui.addFrame.AddFrame;
 import gui.registration.SignUpDialog;
 import store.StoreException;
+import javax.swing.JCheckBox;
 
 public class MainFrame extends JFrame implements PropertyChangeListener {
 
@@ -138,8 +139,21 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		allExams = new TableExams(container);
 		allExams.setBackground(Color.WHITE);
 		allExams.setForeground(Color.WHITE);
-		allExams.setBounds(359, 34, 427, 329);
+		allExams.setBounds(359, 34, 427, 312);
 		contentPane.add((JPanel) allExams);
+
+		JCheckBox chckbxNichtBestandenePrfungen = new JCheckBox("Nicht bestandene Prüfungen anzeigen ");
+		chckbxNichtBestandenePrfungen.setBackground(Color.WHITE);
+		chckbxNichtBestandenePrfungen.setBounds(355, 348, 431, 23);
+		chckbxNichtBestandenePrfungen.setOpaque(true);
+		chckbxNichtBestandenePrfungen.addActionListener(e -> {
+			if (((JCheckBox) e.getSource()).isSelected()) {
+				allExams.loadAll();
+			} else {
+				allExams.load();
+			}
+		});
+		contentPane.add(chckbxNichtBestandenePrfungen);
 
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -161,8 +175,10 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		int sumLp = 0;
 		double sumNoten = 0;
 		for (int i = 0; i < container.getSize(); i++) {
-			sumLp += container.getExamByIndex(i).getLeistungpunkte();
-			sumNoten += container.getExamByIndex(i).getNote() * container.getExamByIndex(i).getLeistungpunkte();
+			if (container.getExamByIndex(i).getNote() <= 4.0) {
+				sumLp += container.getExamByIndex(i).getLeistungpunkte();
+				sumNoten += container.getExamByIndex(i).getNote() * container.getExamByIndex(i).getLeistungpunkte();
+			}
 		}
 		durchschnitt = sumNoten / (double) sumLp;
 		durchschnittsnote.setText(new DecimalFormat("0.00").format(durchschnitt));
@@ -188,7 +204,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 				addDia.setCancelButtonActivated(false);
 				addDia.setVisible(true);
 				calcDurchschnitt();
-				allExams.load(); 
+				allExams.load();
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -201,7 +217,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		AddFrame addDia = new AddFrame(this, "Neue Prüfung hinzufügen");
 		addDia.setVisible(true);
 		calcDurchschnitt();
-		allExams.load(); 
+		allExams.load();
 
 	}
 
@@ -218,7 +234,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 						Integer.valueOf((String) tb.getValueAt(row, 1)),
 						Double.valueOf((String) tb.getValueAt(row, 3)));
 				container.unlinkExam(e);
-				allExams.load(); 
+				allExams.load();
 				calcDurchschnitt();
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				// TODO Auto-generated catch block
