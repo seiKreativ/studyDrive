@@ -30,7 +30,6 @@ public class RegistrationDialog extends JDialog {
 	private static final long serialVersionUID = 3198864217046720627L;
 	private JPanel contentPane;
 	private JTextField usernameTextfield;
-	private JTextField emailTextField;
 	private JTextField passwordTextfield;
 	private JTextField repeatPasswordTextfield;
 
@@ -40,7 +39,7 @@ public class RegistrationDialog extends JDialog {
 	public RegistrationDialog() {
 		setBackground(Color.WHITE);
 		//setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setBounds(100, 100, 343, 386);
+		setBounds(100, 100, 343, 304);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -51,7 +50,7 @@ public class RegistrationDialog extends JDialog {
 		btnSignUp.setBackground(Color.DARK_GRAY);
 		btnSignUp.setForeground(Color.WHITE);
 		btnSignUp.setFont(new Font("Arial Nova Light", Font.PLAIN, 20));
-		btnSignUp.setBounds(88, 294, 147, 32);
+		btnSignUp.setBounds(88, 250, 147, 32);
 		btnSignUp.setBorderPainted(false);
 		contentPane.add(btnSignUp);
 		btnSignUp.addActionListener(e -> onSignUp());
@@ -70,31 +69,16 @@ public class RegistrationDialog extends JDialog {
 		JSeparator separator = new JSeparator();
 		separator.setBounds(73, 130, 1, 2);
 		contentPane.add(separator);
-
-		emailTextField = new JTextField();
-		emailTextField.setFont(new Font("Arial Nova Light", Font.PLAIN, 11));
-		emailTextField.setColumns(10);
-		emailTextField.setBackground(Color.WHITE);
-		emailTextField.setBounds(32, 143, 261, 20);
-		contentPane.add(emailTextField);
-
-		JLabel lblEmail = new JLabel("E-Mail:");
-		lblEmail.setBounds(32, 126, 261, 14);
-		contentPane.add(lblEmail);
-		
-		JSeparator separator_1 = new JSeparator();
-		separator_1.setBounds(73, 174, 1, 2);
-		contentPane.add(separator_1);
 		
 		passwordTextfield = new JPasswordField();
 		//passwordTextfield.setFont(new Font("Arial Nova Light", Font.PLAIN, 11));
 		passwordTextfield.setColumns(10);
 		passwordTextfield.setBackground(Color.WHITE);
-		passwordTextfield.setBounds(32, 191, 261, 20);
+		passwordTextfield.setBounds(32, 147, 261, 20);
 		contentPane.add(passwordTextfield);
 		
 		JLabel lblPassword = new JLabel("Password:");
-		lblPassword.setBounds(32, 174, 261, 14);
+		lblPassword.setBounds(32, 130, 261, 14);
 		contentPane.add(lblPassword);
 		
 		JSeparator separator_2 = new JSeparator();
@@ -105,11 +89,11 @@ public class RegistrationDialog extends JDialog {
 		//repeatPasswordTextfield.setFont(new Font("Arial Nova Light", Font.PLAIN, 11));
 		repeatPasswordTextfield.setColumns(10);
 		repeatPasswordTextfield.setBackground(Color.WHITE);
-		repeatPasswordTextfield.setBounds(32, 239, 261, 20);
+		repeatPasswordTextfield.setBounds(32, 195, 261, 20);
 		contentPane.add(repeatPasswordTextfield);
 		
 		JLabel lblRepeatPassword = new JLabel("Repeat Password:");
-		lblRepeatPassword.setBounds(32, 222, 261, 14);
+		lblRepeatPassword.setBounds(32, 178, 261, 14);
 		contentPane.add(lblRepeatPassword);
 		
 		JSeparator separator_3 = new JSeparator();
@@ -118,7 +102,7 @@ public class RegistrationDialog extends JDialog {
 		
 		JLabel lblRegistration = new JLabel("Registration");
 		lblRegistration.setFont(new Font("Arial Nova Light", Font.PLAIN, 26));
-		lblRegistration.setBounds(32, 11, 171, 40);
+		lblRegistration.setBounds(96, 11, 139, 40);
 		contentPane.add(lblRegistration);
 		
 		JLabel lblX = new JLabel("X");
