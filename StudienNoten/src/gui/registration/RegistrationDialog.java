@@ -70,14 +70,14 @@ public class RegistrationDialog extends JDialog {
 		JSeparator separator = new JSeparator();
 		separator.setBounds(73, 130, 1, 2);
 		contentPane.add(separator);
-		
+
 		emailTextField = new JTextField();
 		emailTextField.setFont(new Font("Arial Nova Light", Font.PLAIN, 11));
 		emailTextField.setColumns(10);
 		emailTextField.setBackground(Color.WHITE);
 		emailTextField.setBounds(32, 143, 261, 20);
 		contentPane.add(emailTextField);
-		
+
 		JLabel lblEmail = new JLabel("E-Mail:");
 		lblEmail.setBounds(32, 126, 261, 14);
 		contentPane.add(lblEmail);
@@ -145,12 +145,12 @@ public class RegistrationDialog extends JDialog {
 				dispose();
 				new MainFrame();
 			} catch (StoreException | IllegalInputException e) {
-				new ExceptionMessage(null, "Error", "Error: " + e.getMessage());
-				//JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				//new ExceptionMessage(null, "Error", "Error: " + e.getMessage());
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		else
-			new ExceptionMessage(null, "Error", "Error: passwords not the same");
-			//JOptionPane.showMessageDialog(this, "Error: passwords not the same", "Error", JOptionPane.ERROR_MESSAGE);
+			//new ExceptionMessage(null, "Error", "Error: passwords not the same");
+			JOptionPane.showMessageDialog(this, "Error: passwords not the same", "Error", JOptionPane.ERROR_MESSAGE);
 	}
 }

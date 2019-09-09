@@ -93,8 +93,8 @@ public class SignUpDialog extends JDialog {
 			dispose();
 			new MainFrame();
 		} catch (StoreException | IllegalInputException e) {
-			new ExceptionMessage(null, "Error", "Error: " + e.getMessage());
-			//JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			//new ExceptionMessage(null, "Error", "Error: " + e.getMessage());
+			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }
