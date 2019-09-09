@@ -52,7 +52,7 @@ public class Model implements TableModel {
 		case 1:
 			return "Name";
 		case 2:
-			return "Leistungspunkte";
+			return "LPs";
 		case 3:
 			return "Note";
 		default:
