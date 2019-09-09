@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -46,8 +48,10 @@ public class TableExams extends JPanel {
 				return false;
 			}
 		};
-		String header[] = new String[] { "Semester", "LPs", "Name", "Note" };
+		String header[] = new String[] { "Sem", "LPs", "Name", "Note" };
 		dm.setColumnIdentifiers(header);
+		
+		// Table row should be red if exam not passed
 		tblTaskList = new JTable(dm) {
 			@Override
 			public Dimension getPreferredScrollableViewportSize() {
@@ -71,6 +75,17 @@ public class TableExams extends JPanel {
 		tblTaskList.setShowVerticalLines(true);
 		tblTaskList.setCellSelectionEnabled(false);
 		tblTaskList.setRowSelectionAllowed(true);
+		
+
+		// Table Cell Renderer 
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer(); 
+		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+		tblTaskList.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		tblTaskList.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+		tblTaskList.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+		
+		
+		//Table Sorter
 		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(tblTaskList.getModel());
 		tblTaskList.setRowSorter(sorter);
 		sorter.setSortsOnUpdates(true);
@@ -83,8 +98,8 @@ public class TableExams extends JPanel {
 
 		load();
 
-		tblTaskList.getColumn("Semester").setPreferredWidth(20);
-		tblTaskList.getColumn("Name").setPreferredWidth(200);
+		tblTaskList.getColumn("Sem").setPreferredWidth(10);
+		tblTaskList.getColumn("Name").setPreferredWidth(210);
 		tblTaskList.getColumn("LPs").setPreferredWidth(10);
 		tblTaskList.getColumn("Note").setPreferredWidth(10);
 		this.setLayout(new BorderLayout());
