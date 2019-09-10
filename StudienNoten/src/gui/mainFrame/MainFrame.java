@@ -68,9 +68,13 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		mntmLogOut.addActionListener(e -> onLogOut());
 		mnAllgemein.add(mntmLogOut);
 
+		JMenuItem mntmDeleteUser = new JMenuItem("Account Löschen");
+		mntmDeleteUser.addActionListener(e -> onDeleteUser());
+		mnAllgemein.add(mntmDeleteUser);
+
 		JMenuItem mntmInformation = new JMenuItem("Information");
 		mntmInformation.addActionListener(e -> {
-			JOptionPane.showMessageDialog(this, "Version 1.1.1.1.1.0");
+			JOptionPane.showMessageDialog(this, "Version 1.0");
 		});
 		mnAllgemein.add(mntmInformation);
 		contentPane = new JPanel();
@@ -249,6 +253,23 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			container.close();
 			dispose();
 			new SignUpDialog();
+		} catch (StoreException e) {
+			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void onDeleteUser() {
+		try {
+			String tmpPassword = JOptionPane.showInputDialog(this, "Zum Löschen Passwort für User " + container.getUser() + " eingeben.", "Acoount Löschen", JOptionPane.INFORMATION_MESSAGE);
+			if (tmpPassword.equals(container.getPassword())) {
+				container.deleteUser();
+				JOptionPane.showMessageDialog(this, "User " + container.getUser() + " erfolgreich gelöscht", "Information", JOptionPane.INFORMATION_MESSAGE);
+				onLogOut();
+			}
+			else {
+				JOptionPane.showMessageDialog(this, "Falsches Passwort", "Error", JOptionPane.ERROR_MESSAGE);
+				onDeleteUser();
+			}
 		} catch (StoreException e) {
 			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}

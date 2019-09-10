@@ -2,7 +2,6 @@ package gui.registration;
 
 import data.exam.IllegalInputException;
 import data.exam.Student;
-import gui.ExceptionMessage;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
 
@@ -93,7 +92,6 @@ public class SignUpDialog extends JDialog {
 			dispose();
 			new MainFrame();
 		} catch (StoreException | IllegalInputException e) {
-			//new ExceptionMessage(null, "Error", "Error: " + e.getMessage());
 			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}

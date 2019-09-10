@@ -110,6 +110,18 @@ public class ExamContainer implements Iterable<Exam> {
 		unique = null;
 	}
 
+	public String getUser() throws StoreException {
+		return store.getUser();
+	}
+
+	public String getPassword() throws StoreException {
+		return store.getPassword();
+	}
+
+	public void deleteUser() throws StoreException {
+		store.deleteUser();
+	}
+
 	public void addPropertyChangeListener(PropertyChangeListener l) {
 		changes.addPropertyChangeListener(l);
 	}
@@ -117,7 +129,5 @@ public class ExamContainer implements Iterable<Exam> {
 	public void removePropertyChangeListener(PropertyChangeListener l) {
 		changes.removePropertyChangeListener(l);
 	}
-	
-	
 
 }

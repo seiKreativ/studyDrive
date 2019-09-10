@@ -18,7 +18,6 @@ import javax.swing.border.EmptyBorder;
 
 import data.exam.IllegalInputException;
 import data.exam.Student;
-import gui.ExceptionMessage;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
 
@@ -129,12 +128,10 @@ public class RegistrationDialog extends JDialog {
 				dispose();
 				new MainFrame();
 			} catch (StoreException | IllegalInputException e) {
-				//new ExceptionMessage(null, "Error", "Error: " + e.getMessage());
 				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		else
-			//new ExceptionMessage(null, "Error", "Error: passwords not the same");
 			JOptionPane.showMessageDialog(this, "Error: passwords not the same", "Error", JOptionPane.ERROR_MESSAGE);
 	}
 }

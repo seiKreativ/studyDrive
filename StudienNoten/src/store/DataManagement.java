@@ -17,6 +17,12 @@ public interface DataManagement {
     */
     public void setUser(String username, String password) throws StoreException;
 
+    public String getUser() throws StoreException;
+
+    public String getPassword() throws StoreException;
+
+    public void deleteUser() throws StoreException;
+
     public void add(Exam e) throws StoreException;
 
     public void delete(Exam e) throws StoreException;

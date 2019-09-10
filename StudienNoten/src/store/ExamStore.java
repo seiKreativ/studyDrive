@@ -23,6 +23,7 @@ public class ExamStore implements DataManagement {
 	private Connection con = null;
 	private static ExamStore unique;
     private String username;
+    private String password;
 
 	private ExamStore() throws StoreException{
 		try {
@@ -75,6 +76,7 @@ public class ExamStore implements DataManagement {
 			String befehl2 = "INSERT INTO Users VALUES ('" + username + "','" + password + "');";
 			abfrage.executeUpdate(befehl2);
 			this.username = username;
+			this.password = password;
 		} catch (SQLException e1) {
 			throw new StoreException("Error: " + e1.getMessage(), e1);
 		}
@@ -92,13 +94,36 @@ public class ExamStore implements DataManagement {
 		while (ergebnis.next()) {
 			if (ergebnis.getString("username").equals(username) && ergebnis.getString("password").equals(password)) {
 				this.username = username;
+				this.password = password;
 				tmp = true;
 			}
 		}
 		if (!tmp)
 			throw new StoreException("Username or password wrong", null);
 		} catch (SQLException e1) {
-			throw new StoreException("Error while adding exam " + e1.getMessage(), e1);
+			throw new StoreException("Error while setting user " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public String getUser() throws StoreException {
+		return this.username;
+	}
+
+	@Override
+	public String getPassword() throws StoreException {
+		return this.password;
+	}
+
+	@Override
+	public void deleteUser() throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "DELETE FROM Exams WHERE username = '" + username + "';";
+			abfrage.executeUpdate(befehl);
+			String befehl2= "DELETE FROM Users WHERE username = '" + username + "';";
+			abfrage.executeUpdate(befehl2);
+		} catch (SQLException e1) {
+			throw new StoreException("Error while deleting user " + e1.getMessage(), e1);
 		}
 	}
 
