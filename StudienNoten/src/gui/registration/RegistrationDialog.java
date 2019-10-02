@@ -28,9 +28,10 @@ public class RegistrationDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = 3198864217046720627L;
 	private JPanel contentPane;
-	private JTextField usernameTextfield;
+	private JTextField emailTextfield;
 	private JTextField passwordTextfield;
 	private JTextField repeatPasswordTextfield;
+	private JTextField nameTextfield;
 
 	
 	
@@ -38,7 +39,7 @@ public class RegistrationDialog extends JDialog {
 	public RegistrationDialog() {
 		setBackground(Color.WHITE);
 		//setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setBounds(100, 100, 343, 304);
+		setBounds(100, 100, 343, 364);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -49,53 +50,68 @@ public class RegistrationDialog extends JDialog {
 		btnSignUp.setBackground(Color.DARK_GRAY);
 		btnSignUp.setForeground(Color.WHITE);
 		btnSignUp.setFont(new Font("Arial Nova Light", Font.PLAIN, 20));
-		btnSignUp.setBounds(88, 250, 147, 32);
+		btnSignUp.setBounds(88, 297, 147, 32);
 		btnSignUp.setBorderPainted(false);
 		contentPane.add(btnSignUp);
 		btnSignUp.addActionListener(e -> onSignUp());
 		
-		usernameTextfield = new JTextField();
-		usernameTextfield.setFont(new Font("Arial Nova Light", Font.PLAIN, 11));
-		usernameTextfield.setBackground(Color.WHITE);
-		usernameTextfield.setBounds(32, 99, 261, 20);
-		contentPane.add(usernameTextfield);
-		usernameTextfield.setColumns(10);
+		nameTextfield = new JTextField();
+		nameTextfield.setFont(new Font("Arial Nova Light", Font.PLAIN, 11));
+		nameTextfield.setColumns(10);
+		nameTextfield.setBackground(Color.WHITE);
+		nameTextfield.setBounds(32, 98, 261, 20);
+		contentPane.add(nameTextfield);
+		
+		JLabel lblName = new JLabel("Name");
+		lblName.setBounds(32, 81, 261, 14);
+		contentPane.add(lblName);
+		
+		JSeparator separator_1 = new JSeparator();
+		separator_1.setBounds(73, 116, 1, 2);
+		contentPane.add(separator_1);
+		
+		emailTextfield = new JTextField();
+		emailTextfield.setFont(new Font("Arial Nova Light", Font.PLAIN, 11));
+		emailTextfield.setBackground(Color.WHITE);
+		emailTextfield.setBounds(32, 146, 261, 20);
+		contentPane.add(emailTextfield);
+		emailTextfield.setColumns(10);
 		
 		JLabel lblUsername = new JLabel("Email");
-		lblUsername.setBounds(32, 82, 261, 14);
+		lblUsername.setBounds(32, 129, 261, 14);
 		contentPane.add(lblUsername);
 		
 		JSeparator separator = new JSeparator();
-		separator.setBounds(73, 130, 1, 2);
+		separator.setBounds(73, 177, 1, 2);
 		contentPane.add(separator);
 		
 		passwordTextfield = new JPasswordField();
 		passwordTextfield.setColumns(10);
 		passwordTextfield.setBackground(Color.WHITE);
-		passwordTextfield.setBounds(32, 147, 261, 20);
+		passwordTextfield.setBounds(32, 194, 261, 20);
 		contentPane.add(passwordTextfield);
 		
 		JLabel lblPassword = new JLabel("Password:");
-		lblPassword.setBounds(32, 130, 261, 14);
+		lblPassword.setBounds(32, 177, 261, 14);
 		contentPane.add(lblPassword);
 		
 		JSeparator separator_2 = new JSeparator();
-		separator_2.setBounds(73, 222, 1, 2);
+		separator_2.setBounds(73, 269, 1, 2);
 		contentPane.add(separator_2);
 		
 		repeatPasswordTextfield = new JPasswordField();
 		//repeatPasswordTextfield.setFont(new Font("Arial Nova Light", Font.PLAIN, 11));
 		repeatPasswordTextfield.setColumns(10);
 		repeatPasswordTextfield.setBackground(Color.WHITE);
-		repeatPasswordTextfield.setBounds(32, 195, 261, 20);
+		repeatPasswordTextfield.setBounds(32, 242, 261, 20);
 		contentPane.add(repeatPasswordTextfield);
 		
 		JLabel lblRepeatPassword = new JLabel("Repeat Password:");
-		lblRepeatPassword.setBounds(32, 178, 261, 14);
+		lblRepeatPassword.setBounds(32, 225, 261, 14);
 		contentPane.add(lblRepeatPassword);
 		
 		JSeparator separator_3 = new JSeparator();
-		separator_3.setBounds(75, 264, 1, 2);
+		separator_3.setBounds(75, 311, 1, 2);
 		contentPane.add(separator_3);
 		
 		JLabel lblRegistration = new JLabel("Registration");
@@ -123,7 +139,7 @@ public class RegistrationDialog extends JDialog {
 	private void onSignUp() {
 		if (passwordTextfield.getText().equals(repeatPasswordTextfield.getText())) {
 			try {
-				new Student("Muss noch Name Feld hinzugefügt werden", usernameTextfield.getText(), passwordTextfield.getText(), true);
+				new Student(nameTextfield.getText(), emailTextfield.getText(), passwordTextfield.getText(), true);
 				dispose();
 				new MainFrame();
 			} catch (StoreException | IllegalInputException e) {
