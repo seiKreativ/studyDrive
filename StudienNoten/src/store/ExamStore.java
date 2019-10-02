@@ -39,7 +39,7 @@ public class ExamStore implements DataManagement {
 	}
  
 	@Override
-	public void load(LectureContainer lectures, ExamContainer container) throws StoreException {
+	public void load(LectureContainer lectures, ExamContainer container, SheetContainer sheets) throws StoreException {
 		try (Statement abfrage = con.createStatement()){
 			String befehl = "SELECT distinct lecture, semester, credits FROM userlecture WHERE username = '" + email + "'";
 			ResultSet ergebnis = abfrage.executeQuery(befehl); 
@@ -51,15 +51,46 @@ public class ExamStore implements DataManagement {
 					throw new StoreException("Loading failed: " + e.getMessage(), e);
 				}
 			}
-			String befehl2 = "SELECT distinct name, mark FROM exams WHERE username = '" + email + "'";
+			String befehl2 = "SELECT distinct name, mark, semester FROM exams WHERE username = '" + email + "'";
 			ResultSet ergebnis2 = abfrage.executeQuery(befehl2);
 			while (ergebnis2.next()) {
-				Lecture tmp = lectures.getLectureByName(ergebnis2.getString("name"));
+				Lecture tmp = lectures.getLectureByName(ergebnis2.getString("name"), ergebnis2.getInt("semester"));
 				container.linkExamLoading(new Exam(tmp, ergebnis2.getDouble("mark")));
 			}
-		} catch (SQLException | IllegalInputException | ExamAlreadyExistsException e) {
+			String befehl3 = "SELECT distinct lecture, number, points, maxPoints, semester FROM exams WHERE username = '" + email + "'";
+			ResultSet ergebnis3 = abfrage.executeQuery(befehl3);
+			while (ergebnis3.next()) {
+				Lecture tmp = lectures.getLectureByName(ergebnis3.getString("lecture"), ergebnis3.getInt("semester"));
+				sheets.linkSheetLoading(new Sheet(tmp, ergebnis3.getInt("number"), ergebnis3.getDouble("points"), ergebnis3.getDouble("maxPoints")));
+			}
+		} catch (SQLException | IllegalInputException | ExamAlreadyExistsException | SheetAlreadyExistsException e) {
 			throw new StoreException("Error while loading: " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public void addSheet(Sheet s) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "INSERT INTO usersheet VALUES ('" + email + "','" + s.getName() + "', " + s.getNumber() + ", " + s.getPoints() + ", " + s.getMaxPoints() + ", " + s.getSemester() + ");";
+			abfrage.executeUpdate(befehl);
+		} catch (SQLException e1) {
+			throw new StoreException("Error while adding sheet " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public void deleteSheet(Sheet s) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "DELETE FROM usersheet WHERE username = '" + email + "' AND semester = " + s.getSemester() + " AND name = '" + s.getName() + "';";
+			abfrage.executeUpdate(befehl);
+		} catch (SQLException e1) {
+			throw new StoreException("Error while deleting lecture " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public void modifySheet(Sheet sold, Sheet snew) throws StoreException {
+		// noch zu implementiere. was kann man hier verändern?
 	}
 
 	private static String hashPassword(String password_plaintext) {
@@ -148,7 +179,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void addExam(Exam e) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "INSERT INTO exams VALUES ('" + e.getSemester() + "','" + e.getName() + "', " + e.getLeistungpunkte() + "', '" + e.getNote() + "', '" + email + "');";
+			String befehl = "INSERT INTO exams VALUES (" + e.getSemester() + ",'" + e.getName() + "', " + e.getLeistungpunkte() + ", " + e.getNote() + ", '" + email + "');";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding exam " + e1.getMessage(), e1);
@@ -178,7 +209,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void addLecture(Lecture e) throws StoreException{
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "INSERT INTO userlecture VALUES ('" + email + "','" + e.getName() + "', " + e.getSemester() + "', '" + e.getLeistungpunkte() + "');";
+			String befehl = "INSERT INTO userlecture VALUES ('" + email + "','" + e.getName() + "', " + e.getSemester() + ", " + e.getLeistungpunkte() + ");";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding lecture " + e1.getMessage(), e1);
@@ -198,7 +229,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void modifyLecture(Lecture eold, Lecture enew) throws StoreException{
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "update userlecture set credits = '" + enew.getLeistungpunkte() + "' " +
+			String befehl = "update userlecture set credits = " + enew.getLeistungpunkte() + " " +
 					"WHERE username = '" + email + "' AND semester = " + eold.getSemester() + " AND name = '"+ eold.getName() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e) {

@@ -1,9 +1,6 @@
 package store;
 
-import data.exam.Exam;
-import data.exam.ExamContainer;
-import data.exam.Lecture;
-import data.exam.LectureContainer;
+import data.exam.*;
 
 public interface DataManagement {
 
@@ -29,7 +26,13 @@ public interface DataManagement {
 
     void modifyLecture(Lecture eold, Lecture enew) throws StoreException;
 
-    void load(LectureContainer lectures, ExamContainer exams) throws StoreException;
+    void load(LectureContainer lectures, ExamContainer exams, SheetContainer sheets) throws StoreException;
+
+    void addSheet(Sheet s) throws StoreException;
+
+    void deleteSheet(Sheet s) throws StoreException;
+
+    void modifySheet(Sheet sold, Sheet snew) throws StoreException;
 
     public void close() throws StoreException;
 

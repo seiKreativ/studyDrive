@@ -72,16 +72,17 @@ public class LectureContainer implements Iterable<Lecture> {
 
     public void load() throws StoreException {
         ExamContainer exams = ExamContainer.instance();
-        store.load(this, exams);
+        SheetContainer sheets = SheetContainer.instance();
+        store.load(this, exams, sheets);
     }
 
     public Lecture getLectureByIndex(int pos) {
         return lectures.get(pos);
     }
 
-    public Lecture getLectureByName(String name) {
+    public Lecture getLectureByName(String name, int semester) {
         for (Lecture e : lectures) {
-            if (e.getName().equals(name))
+            if (e.getName().equals(name) && e.getSemester() == semester)
                 return e;
         }
         return null;
