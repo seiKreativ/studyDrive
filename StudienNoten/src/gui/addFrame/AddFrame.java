@@ -11,10 +11,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import data.exam.Exam;
-import data.exam.ExamAlreadyExistsException;
-import data.exam.ExamContainer;
 import data.exam.IllegalInputException;
+import data.exam.exam.Exam;
+import data.exam.exam.ExamAlreadyExistsException;
+import data.exam.exam.ExamContainer;
+import data.exam.lecture.Lecture;
+import data.exam.lecture.LectureAlreadyExistsException;
+import data.exam.lecture.LectureContainer;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
 
@@ -28,7 +31,8 @@ public class AddFrame extends JDialog {
 	private JTextField txtLeistungspunkte;
 	private JTextField txtName;
 	private JComboBox<String> comboBoxSem, comboBoxNoten;
-	private ExamContainer container = null;
+	private ExamContainer examContainer = null;
+	private LectureContainer lectureContainer;
 	private JButton btnClose;
 
 	/*
@@ -120,7 +124,8 @@ public class AddFrame extends JDialog {
 		contentPane.add(btnClose);
 
 		try {
-			container = ExamContainer.instance();
+			lectureContainer = LectureContainer.instance();
+			examContainer = ExamContainer.instance();
 		} catch (StoreException e) {
 			// Dieser Fehler kann an der Stelle nicht auftreten
 		}
@@ -138,14 +143,14 @@ public class AddFrame extends JDialog {
 	}
 
 	private void onAdd() {
-		/*try {
-			Exam exam = new Exam(Integer.parseInt((String) comboBoxSem.getSelectedItem()),
-					txtName.getText().replace("'", ""), Integer.parseInt(txtLeistungspunkte.getText()),
-					Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
-			container.linkExam(exam); 
-		} catch (NumberFormatException | StoreException | ExamAlreadyExistsException | IllegalInputException e) {
+		try {
+			Lecture lecture = new Lecture(Integer.parseInt((String) comboBoxSem.getSelectedItem()),
+					txtName.getText().replace("'", ""), Integer.parseInt(txtLeistungspunkte.getText()));
+			Exam exam = new Exam(lecture, Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
+			examContainer.linkExam(exam);
+		} catch (NumberFormatException | StoreException | IllegalInputException | ExamAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		}*/
+		}
 		dispose(); 
 	}
 }

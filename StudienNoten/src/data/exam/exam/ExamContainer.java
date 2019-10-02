@@ -1,4 +1,4 @@
-package data.exam;
+package data.exam.exam;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -57,8 +57,9 @@ public class ExamContainer implements Iterable<Exam> {
 	}
 
 	public void linkExamLoading(Exam e) throws ExamAlreadyExistsException {
-		if (exams.contains(e))
-			throw new ExamAlreadyExistsException(e.getName());
+		//gibt grad noch Probleme, weil die lecture und die exam tabelle noch nicht schön eingebunden ist
+		//if (exams.contains(e))
+		//	throw new ExamAlreadyExistsException(e.getName());
 		exams.add(e);
 	}
 
@@ -93,31 +94,16 @@ public class ExamContainer implements Iterable<Exam> {
 		return exams.size(); 
 	}
 
-	// soll nur noch über LectureContainer möglich sein, ist nur noch temporär drin, dass das Programm grad noch läuft
-	public void close() throws StoreException {
-		store.close();
-		store = null;
-		unique = null;
-	}
-
-	public String getUser() throws StoreException {
-		return store.getUser();
-	}
-
-	public String getPassword() throws StoreException {
-		return store.getPassword();
-	}
-
-	public void deleteUser() throws StoreException {
-		store.deleteUser();
-	}
-
 	public void addPropertyChangeListener(PropertyChangeListener l) {
 		changes.addPropertyChangeListener(l);
 	}
 
 	public void removePropertyChangeListener(PropertyChangeListener l) {
 		changes.removePropertyChangeListener(l);
+	}
+
+	public void close() {
+		unique = null;
 	}
 
 }

@@ -1,4 +1,4 @@
-package data.exam;
+package data.exam.lecture;
 
 public class LectureAlreadyExistsException extends Exception {
     /**

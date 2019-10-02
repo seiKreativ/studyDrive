@@ -1,4 +1,4 @@
-package data.exam;
+package data.exam.lecture;
 
 public class LectureNotFoundException extends Exception {
     /**

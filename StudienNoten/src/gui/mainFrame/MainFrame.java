@@ -23,10 +23,13 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-import data.exam.Exam;
-import data.exam.ExamContainer;
-import data.exam.ExamNotFoundException;
 import data.exam.IllegalInputException;
+import data.exam.exam.Exam;
+import data.exam.exam.ExamContainer;
+import data.exam.exam.ExamNotFoundException;
+import data.exam.lecture.Lecture;
+import data.exam.lecture.LectureContainer;
+import data.exam.sheet.SheetContainer;
 import gui.addFrame.AddFrame;
 import gui.registration.SignUpDialog;
 import store.StoreException;
@@ -37,7 +40,9 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 	private static final long serialVersionUID = -5724418947028211664L;
 	private JPanel contentPane;
 	private JTextField durchschnittsnote;
-	private ExamContainer container;
+	private ExamContainer examContainer;
+	private LectureContainer lectureContainer;
+	private SheetContainer sheetContainer;
 	private JButton btnAdd, btnDel, btnMod;
 	private TableExams allExams;
 	private double durchschnitt;
@@ -133,14 +138,15 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		btnMod.addActionListener(e -> onModify());
 
 		try {
-			container = ExamContainer.instance();
+			lectureContainer= LectureContainer.instance();
+			examContainer = ExamContainer.instance();
+			sheetContainer = SheetContainer.instance();
 		} catch (StoreException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		container.addPropertyChangeListener(this);
 
-		allExams = new TableExams(container);
+		allExams = new TableExams(examContainer);
 		allExams.setBackground(Color.WHITE);
 		allExams.setForeground(Color.WHITE);
 		allExams.setBounds(359, 34, 427, 312);
@@ -163,7 +169,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				try {
-					container.close();
+					lectureContainer.close();
 				} catch (StoreException ex) {
 					System.out.println("Database Error: closing failed " + ex.getMessage());
 				}
@@ -178,10 +184,10 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		// TODO Auto-generated method stub
 		int sumLp = 0;
 		double sumNoten = 0;
-		for (int i = 0; i < container.getSize(); i++) {
-			if (container.getExamByIndex(i).getNote() <= 4.0) {
-				sumLp += container.getExamByIndex(i).getLeistungpunkte();
-				sumNoten += container.getExamByIndex(i).getNote() * container.getExamByIndex(i).getLeistungpunkte();
+		for (int i = 0; i < examContainer.getSize(); i++) {
+			if (examContainer.getExamByIndex(i).getNote() <= 4.0) {
+				sumLp += examContainer.getExamByIndex(i).getLeistungpunkte();
+				sumNoten += examContainer.getExamByIndex(i).getNote() * examContainer.getExamByIndex(i).getLeistungpunkte();
 			}
 		}
 		durchschnitt = sumNoten / (double) sumLp;
@@ -196,13 +202,14 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		} else {
 			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
-/*			try {
+			try {
 				int tempSem = Integer.valueOf((String) tb.getValueAt(row, 0));
 				String tempName = (String) tb.getValueAt(row, 2);
 				int tempLp = Integer.valueOf((String) tb.getValueAt(row, 1));
 				double tempNote = Double.valueOf((String) tb.getValueAt(row, 3));
-				Exam e = new Exam(tempSem, tempName, tempLp, tempNote);
-				container.unlinkExam(e);
+				Lecture l = new Lecture(tempSem, tempName, tempLp);
+				Exam e = new Exam(l, tempNote);
+				examContainer.unlinkExam(e);
 				AddFrame addDia = new AddFrame(this, "Prüfung ändern");
 				addDia.setData(tempSem, tempName, tempLp, tempNote);
 				addDia.setCancelButtonActivated(false);
@@ -212,7 +219,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
+			}
 		}
 	}
 
@@ -233,24 +240,24 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		} else {
 			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
-/*			try {
-				Exam e = new Exam(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
-						Integer.valueOf((String) tb.getValueAt(row, 1)),
-						Double.valueOf((String) tb.getValueAt(row, 3)));
-				container.unlinkExam(e);
+			try {
+				Lecture l = new Lecture(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
+						Integer.valueOf((String) tb.getValueAt(row, 1)));
+				Exam e = new Exam(l, Double.valueOf((String) tb.getValueAt(row, 3)));
+				examContainer.unlinkExam(e);
 				allExams.load();
 				calcDurchschnitt();
-			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
+			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
+			}
 		}
 
 	}
 
 	private void onLogOut() {
 		try {
-			container.close();
+			lectureContainer.close();
 			dispose();
 			new SignUpDialog();
 		} catch (StoreException e) {
@@ -260,10 +267,10 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 
 	private void onDeleteUser() {
 		try {
-			String tmpPassword = JOptionPane.showInputDialog(this, "Zum Löschen Passwort für User " + container.getUser() + " eingeben.", "Acoount Löschen", JOptionPane.INFORMATION_MESSAGE);
-			if (tmpPassword.equals(container.getPassword())) {
-				container.deleteUser();
-				JOptionPane.showMessageDialog(this, "User " + container.getUser() + " erfolgreich gelöscht", "Information", JOptionPane.INFORMATION_MESSAGE);
+			String tmpPassword = JOptionPane.showInputDialog(this, "Zum Löschen Passwort für User " + lectureContainer.getUser() + " eingeben.", "Acoount Löschen", JOptionPane.INFORMATION_MESSAGE);
+			if (tmpPassword.equals(lectureContainer.getPassword())) {
+				lectureContainer.deleteUser();
+				JOptionPane.showMessageDialog(this, "User " + lectureContainer.getUser() + " erfolgreich gelöscht", "Information", JOptionPane.INFORMATION_MESSAGE);
 				onLogOut();
 			}
 			else {

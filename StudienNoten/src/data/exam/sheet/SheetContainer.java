@@ -1,4 +1,4 @@
-package data.exam;
+package data.exam.sheet;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -93,19 +93,16 @@ public class SheetContainer implements Iterable<Sheet> {
         return sheets.size();
     }
 
-    // soll nur noch über LectureContainer möglich sein, ist nur noch temporär drin, dass das Programm grad noch läuft
-    public void close() throws StoreException {
-        store.close();
-        store = null;
-        unique = null;
-    }
-
     public void addPropertyChangeListener(PropertyChangeListener l) {
         changes.addPropertyChangeListener(l);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener l) {
         changes.removePropertyChangeListener(l);
+    }
+
+    public void close() {
+        unique = null;
     }
 
 }

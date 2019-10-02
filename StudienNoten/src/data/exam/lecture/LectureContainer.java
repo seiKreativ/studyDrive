@@ -1,10 +1,12 @@
-package data.exam;
+package data.exam.lecture;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 import java.util.Vector;
 
+import data.exam.exam.ExamContainer;
+import data.exam.sheet.SheetContainer;
 import store.ExamStore;
 import store.StoreException;
 
@@ -13,6 +15,8 @@ public class LectureContainer implements Iterable<Lecture> {
     private Vector<Lecture> lectures;
     private ExamStore store = null;
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
+    private ExamContainer examContainer;
+    private SheetContainer sheetContainer;
 
     private LectureContainer() throws StoreException {
         lectures = new Vector<Lecture>();
@@ -71,9 +75,9 @@ public class LectureContainer implements Iterable<Lecture> {
     }
 
     public void load() throws StoreException {
-        ExamContainer exams = ExamContainer.instance();
-        SheetContainer sheets = SheetContainer.instance();
-        store.load(this, exams, sheets);
+        examContainer = ExamContainer.instance();
+        sheetContainer = SheetContainer.instance();
+        store.load(this, examContainer, sheetContainer);
     }
 
     public Lecture getLectureByIndex(int pos) {
@@ -103,6 +107,8 @@ public class LectureContainer implements Iterable<Lecture> {
     public void close() throws StoreException {
         store.close();
         store = null;
+        examContainer.close();
+        sheetContainer.close();
         unique = null;
     }
 

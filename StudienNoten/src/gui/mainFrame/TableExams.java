@@ -20,8 +20,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import data.exam.Exam;
-import data.exam.ExamContainer;
+import data.exam.exam.Exam;
+import data.exam.exam.ExamContainer;
 
 public class TableExams extends JPanel {
 
