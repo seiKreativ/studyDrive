@@ -68,9 +68,13 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		mntmLogOut.addActionListener(e -> onLogOut());
 		mnAllgemein.add(mntmLogOut);
 
+		JMenuItem mntmDeleteUser = new JMenuItem("Account Löschen");
+		mntmDeleteUser.addActionListener(e -> onDeleteUser());
+		mnAllgemein.add(mntmDeleteUser);
+
 		JMenuItem mntmInformation = new JMenuItem("Information");
 		mntmInformation.addActionListener(e -> {
-			JOptionPane.showMessageDialog(this, "Version 1.1.1.1.1.0");
+			JOptionPane.showMessageDialog(this, "Version 1.0");
 		});
 		mnAllgemein.add(mntmInformation);
 		contentPane = new JPanel();
@@ -192,7 +196,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		} else {
 			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
-			try {
+/*			try {
 				int tempSem = Integer.valueOf((String) tb.getValueAt(row, 0));
 				String tempName = (String) tb.getValueAt(row, 2);
 				int tempLp = Integer.valueOf((String) tb.getValueAt(row, 1));
@@ -208,7 +212,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		}
 	}
 
@@ -229,7 +233,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		} else {
 			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
-			try {
+/*			try {
 				Exam e = new Exam(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
 						Integer.valueOf((String) tb.getValueAt(row, 1)),
 						Double.valueOf((String) tb.getValueAt(row, 3)));
@@ -239,7 +243,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		}
 
 	}
@@ -249,6 +253,23 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			container.close();
 			dispose();
 			new SignUpDialog();
+		} catch (StoreException e) {
+			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void onDeleteUser() {
+		try {
+			String tmpPassword = JOptionPane.showInputDialog(this, "Zum Löschen Passwort für User " + container.getUser() + " eingeben.", "Acoount Löschen", JOptionPane.INFORMATION_MESSAGE);
+			if (tmpPassword.equals(container.getPassword())) {
+				container.deleteUser();
+				JOptionPane.showMessageDialog(this, "User " + container.getUser() + " erfolgreich gelöscht", "Information", JOptionPane.INFORMATION_MESSAGE);
+				onLogOut();
+			}
+			else {
+				JOptionPane.showMessageDialog(this, "Falsches Passwort", "Error", JOptionPane.ERROR_MESSAGE);
+				onDeleteUser();
+			}
 		} catch (StoreException e) {
 			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}

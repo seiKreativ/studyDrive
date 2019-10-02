@@ -17,7 +17,6 @@ public class ExamContainer implements Iterable<Exam> {
 	private ExamContainer() throws StoreException {
 		exams = new Vector<Exam>();
 		store = ExamStore.instance();
-		loadExams();
 	}
 
 	public static ExamContainer instance() throws StoreException {
@@ -37,7 +36,7 @@ public class ExamContainer implements Iterable<Exam> {
 		}
 		if (temp)
 			throw new ExamAlreadyExistsException(e.getName());
-		store.add(e);
+		store.addExam(e);
 		exams.add(e);
 		changes.firePropertyChange("exam added", null, e);
 	}
@@ -52,7 +51,7 @@ public class ExamContainer implements Iterable<Exam> {
 		}
 		if (!temp)
 			throw new ExamNotFoundException(e.getName());
-		store.delete(e);
+		store.deleteExam(e);
 		exams.remove(e);
 		changes.firePropertyChange("exam removed", e, null);
 	}
@@ -67,17 +66,7 @@ public class ExamContainer implements Iterable<Exam> {
 	 * the actuall modifying has to happen in the gui panel with the setters
 	 */
 	public void modify(Exam eold, Exam enew) throws StoreException {
-		store.modify(eold, enew);
-	}
-
-	public void loadExams() throws StoreException {
-		store.load(this);
-		/*
-		 * not needed anymore isn't it?
-		 * 
-		 * Vector<Exam> backup = new Vector<Exam>(exams); exams.clear(); try {
-		 * store.load(unique); } catch (StoreException e) { exams = backup; throw e; }
-		 */
+		store.modifyExam(eold, enew);
 	}
 
 	public Exam getExamByIndex(int pos) {
@@ -104,10 +93,23 @@ public class ExamContainer implements Iterable<Exam> {
 		return exams.size(); 
 	}
 
+	// soll nur noch über LectureContainer möglich sein, ist nur noch temporär drin, dass das Programm grad noch läuft
 	public void close() throws StoreException {
 		store.close();
 		store = null;
 		unique = null;
+	}
+
+	public String getUser() throws StoreException {
+		return store.getUser();
+	}
+
+	public String getPassword() throws StoreException {
+		return store.getPassword();
+	}
+
+	public void deleteUser() throws StoreException {
+		store.deleteUser();
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener l) {
@@ -117,7 +119,5 @@ public class ExamContainer implements Iterable<Exam> {
 	public void removePropertyChangeListener(PropertyChangeListener l) {
 		changes.removePropertyChangeListener(l);
 	}
-	
-	
 
 }

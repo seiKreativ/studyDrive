@@ -1,27 +1,38 @@
 package store;
 
-import data.exam.Exam;
-import data.exam.ExamContainer;
+import data.exam.*;
 
 public interface DataManagement {
 
-    public void load(ExamContainer container) throws StoreException;
+    public void newUser(String name, String username, String password) throws StoreException;
 
-    /*
-    for the regristration of a new User
-    */
-    public void newUser(String username, String password) throws StoreException;
-
-    /*
-    sets the User (at login)
-    */
     public void setUser(String username, String password) throws StoreException;
 
-    public void add(Exam e) throws StoreException;
+    public String getUser() throws StoreException;
 
-    public void delete(Exam e) throws StoreException;
+    public String getPassword() throws StoreException;
 
-    public void modify(Exam eold, Exam enew) throws StoreException;
+    public void deleteUser() throws StoreException;
+
+    public void addExam(Exam e) throws StoreException;
+
+    public void deleteExam(Exam e) throws StoreException;
+
+    public void modifyExam(Exam eold, Exam enew) throws StoreException;
+
+    void addLecture(Lecture e) throws StoreException;
+
+    void deleteLecture(Lecture e) throws StoreException;
+
+    void modifyLecture(Lecture eold, Lecture enew) throws StoreException;
+
+    void load(LectureContainer lectures, ExamContainer exams, SheetContainer sheets) throws StoreException;
+
+    void addSheet(Sheet s) throws StoreException;
+
+    void deleteSheet(Sheet s) throws StoreException;
+
+    void modifySheet(Sheet sold, Sheet snew) throws StoreException;
 
     public void close() throws StoreException;
 
