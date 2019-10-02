@@ -50,7 +50,7 @@ public class TableExams extends JPanel {
 		};
 		String header[] = new String[] { "Sem", "LPs", "Name", "Note" };
 		dm.setColumnIdentifiers(header);
-		
+
 		// Table row should be red if exam not passed
 		tblTaskList = new JTable(dm) {
 			@Override
@@ -75,17 +75,15 @@ public class TableExams extends JPanel {
 		tblTaskList.setShowVerticalLines(true);
 		tblTaskList.setCellSelectionEnabled(false);
 		tblTaskList.setRowSelectionAllowed(true);
-		
 
-		// Table Cell Renderer 
-		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer(); 
+		// Table Cell Renderer
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
 		tblTaskList.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 		tblTaskList.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
 		tblTaskList.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
-		
-		
-		//Table Sorter
+
+		// Table Sorter
 		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(tblTaskList.getModel());
 		tblTaskList.setRowSorter(sorter);
 		sorter.setSortsOnUpdates(true);
@@ -129,23 +127,25 @@ public class TableExams extends JPanel {
 	 * BorderLayout()); this.add(new JScrollPane(dataTable));
 	 */
 	public void load() {
-		while (dm.getRowCount() > 0) {
-			dm.removeRow(0);
-		}
-		for (int count = 1; count <= container.getSize(); count++) {
-			Exam e = container.getExamByIndex(count - 1);
-			if (e.getNote() > 4.0) {
-				continue;
-			} else {
-				Vector<String> data = new Vector<String>();
-				data.add(Integer.toString(e.getSemester()));
-				data.add(Integer.toString(e.getLeistungpunkte()));
-				data.add(e.getName());
-				data.add(Double.toString(e.getNote()));
-				dm.addRow(data);
+		if (container != null) {
+			while (dm.getRowCount() > 0) {
+				dm.removeRow(0);
 			}
+			for (int count = 1; count <= container.getSize(); count++) {
+				Exam e = container.getExamByIndex(count - 1);
+				if (e.getNote() > 4.0) {
+					continue;
+				} else {
+					Vector<String> data = new Vector<String>();
+					data.add(Integer.toString(e.getSemester()));
+					data.add(Integer.toString(e.getLeistungpunkte()));
+					data.add(e.getName());
+					data.add(Double.toString(e.getNote()));
+					dm.addRow(data);
+				}
+			}
+			revalidate();
 		}
-		revalidate();
 	}
 
 	public DefaultTableModel getDefaultTableModel() {
