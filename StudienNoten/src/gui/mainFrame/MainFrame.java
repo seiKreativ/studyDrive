@@ -196,7 +196,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		} else {
 			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
-			try {
+/*			try {
 				int tempSem = Integer.valueOf((String) tb.getValueAt(row, 0));
 				String tempName = (String) tb.getValueAt(row, 2);
 				int tempLp = Integer.valueOf((String) tb.getValueAt(row, 1));
@@ -212,7 +212,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		}
 	}
 
@@ -233,7 +233,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		} else {
 			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
-			try {
+/*			try {
 				Exam e = new Exam(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
 						Integer.valueOf((String) tb.getValueAt(row, 1)),
 						Double.valueOf((String) tb.getValueAt(row, 3)));
@@ -243,7 +243,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		}
 
 	}

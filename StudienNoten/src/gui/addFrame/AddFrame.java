@@ -138,14 +138,14 @@ public class AddFrame extends JDialog {
 	}
 
 	private void onAdd() {
-		try {
+		/*try {
 			Exam exam = new Exam(Integer.parseInt((String) comboBoxSem.getSelectedItem()),
 					txtName.getText().replace("'", ""), Integer.parseInt(txtLeistungspunkte.getText()),
 					Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
 			container.linkExam(exam); 
 		} catch (NumberFormatException | StoreException | ExamAlreadyExistsException | IllegalInputException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		}
+		}*/
 		dispose(); 
 	}
 }

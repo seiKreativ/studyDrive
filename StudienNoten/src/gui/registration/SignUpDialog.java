@@ -34,7 +34,7 @@ public class SignUpDialog extends JDialog {
 		getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
 
-		JLabel lblUsername = new JLabel("Username");
+		JLabel lblUsername = new JLabel("Email");
 		lblUsername.setBounds(35, 11, 307, 14);
 		panel.add(lblUsername);
 
@@ -88,7 +88,7 @@ public class SignUpDialog extends JDialog {
 
 	private void onSignIn() {
 		try {
-			new Student(txtUsername.getText(), txtPassword.getText(), false);
+			new Student("Feld für Name fehlt", txtUsername.getText(), txtPassword.getText(), false);
 			dispose();
 			new MainFrame();
 		} catch (StoreException | IllegalInputException e) {

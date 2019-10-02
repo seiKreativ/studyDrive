@@ -2,18 +2,18 @@ package data.exam;
 
 public class Exam {
 
-	private int semester, leistungsPunkte, id; 
-	private double note; 
-	private String name;
+	private Lecture lecture;
+	private double note;
 	
-	
-	public Exam(int semester, String name, int leistungsPunkte, double note) throws IllegalInputException {
-			this.setName(name);
-			this.setSemester(semester); 
-			this.setLeistungsPunkte(leistungsPunkte); 
+	public Exam(Lecture lecture, double note) throws IllegalInputException {
+			this.setLecture(lecture);
 			this.setNote(note);
 	}
-	
+
+	private void setLecture(Lecture lecture) {
+		this.lecture = lecture;
+	}
+
 
 	private void setNote(double note2) throws IllegalInputException {
 		if (note2 < 1.0 || note2 > 5.0) {
@@ -22,45 +22,17 @@ public class Exam {
 		this.note = note2; 
 	}
 
-	private void setLeistungsPunkte(int leistungsPunkte2) throws IllegalInputException{
-		if (leistungsPunkte2 < 2 || leistungsPunkte > 30) {
-			throw new IllegalInputException("Leistungspunkte not correct");
-		}
-		this.leistungsPunkte = leistungsPunkte2;
-	}
+	public String getName(){ return lecture.getName(); }
+	public int getLeistungpunkte(){ return lecture.getLeistungpunkte(); }
+	public int getSemester() { return lecture.getSemester(); }
 
-	private void setSemester(int semester2) throws IllegalInputException{
-		if (semester2 < 1 || semester2 > 12) {
-			throw new IllegalInputException("Semester not correct");
-		}
-		this.semester = semester2; 
-	}
-
-	private void setName(String name2) throws IllegalInputException{
-		/*try {
-			ExamContainer container = ExamContainer.instance();
-			for (Exam e : container) {
-				if (e.getName().equals(name2))
-						throw new IllegalInputException("name already exists");
-			}
-		} catch (StoreException e) {
-			
-		}*/
-		if (name2.length() < 1) {
-			throw new IllegalInputException("Name not correct");
-		}
-		this.name = name2; 
-	}
-
-	public String getName(){ return this.name; }
-	public int getLeistungpunkte(){ return this.leistungsPunkte; }
+	public Lecture getLecture() { return this.lecture; };
 	public double getNote() { return this.note; }
-	public int getSemester() { return this.semester; }
 	
 	@Override
 	public String toString() {
-		return "Exam [semester=" + semester + ", leistungsPunkte=" + leistungsPunkte + ", note=" + note
-				+ ", name=" + name + "]";
+		return "Exam [semester=" + lecture.getSemester() + ", leistungsPunkte=" + lecture.getLeistungpunkte() + ", note=" + note
+				+ ", name=" + lecture.getName() + "]";
 	}
 	
 	@Override

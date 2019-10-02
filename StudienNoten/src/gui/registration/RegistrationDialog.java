@@ -61,7 +61,7 @@ public class RegistrationDialog extends JDialog {
 		contentPane.add(usernameTextfield);
 		usernameTextfield.setColumns(10);
 		
-		JLabel lblUsername = new JLabel("Username:");
+		JLabel lblUsername = new JLabel("Email");
 		lblUsername.setBounds(32, 82, 261, 14);
 		contentPane.add(lblUsername);
 		
@@ -70,7 +70,6 @@ public class RegistrationDialog extends JDialog {
 		contentPane.add(separator);
 		
 		passwordTextfield = new JPasswordField();
-		//passwordTextfield.setFont(new Font("Arial Nova Light", Font.PLAIN, 11));
 		passwordTextfield.setColumns(10);
 		passwordTextfield.setBackground(Color.WHITE);
 		passwordTextfield.setBounds(32, 147, 261, 20);
@@ -124,7 +123,7 @@ public class RegistrationDialog extends JDialog {
 	private void onSignUp() {
 		if (passwordTextfield.getText().equals(repeatPasswordTextfield.getText())) {
 			try {
-				new Student(usernameTextfield.getText(), passwordTextfield.getText(), true);
+				new Student("Muss noch Name Feld hinzugefügt werden", usernameTextfield.getText(), passwordTextfield.getText(), true);
 				dispose();
 				new MainFrame();
 			} catch (StoreException | IllegalInputException e) {

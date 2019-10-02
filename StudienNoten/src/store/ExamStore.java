@@ -2,10 +2,8 @@ package store;
 
 import java.sql.*;
 
-import data.exam.Exam;
-import data.exam.ExamAlreadyExistsException;
-import data.exam.ExamContainer;
-import data.exam.IllegalInputException;
+import data.exam.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class ExamStore implements DataManagement {
 
@@ -16,13 +14,13 @@ public class ExamStore implements DataManagement {
 	Exams: "name" (varchar(30)), "semester" (int), "leistungspunkte" (int), "note" (double), "username" (varchar(20)), primary key: username, semester, name
 	*/
 
-	private final static String connection = "jdbc:mysql://www.remotemysql.com:3306/Rjb9OP2iXT";
-	private final static String user = "Rjb9OP2iXT";
-	private final static String passworddatabase = "qlff07GmU1";
+	private final static String connection = "jdbc:mysql://www.remotemysql.com:3306/oUyCsXhXyi";
+	private final static String user = "oUyCsXhXyi";
+	private final static String passworddatabase = "IzgttKiqZr";
 	private final static String driverDB = "com.mysql.cj.jdbc.Driver";
 	private Connection con = null;
 	private static ExamStore unique;
-    private String username;
+    private String email;
     private String password;
 
 	private ExamStore() throws StoreException{
@@ -41,41 +39,56 @@ public class ExamStore implements DataManagement {
 	}
  
 	@Override
-	public void load(ExamContainer container) throws StoreException {
+	public void load(LectureContainer lectures, ExamContainer container) throws StoreException {
 		try (Statement abfrage = con.createStatement()){
-			String befehl = "SELECT distinct name, semester, leistungspunkte, note FROM Exams WHERE username = '" + username + "'";
+			String befehl = "SELECT distinct lecture, semester, credits FROM userlecture WHERE username = '" + email + "'";
 			ResultSet ergebnis = abfrage.executeQuery(befehl); 
 			while (ergebnis.next()) {
 				try {
-					Exam e = new Exam(ergebnis.getInt("semester"), ergebnis.getString("name"), ergebnis.getInt("leistungspunkte"), ergebnis.getDouble("note"));
-					container.linkExamLoading(e);
-				} catch (IllegalInputException | SQLException | ExamAlreadyExistsException e) {
+					Lecture l = new Lecture(ergebnis.getInt("semester"), ergebnis.getString("lecture"), ergebnis.getInt("credits"));
+					lectures.linkLectureLoading(l);
+				} catch (IllegalInputException | SQLException | LectureAlreadyExistsException e) {
 					throw new StoreException("Loading failed: " + e.getMessage(), e);
 				}
 			}
-		} catch (SQLException e) {
+			String befehl2 = "SELECT distinct name, mark FROM exams WHERE username = '" + email + "'";
+			ResultSet ergebnis2 = abfrage.executeQuery(befehl2);
+			while (ergebnis2.next()) {
+				Lecture tmp = lectures.getLectureByName(ergebnis2.getString("name"));
+				container.linkExamLoading(new Exam(tmp, ergebnis2.getDouble("mark")));
+			}
+		} catch (SQLException | IllegalInputException | ExamAlreadyExistsException e) {
 			throw new StoreException("Error while loading: " + e.getMessage(), e);
 		}
 	}
 
+	private static String hashPassword(String password_plaintext) {
+		int workload = 10;
+		String salt = BCrypt.gensalt(workload);
+		String hashed_password = BCrypt.hashpw(password_plaintext, salt);
+
+		return(hashed_password);
+	}
+
 	@Override
-	public void newUser(String username, String password) throws StoreException {
+	public void newUser(String name, String email, String password) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
 			/*
 			checking, if the username alredy exists
 			 */
-			String befehl = "select * from Users;";
+			String befehl = "select * from users;";
 			ResultSet ergebnis = abfrage.executeQuery(befehl);
 			while (ergebnis.next()) {
-				if (ergebnis.getString("username").equals(username))
+				if (ergebnis.getString("email").equals(email))
 					throw new StoreException("Username alredy exists", null);
 			}
 			/*
 			adding user
 			 */
-			String befehl2 = "INSERT INTO Users VALUES ('" + username + "','" + password + "');";
+			String hashed_password = ExamStore.hashPassword(password);
+			String befehl2 = "INSERT INTO users VALUES ('" + name + "','" + email + "','" + hashed_password + "'));";
 			abfrage.executeUpdate(befehl2);
-			this.username = username;
+			this.email = email;
 			this.password = password;
 		} catch (SQLException e1) {
 			throw new StoreException("Error: " + e1.getMessage(), e1);
@@ -83,17 +96,18 @@ public class ExamStore implements DataManagement {
 	}
 
 	@Override
-	public void setUser(String username, String password) throws StoreException {
+	public void setUser(String email, String password) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
 		/*
 		checking, if the user exists and setting the username
 		 */
-		String befehl = "select * from Users;";
+		String befehl = "select * from users;";
 		ResultSet ergebnis = abfrage.executeQuery(befehl);
 		boolean tmp = false;
+		String hashed_password = ExamStore.hashPassword(password);
 		while (ergebnis.next()) {
-			if (ergebnis.getString("username").equals(username) && ergebnis.getString("password").equals(password)) {
-				this.username = username;
+			if (ergebnis.getString("email").equals(email) && ergebnis.getString("password").equals(hashed_password)) {
+				this.email = email;
 				this.password = password;
 				tmp = true;
 			}
@@ -107,7 +121,7 @@ public class ExamStore implements DataManagement {
 
 	@Override
 	public String getUser() throws StoreException {
-		return this.username;
+		return this.email;
 	}
 
 	@Override
@@ -118,28 +132,32 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void deleteUser() throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "DELETE FROM Exams WHERE username = '" + username + "';";
+			String befehl = "DELETE FROM exams WHERE username = '" + email + "';";
 			abfrage.executeUpdate(befehl);
-			String befehl2= "DELETE FROM Users WHERE username = '" + username + "';";
+			String befehl1 = "DELETE FROM userlecture WHERE email = '" + email + "';";
+			abfrage.executeUpdate(befehl1);
+			String befehl2 = "DELETE FROM usersheets WHERE email = '" + email + "';";
 			abfrage.executeUpdate(befehl2);
+			String befehl3 = "DELETE FROM users WHERE email = '" + email + "';";
+			abfrage.executeUpdate(befehl3);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while deleting user " + e1.getMessage(), e1);
 		}
 	}
 
 	@Override
-	public void add(Exam e) throws StoreException {
+	public void addExam(Exam e) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "INSERT INTO Exams VALUES ('" + e.getName() + "', '" + e.getSemester() + "','" + e.getLeistungpunkte() + "', '" + e.getNote() + "', '" + username + "');";
+			String befehl = "INSERT INTO exams VALUES ('" + e.getSemester() + "','" + e.getName() + "', " + e.getLeistungpunkte() + "', '" + e.getNote() + "', '" + email + "');";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding exam " + e1.getMessage(), e1);
 		}
 	}
 
-    public void delete(Exam e) throws StoreException {
+    public void deleteExam(Exam e) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "DELETE FROM Exams WHERE username = '" + username + "' AND semester = " + Integer.toString(e.getSemester()) + " AND name = '"+ e.getName() + "';";
+			String befehl = "DELETE FROM exams WHERE username = '" + email + "' AND semester = " + e.getSemester() + " AND name = '" + e.getName() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while deleting exam " + e1.getMessage(), e1);
@@ -147,15 +165,46 @@ public class ExamStore implements DataManagement {
     }
 
     @Override
-    public void modify(Exam eold, Exam enew) throws StoreException {
+    public void modifyExam(Exam eold, Exam enew) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "update Exams set name = '" + enew.getName() + "', semester = '" + enew.getSemester() + "', leistungspunkte = '" + enew.getLeistungpunkte() + "', note = '" + enew.getNote() + "' " +
-					"WHERE username = '" + username + "' AND semester = " + Integer.toString(eold.getSemester()) + " AND name = '"+ eold.getName() + "';";
+			String befehl = "update exams set note = '" + enew.getNote() + "' " +
+					"WHERE username = '" + email + "' AND semester = " + eold.getSemester() + " AND name = '"+ eold.getName() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e) {
 			throw new StoreException("Error while modifying exam " + e.getMessage(), e);
 		}
     }
+
+	@Override
+	public void addLecture(Lecture e) throws StoreException{
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "INSERT INTO userlecture VALUES ('" + email + "','" + e.getName() + "', " + e.getSemester() + "', '" + e.getLeistungpunkte() + "');";
+			abfrage.executeUpdate(befehl);
+		} catch (SQLException e1) {
+			throw new StoreException("Error while adding lecture " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public void deleteLecture(Lecture e) throws StoreException{
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "DELETE FROM userlecture WHERE username = '" + email + "' AND semester = " + e.getSemester() + " AND name = '" + e.getName() + "';";
+			abfrage.executeUpdate(befehl);
+		} catch (SQLException e1) {
+			throw new StoreException("Error while deleting lecture " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public void modifyLecture(Lecture eold, Lecture enew) throws StoreException{
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "update userlecture set credits = '" + enew.getLeistungpunkte() + "' " +
+					"WHERE username = '" + email + "' AND semester = " + eold.getSemester() + " AND name = '"+ eold.getName() + "';";
+			abfrage.executeUpdate(befehl);
+		} catch (SQLException e) {
+			throw new StoreException("Error while modifying lecture " + e.getMessage(), e);
+		}
+	}
 
 	@Override
 	public void close() throws StoreException {
