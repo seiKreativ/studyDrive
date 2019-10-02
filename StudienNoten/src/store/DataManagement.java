@@ -1,6 +1,11 @@
 package store;
 
-import data.exam.*;
+import data.exam.exam.Exam;
+import data.exam.exam.ExamContainer;
+import data.exam.lecture.Lecture;
+import data.exam.lecture.LectureContainer;
+import data.exam.sheet.Sheet;
+import data.exam.sheet.SheetContainer;
 
 public interface DataManagement {
 

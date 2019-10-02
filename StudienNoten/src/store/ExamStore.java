@@ -3,16 +3,18 @@ package store;
 import java.sql.*;
 
 import data.exam.*;
+import data.exam.exam.Exam;
+import data.exam.exam.ExamAlreadyExistsException;
+import data.exam.exam.ExamContainer;
+import data.exam.lecture.Lecture;
+import data.exam.lecture.LectureAlreadyExistsException;
+import data.exam.lecture.LectureContainer;
+import data.exam.sheet.Sheet;
+import data.exam.sheet.SheetAlreadyExistsException;
+import data.exam.sheet.SheetContainer;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class ExamStore implements DataManagement {
-
-	/*
-	is just use my databse, that can be changed easily. The database has to have the
-	tables "Users" and "Exams" with the attributs (which can be changed to if necessary)
-	Users: "username" (varchar(20)) and "password" (varchar(20)), primary key: username
-	Exams: "name" (varchar(30)), "semester" (int), "leistungspunkte" (int), "note" (double), "username" (varchar(20)), primary key: username, semester, name
-	*/
 
 	private final static String connection = "jdbc:mysql://www.remotemysql.com:3306/oUyCsXhXyi";
 	private final static String user = "oUyCsXhXyi";
@@ -41,7 +43,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void load(LectureContainer lectures, ExamContainer container, SheetContainer sheets) throws StoreException {
 		try (Statement abfrage = con.createStatement()){
-			String befehl = "SELECT distinct lecture, semester, credits FROM userlecture WHERE username = '" + email + "'";
+			String befehl = "SELECT distinct lecture, semester, credits FROM userlecture WHERE email = '" + email + "'";
 			ResultSet ergebnis = abfrage.executeQuery(befehl); 
 			while (ergebnis.next()) {
 				try {
@@ -57,7 +59,7 @@ public class ExamStore implements DataManagement {
 				Lecture tmp = lectures.getLectureByName(ergebnis2.getString("name"), ergebnis2.getInt("semester"));
 				container.linkExamLoading(new Exam(tmp, ergebnis2.getDouble("mark")));
 			}
-			String befehl3 = "SELECT distinct lecture, number, points, maxPoints, semester FROM exams WHERE username = '" + email + "'";
+			String befehl3 = "SELECT distinct lecture, number, points, maxPoints, semester FROM usersheet WHERE email = '" + email + "'";
 			ResultSet ergebnis3 = abfrage.executeQuery(befehl3);
 			while (ergebnis3.next()) {
 				Lecture tmp = lectures.getLectureByName(ergebnis3.getString("lecture"), ergebnis3.getInt("semester"));
@@ -96,9 +98,8 @@ public class ExamStore implements DataManagement {
 	private static String hashPassword(String password_plaintext) {
 		int workload = 10;
 		String salt = BCrypt.gensalt(workload);
-		String hashed_password = BCrypt.hashpw(password_plaintext, salt);
 
-		return(hashed_password);
+		return(BCrypt.hashpw(password_plaintext, salt));
 	}
 
 	@Override
@@ -117,7 +118,7 @@ public class ExamStore implements DataManagement {
 			adding user
 			 */
 			String hashed_password = ExamStore.hashPassword(password);
-			String befehl2 = "INSERT INTO users VALUES ('" + name + "','" + email + "','" + hashed_password + "'));";
+			String befehl2 = "INSERT INTO users (name, email, password) VALUES ('" + name + "','" + email + "','" + hashed_password + "');";
 			abfrage.executeUpdate(befehl2);
 			this.email = email;
 			this.password = password;
@@ -135,9 +136,8 @@ public class ExamStore implements DataManagement {
 		String befehl = "select * from users;";
 		ResultSet ergebnis = abfrage.executeQuery(befehl);
 		boolean tmp = false;
-		String hashed_password = ExamStore.hashPassword(password);
 		while (ergebnis.next()) {
-			if (ergebnis.getString("email").equals(email) && ergebnis.getString("password").equals(hashed_password)) {
+			if (ergebnis.getString("email").equals(email) && BCrypt.checkpw(password, ergebnis.getString("password"))) {
 				this.email = email;
 				this.password = password;
 				tmp = true;

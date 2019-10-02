@@ -1,4 +1,4 @@
-package data.exam;
+package data.exam.sheet;
 
 public class SheetNotFoundException extends Exception {
     /**

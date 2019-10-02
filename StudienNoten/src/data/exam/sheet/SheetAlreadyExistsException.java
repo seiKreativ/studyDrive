@@ -1,4 +1,4 @@
-package data.exam;
+package data.exam.sheet;
 
 public class SheetAlreadyExistsException extends Exception {
     /**
