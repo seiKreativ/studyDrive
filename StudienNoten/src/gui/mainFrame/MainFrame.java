@@ -10,6 +10,7 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -17,9 +18,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -33,35 +37,38 @@ import data.exam.sheet.SheetContainer;
 import gui.addFrame.AddFrame;
 import gui.registration.SignUpDialog;
 import store.StoreException;
-import javax.swing.JCheckBox;
 
-public class MainFrame extends JFrame implements PropertyChangeListener {
+public class MainFrame extends JFrame implements PropertyChangeListener{
 
 	private static final long serialVersionUID = -5724418947028211664L;
-	private JPanel contentPane;
+	private JPanel examsPane;
 	private JTextField durchschnittsnote;
+	private JTextField insgÜbungsblätter;
+	private JTextField insgVorlesungen;
 	private ExamContainer examContainer;
 	private LectureContainer lectureContainer;
 	private SheetContainer sheetContainer;
-	private JButton btnAdd, btnDel, btnMod;
+	private JButton btnAddExam, btnDelExam, btnModExam;
 	private TableExams allExams;
 	private double durchschnitt;
 
+	
 	/**
-	 * 
-	 * public static void main(String[] args) { EventQueue.invokeLater(new
-	 * Runnable() { public void run() { try { MainFrame frame = new MainFrame();
-	 * frame.setVisible(true); } catch (Exception e) { e.printStackTrace(); } } });
-	 * }
-	 * 
-	 * 
+	 * Create the frame.
 	 */
 	public MainFrame() {
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 		setTitle("Studium Noten Manager");
 		setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		Border emptyBorder = javax.swing.BorderFactory.createEmptyBorder();
-		setBounds(100, 100, 800, 431);
+		setBounds(100, 100, 800, 464);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -82,18 +89,30 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 			JOptionPane.showMessageDialog(this, "Version 1.0");
 		});
 		mnAllgemein.add(mntmInformation);
-		contentPane = new JPanel();
-		contentPane.setBackground(Color.WHITE);
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
+		
+		try {
+			lectureContainer= LectureContainer.instance();
+			examContainer = ExamContainer.instance();
+			sheetContainer = SheetContainer.instance();
+		} catch (StoreException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        setContentPane(tabbedPane);
+		
+		examsPane = new JPanel();
+		examsPane.setBackground(Color.WHITE);
+		examsPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		examsPane.setLayout(null);
 
 		JPanel grade = new JPanel();
 		grade.setLayout(new BorderLayout(0, 0));
 		grade.setBorder(new EmptyBorder(5, 5, 5, 5));
 		grade.setBounds(0, 35, 349, 175);
 		grade.setBackground(Color.WHITE);
-		contentPane.add(grade);
+		examsPane.add(grade);
 
 		durchschnittsnote = new JTextField();
 		durchschnittsnote.setBackground(Color.WHITE);
@@ -113,44 +132,36 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		lblDurchschnittsnote.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDurchschnittsnote.setFont(new Font("Tahoma", Font.PLAIN, 19));
 
-		JPanel panel = new JPanel();
-		panel.setBackground(Color.WHITE);
-		panel.setBounds(10, 210, 339, 165);
-		contentPane.add(panel);
-		panel.setLayout(null);
+		JPanel examsOptions = new JPanel();
+		examsOptions.setBackground(Color.WHITE);
+		examsOptions.setBounds(10, 210, 339, 165);
+		examsPane.add(examsOptions);
+		examsOptions.setLayout(null);
 
-		btnAdd = new JButton("Pr\u00FCfung hinzuf\u00FCgen ");
-		btnAdd.setBackground(Color.GRAY);
-		btnAdd.setBounds(10, 5, 319, 41);
-		panel.add(btnAdd);
-		btnAdd.addActionListener(e -> onAdd());
+		btnAddExam = new JButton("Prüfung hinzufügen ");
+		btnAddExam.setBackground(Color.GRAY);
+		btnAddExam.setBounds(10, 5, 319, 41);
+		examsOptions.add(btnAddExam);
+		btnAddExam.addActionListener(e -> onAdd());
 
-		btnDel = new JButton("Pr\u00FCfung l\u00F6schen ");
-		btnDel.setBackground(Color.GRAY);
-		btnDel.setBounds(10, 57, 319, 41);
-		panel.add(btnDel);
-		btnDel.addActionListener(e -> onDel());
+		btnDelExam = new JButton("Prüfung löschen ");
+		btnDelExam.setBackground(Color.GRAY);
+		btnDelExam.setBounds(10, 57, 319, 41);
+		examsOptions.add(btnDelExam);
+		btnDelExam.addActionListener(e -> onDel());
 
-		btnMod = new JButton("Pr\u00FCfung ver\u00E4ndern");
-		btnMod.setBackground(Color.GRAY);
-		btnMod.setBounds(10, 109, 319, 41);
-		panel.add(btnMod);
-		btnMod.addActionListener(e -> onModify());
+		btnModExam = new JButton("Prüfung verändern");
+		btnModExam.setBackground(Color.GRAY);
+		btnModExam.setBounds(10, 109, 319, 41);
+		examsOptions.add(btnModExam);
+		btnModExam.addActionListener(e -> onModify());
 
-		try {
-			lectureContainer= LectureContainer.instance();
-			examContainer = ExamContainer.instance();
-			sheetContainer = SheetContainer.instance();
-		} catch (StoreException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
 		allExams = new TableExams(examContainer);
 		allExams.setBackground(Color.WHITE);
 		allExams.setForeground(Color.WHITE);
 		allExams.setBounds(359, 34, 427, 312);
-		contentPane.add((JPanel) allExams);
+		examsPane.add((JPanel) allExams);
 
 		JCheckBox chckbxNichtBestandenePrfungen = new JCheckBox("Nicht bestandene Prüfungen anzeigen ");
 		chckbxNichtBestandenePrfungen.setBackground(Color.WHITE);
@@ -163,7 +174,123 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 				allExams.load();
 			}
 		});
-		contentPane.add(chckbxNichtBestandenePrfungen);
+		examsPane.add(chckbxNichtBestandenePrfungen);
+		calcDurchschnitt();
+		tabbedPane.addTab("Exams", examsPane);
+		
+		JPanel sheetsPanel = new JPanel();
+		sheetsPanel.setLayout(null);
+		sheetsPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		sheetsPanel.setBackground(Color.WHITE);
+		tabbedPane.addTab("Sheets", sheetsPanel);
+		
+		JPanel countSheet = new JPanel();
+		countSheet.setLayout(new BorderLayout(0, 0));
+		countSheet.setBorder(new EmptyBorder(5, 5, 5, 5));
+		countSheet.setBounds(0, 35, 349, 175);
+		countSheet.setBackground(Color.WHITE);
+		
+		insgÜbungsblätter = new JTextField();
+		insgÜbungsblätter.setBackground(Color.WHITE);
+		insgÜbungsblätter.setFont(new Font("Tahoma", Font.PLAIN, 48));
+		insgÜbungsblätter.setHorizontalAlignment(SwingConstants.CENTER);
+		insgÜbungsblätter.setText(Integer.toString(sheetContainer.getAllExams().size()));
+		insgÜbungsblätter.setBorder(emptyBorder);
+		insgÜbungsblätter.setEditable(false);
+		insgÜbungsblätter.setOpaque(true);
+		countSheet.add(insgÜbungsblätter, BorderLayout.CENTER);
+		insgÜbungsblätter.setColumns(100);
+		
+		JLabel lblInsgÜbungsblätter = new JLabel("Übungsblätter insgesamt");
+		lblInsgÜbungsblätter.setBackground(Color.WHITE);
+		lblInsgÜbungsblätter.setOpaque(true);
+		countSheet.add(lblInsgÜbungsblätter, BorderLayout.NORTH);
+		lblInsgÜbungsblätter.setHorizontalAlignment(SwingConstants.CENTER);
+		lblInsgÜbungsblätter.setFont(new Font("Tahoma", Font.PLAIN, 19));
+		
+		sheetsPanel.add(countSheet);
+		
+		JPanel sheetOptions = new JPanel();
+		sheetOptions.setLayout(null);
+		sheetOptions.setBackground(Color.WHITE);
+		sheetOptions.setBounds(10, 210, 339, 165);
+		sheetsPanel.add(sheetOptions);
+		
+		JButton btnAddSheet = new JButton("Übungsblatt hinzufügen ");
+		btnAddSheet.setBackground(Color.GRAY);
+		btnAddSheet.setBounds(10, 5, 319, 41);
+		sheetOptions.add(btnAddSheet);
+		
+		JButton btnDelSheet = new JButton("Übungsblatt löschen ");
+		btnDelSheet.setBackground(Color.GRAY);
+		btnDelSheet.setBounds(10, 57, 319, 41);
+		sheetOptions.add(btnDelSheet);
+		
+		JButton btnModSheet = new JButton("Übungsblatt verändern");
+		btnModSheet.setBackground(Color.GRAY);
+		btnModSheet.setBounds(10, 109, 319, 41);
+		sheetOptions.add(btnModSheet);
+		
+		TableSheets tableSheets = new TableSheets(sheetContainer);
+		tableSheets.setBounds(359, 34, 427, 341);
+		sheetsPanel.add(tableSheets);
+		
+		JPanel lecturePanel = new JPanel();
+		lecturePanel.setLayout(null);
+		lecturePanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		lecturePanel.setBackground(Color.WHITE);
+		tabbedPane.addTab("Lectures", lecturePanel);
+		
+		JPanel countLecture = new JPanel();
+		countLecture.setLayout(new BorderLayout(0, 0));
+		countLecture.setBorder(new EmptyBorder(5, 5, 5, 5));
+		countLecture.setBounds(0, 35, 349, 175);
+		countLecture.setBackground(Color.WHITE);
+		
+		insgVorlesungen = new JTextField();
+		insgVorlesungen.setBackground(Color.WHITE);
+		insgVorlesungen.setFont(new Font("Tahoma", Font.PLAIN, 48));
+		insgVorlesungen.setHorizontalAlignment(SwingConstants.CENTER);
+		insgVorlesungen.setText(Integer.toString(lectureContainer.getAllLectures().size()));
+		insgVorlesungen.setBorder(emptyBorder);
+		insgVorlesungen.setEditable(false);
+		insgVorlesungen.setOpaque(true);
+		countLecture.add(insgVorlesungen, BorderLayout.CENTER);
+		insgVorlesungen.setColumns(100);
+		
+		JLabel lblInsgVorlesungen = new JLabel("Vorlesungen insgesamt");
+		lblInsgVorlesungen.setBackground(Color.WHITE);
+		lblInsgVorlesungen.setOpaque(true);
+		countLecture.add(lblInsgVorlesungen, BorderLayout.NORTH);
+		lblInsgVorlesungen.setHorizontalAlignment(SwingConstants.CENTER);
+		lblInsgVorlesungen.setFont(new Font("Tahoma", Font.PLAIN, 19));
+		
+		lecturePanel.add(countLecture);
+		
+		JPanel lectureOptions = new JPanel();
+		lectureOptions.setLayout(null);
+		lectureOptions.setBackground(Color.WHITE);
+		lectureOptions.setBounds(10, 210, 339, 165);
+		lecturePanel.add(lectureOptions);
+		
+		JButton btnAddLecture = new JButton("Vorlesung hinzufügen ");
+		btnAddLecture.setBackground(Color.GRAY);
+		btnAddLecture.setBounds(10, 5, 319, 41);
+		lectureOptions.add(btnAddLecture);
+		
+		JButton btnDelLecture = new JButton("Vorlesung löschen ");
+		btnDelLecture.setBackground(Color.GRAY);
+		btnDelLecture.setBounds(10, 57, 319, 41);
+		lectureOptions.add(btnDelLecture);
+		
+		JButton btnModLecture = new JButton("Vorlesung verändern");
+		btnModLecture.setBackground(Color.GRAY);
+		btnModLecture.setBounds(10, 109, 319, 41);
+		lectureOptions.add(btnModLecture);
+		
+		TableLectures tableLectures = new TableLectures(lectureContainer);
+		tableLectures.setBounds(359, 34, 427, 341);
+		lecturePanel.add(tableLectures);
 
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -176,7 +303,6 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 				System.exit(0);
 			}
 		});
-		calcDurchschnitt();
 		setVisible(true);
 	}
 
@@ -282,7 +408,6 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 		}
 	}
 
-	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		// TODO Auto-generated method stub
 
