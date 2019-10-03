@@ -29,6 +29,7 @@ import data.exam.exam.ExamContainer;
 import data.exam.exam.ExamNotFoundException;
 import data.exam.lecture.Lecture;
 import data.exam.lecture.LectureContainer;
+import data.exam.lecture.LectureNotFoundException;
 import data.exam.sheet.SheetContainer;
 import gui.addFrame.AddFrame;
 import gui.registration.SignUpDialog;
@@ -210,13 +211,14 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 				Lecture l = new Lecture(tempSem, tempName, tempLp);
 				Exam e = new Exam(l, tempNote);
 				examContainer.unlinkExam(e);
+				lectureContainer.unlinkLecture(l);
 				AddFrame addDia = new AddFrame(this, "Prüfung ändern");
 				addDia.setData(tempSem, tempName, tempLp, tempNote);
 				addDia.setCancelButtonActivated(false);
 				addDia.setVisible(true);
 				calcDurchschnitt();
 				allExams.load();
-			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
+			} catch (IllegalInputException | ExamNotFoundException | StoreException | LectureNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -245,9 +247,10 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 						Integer.valueOf((String) tb.getValueAt(row, 1)));
 				Exam e = new Exam(l, Double.valueOf((String) tb.getValueAt(row, 3)));
 				examContainer.unlinkExam(e);
+				lectureContainer.unlinkLecture(l);
 				allExams.load();
 				calcDurchschnitt();
-			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
+			} catch (IllegalInputException | StoreException | ExamNotFoundException | LectureNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

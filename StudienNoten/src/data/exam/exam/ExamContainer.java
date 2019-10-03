@@ -57,9 +57,8 @@ public class ExamContainer implements Iterable<Exam> {
 	}
 
 	public void linkExamLoading(Exam e) throws ExamAlreadyExistsException {
-		//gibt grad noch Probleme, weil die lecture und die exam tabelle noch nicht schön eingebunden ist
-		//if (exams.contains(e))
-		//	throw new ExamAlreadyExistsException(e.getName());
+		if (exams.contains(e))
+		    throw new ExamAlreadyExistsException(e.getName());
 		exams.add(e);
 	}
 
