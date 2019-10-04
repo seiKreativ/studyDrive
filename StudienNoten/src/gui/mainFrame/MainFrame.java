@@ -33,8 +33,11 @@ import data.exam.exam.ExamContainer;
 import data.exam.exam.ExamNotFoundException;
 import data.exam.lecture.Lecture;
 import data.exam.lecture.LectureContainer;
+import data.exam.sheet.Sheet;
 import data.exam.sheet.SheetContainer;
-import gui.addFrame.AddExam;
+import data.exam.sheet.SheetNotFoundException;
+import gui.addFrame.AddExamFrame;
+import gui.addFrame.AddSheetFrame;
 import gui.registration.SignUpDialog;
 import store.StoreException;
 
@@ -50,6 +53,8 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 	private SheetContainer sheetContainer;
 	private JButton btnAddExam, btnDelExam, btnModExam;
 	private TableExams allExams;
+	private TableSheets allSheets; 
+	private TableLectures allLectures; 
 	private double durchschnitt;
 
 	
@@ -234,9 +239,9 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		btnModSheet.addActionListener(e -> onModifySheet());
 		sheetOptions.add(btnModSheet);
 		
-		TableSheets tableSheets = new TableSheets(sheetContainer);
-		tableSheets.setBounds(359, 34, 427, 341);
-		sheetsPanel.add(tableSheets);
+		allSheets = new TableSheets(sheetContainer);
+		allSheets.setBounds(359, 34, 427, 341);
+		sheetsPanel.add(allSheets);
 		
 		JPanel lecturePanel = new JPanel();
 		lecturePanel.setLayout(null);
@@ -294,9 +299,9 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		btnModLecture.addActionListener(e -> onModifyLecture());
 		lectureOptions.add(btnModLecture);
 		
-		TableLectures tableLectures = new TableLectures(lectureContainer);
-		tableLectures.setBounds(359, 34, 427, 341);
-		lecturePanel.add(tableLectures);
+		allLectures = new TableLectures(lectureContainer);
+		allLectures.setBounds(359, 34, 427, 341);
+		lecturePanel.add(allLectures);
 
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -342,7 +347,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 				Lecture l = new Lecture(tempSem, tempName, tempLp);
 				Exam e = new Exam(l, tempNote);
 				examContainer.unlinkExam(e);
-				AddExam addDia = new AddExam(this, "Prüfung ändern");
+				AddExamFrame addDia = new AddExamFrame(this, "Prüfung ändern");
 				addDia.setData(tempSem, tempName, tempLp, tempNote);
 				addDia.setCancelButtonActivated(false);
 				addDia.setVisible(true);
@@ -357,10 +362,10 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 
 	private void onAddExam() {
 		// Prüfung hinzufügen
-		AddExam addDia = new AddExam(this, "Neue Prüfung hinzufügen");
+		AddExamFrame addDia = new AddExamFrame(this, "Neue Prüfung hinzufügen");
 		addDia.setVisible(true);
 		calcDurchschnitt();
-		allExams.load();
+		allSheets.load();
 
 	}
 
@@ -389,27 +394,29 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 	
 	private void onModifySheet() {
 		// Prüfung verändern
-		if (allExams.getTable().getSelectedRow() == -1) {
+		if (allSheets.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
 					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
 		} else {
-			JTable tb = allExams.getTable();
-			int row = allExams.getTable().getSelectedRow();
+			JTable tb = allSheets.getTable();
+			int row = allSheets.getTable().getSelectedRow();
 			try {
-				int tempSem = Integer.valueOf((String) tb.getValueAt(row, 0));
-				String tempName = (String) tb.getValueAt(row, 2);
-				int tempLp = Integer.valueOf((String) tb.getValueAt(row, 1));
-				double tempNote = Double.valueOf((String) tb.getValueAt(row, 3));
-				Lecture l = new Lecture(tempSem, tempName, tempLp);
-				Exam e = new Exam(l, tempNote);
-				examContainer.unlinkExam(e);
-				AddExam addDia = new AddExam(this, "Prüfung ändern");
-				addDia.setData(tempSem, tempName, tempLp, tempNote);
+				Lecture lecture = null;
+				for (int i = 0; i < lectureContainer.getSize(); i++) {
+					Lecture e = lectureContainer.getLectureByIndex(i);
+					if (e.getName().equals((String) tb.getValueAt(row, 1))
+							&& e.getSemester() == Integer.parseInt((String) tb.getValueAt(row, 0))) {
+						lecture = e;
+					}
+				}
+				Sheet e = new Sheet(lecture,Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)) ,Double.valueOf((String) tb.getValueAt(row, 4)));
+				sheetContainer.unlinkSheet(e);
+				AddSheetFrame addDia = new AddSheetFrame(this, "Übungsblatt ändern");
+				addDia.setData(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 1), Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)), Double.valueOf((String) tb.getValueAt(row, 4)));
 				addDia.setCancelButtonActivated(false);
 				addDia.setVisible(true);
-				calcDurchschnitt();
-				allExams.load();
-			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
+				allSheets.load();
+			} catch (IllegalInputException | StoreException | SheetNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -418,29 +425,34 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 
 	private void onAddSheet() {
 		// Prüfung hinzufügen
-		AddExam addDia = new AddExam(this, "Neue Prüfung hinzufügen");
+		AddSheetFrame addDia = new AddSheetFrame(this, "Neues Übungsblatt hinzufügen");
 		addDia.setVisible(true);
-		calcDurchschnitt();
-		allExams.load();
+		allSheets.load();
 
 	}
 
 	private void onDelSheet() {
 		// Prüfung löschen
-		if (allExams.getTable().getSelectedRow() == -1) {
+		if (allSheets.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
 					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
 		} else {
-			JTable tb = allExams.getTable();
-			int row = allExams.getTable().getSelectedRow();
+			JTable tb = allSheets.getTable();
+			int row = allSheets.getTable().getSelectedRow();
 			try {
-				Lecture l = new Lecture(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
-						Integer.valueOf((String) tb.getValueAt(row, 1)));
-				Exam e = new Exam(l, Double.valueOf((String) tb.getValueAt(row, 3)));
-				examContainer.unlinkExam(e);
-				allExams.load();
+				Lecture lecture = null;
+				for (int i = 0; i < lectureContainer.getSize(); i++) {
+					Lecture e = lectureContainer.getLectureByIndex(i);
+					if (e.getName().equals((String) tb.getValueAt(row, 1))
+							&& e.getSemester() == Integer.parseInt((String) tb.getValueAt(row, 0))) {
+						lecture = e;
+					}
+				}
+				Sheet e = new Sheet(lecture,Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)) ,Double.valueOf((String) tb.getValueAt(row, 4)));
+				sheetContainer.unlinkSheet(e);
+				allSheets.load();
 				calcDurchschnitt();
-			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
+			} catch (IllegalInputException | StoreException | SheetNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -464,7 +476,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 				Lecture l = new Lecture(tempSem, tempName, tempLp);
 				Exam e = new Exam(l, tempNote);
 				examContainer.unlinkExam(e);
-				AddExam addDia = new AddExam(this, "Prüfung ändern");
+				AddExamFrame addDia = new AddExamFrame(this, "Prüfung ändern");
 				addDia.setData(tempSem, tempName, tempLp, tempNote);
 				addDia.setCancelButtonActivated(false);
 				addDia.setVisible(true);
@@ -479,7 +491,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 
 	private void onAddLecture() {
 		// Prüfung hinzufügen
-		AddExam addDia = new AddExam(this, "Neue Prüfung hinzufügen");
+		AddExamFrame addDia = new AddExamFrame(this, "Neue Prüfung hinzufügen");
 		addDia.setVisible(true);
 		calcDurchschnitt();
 		allExams.load();

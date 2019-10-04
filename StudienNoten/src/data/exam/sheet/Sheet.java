@@ -66,7 +66,7 @@ public class Sheet {
     public boolean equals(Object o) {
         if (o == null) {
             return false;
-        } else if (!(o instanceof Exam)) {
+        } else if (!(o instanceof Sheet)) {
             return false;
         }
         Sheet e = (Sheet) o;

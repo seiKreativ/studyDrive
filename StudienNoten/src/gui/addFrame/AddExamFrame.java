@@ -21,7 +21,7 @@ import data.exam.lecture.LectureContainer;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
 
-public class AddFrameExam extends JDialog {
+public class AddExamFrame extends JDialog {
 
 	/**
 	 * 
@@ -30,7 +30,7 @@ public class AddFrameExam extends JDialog {
 	private JPanel contentPane;
 	private JTextField txtLeistungspunkte;
 	private JTextField txtName;
-	private JComboBox<String> comboBoxSem, comboBoxNoten;
+	private JComboBox<String> comboBoxSem, comboBoxNoten, comboBoxLectures;
 	private ExamContainer examContainer = null;
 	private LectureContainer lectureContainer;
 	private JButton btnClose;
@@ -44,7 +44,7 @@ public class AddFrameExam extends JDialog {
 	 * 
 	 */
 
-	public AddFrameExam(MainFrame owner, String title) {
+	public AddExamFrame(MainFrame owner, String title) {
 		super(owner, title, true);
 		this.setBounds(300, 400, 717, 128);
 		this.setUndecorated(true);
@@ -84,11 +84,13 @@ public class AddFrameExam extends JDialog {
 		txtLeistungspunkte.setBounds(108, 36, 50, 20);
 		contentPane.add(txtLeistungspunkte);
 		txtLeistungspunkte.setColumns(10);
-
-		txtName = new JTextField();
-		txtName.setColumns(10);
-		txtName.setBounds(190, 36, 380, 20);
-		contentPane.add(txtName);
+		
+		comboBoxLectures = new JComboBox<>();
+		comboBoxLectures.setBounds(190, 36, 380, 20);
+		for (int i = 0; i <= lectureContainer.getSize(); i++) {
+			comboBoxLectures.addItem(lectureContainer.getLectureByIndex(i).getName());
+		}
+		contentPane.add(comboBoxLectures);
 
 		comboBoxNoten = new JComboBox<String>();
 		comboBoxNoten.setBackground(Color.LIGHT_GRAY);
@@ -144,12 +146,20 @@ public class AddFrameExam extends JDialog {
 
 	private void onAdd() {
 		try {
-			Lecture lecture = new Lecture(Integer.parseInt((String) comboBoxSem.getSelectedItem()),
-					txtName.getText().replace("'", ""), Integer.parseInt(txtLeistungspunkte.getText()));
+			Lecture lecture = null;
+			for (int i = 0; i < lectureContainer.getSize(); i++) {
+				Lecture e = lectureContainer.getLectureByIndex(i); 
+				if (e.getName().equals(comboBoxLectures.getSelectedItem()) && e.getSemester() == Integer.parseInt((String) comboBoxSem.getSelectedItem())) {
+					lecture = e; 
+				}
+			}
+			if (lecture == null) {
+				JOptionPane.showMessageDialog(this, "this lecture does not exist");
+				this.dispose();
+			}
 			Exam exam = new Exam(lecture, Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
-			lectureContainer.linkLecture(lecture);
 			examContainer.linkExam(exam);
-		} catch (NumberFormatException | StoreException | IllegalInputException | ExamAlreadyExistsException | LectureAlreadyExistsException e) {
+		} catch (NumberFormatException | StoreException | IllegalInputException | ExamAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		dispose(); 
