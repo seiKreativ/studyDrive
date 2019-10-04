@@ -46,7 +46,7 @@ public class Exam {
 			return false; 
 		} 
 		Exam e = (Exam) o; 
-		if (e.getLeistungpunkte() == this.getLeistungpunkte() && e.getNote() == this.getNote()  && e.getName().equals(this.getName()) && e.getSemester() == this.getSemester()) {
+		if (e.getLecture().equals(this.getLecture()) && e.getNote() == this.getNote()) {
 			return true; 
 		}
 		return false;

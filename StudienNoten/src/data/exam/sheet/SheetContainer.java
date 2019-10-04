@@ -1,7 +1,5 @@
 package data.exam.sheet;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -9,10 +7,11 @@ import store.ExamStore;
 import store.StoreException;
 
 public class SheetContainer implements Iterable<Sheet> {
+
     private static SheetContainer unique = null;
     private Vector<Sheet> sheets;
     private ExamStore store = null;
-    private PropertyChangeSupport changes = new PropertyChangeSupport(this);
+    private static int id = 0;
 
     private SheetContainer() throws StoreException {
         sheets = new Vector<Sheet>();
@@ -36,9 +35,12 @@ public class SheetContainer implements Iterable<Sheet> {
         }
         if (temp)
             throw new SheetAlreadyExistsException(e.getName());
+        if (e.getNumber() == 99) {
+            id++;
+            e.setId(id);
+        }
         store.addSheet(e);
         sheets.add(e);
-        changes.firePropertyChange("sheet added", null, e);
     }
 
     public void unlinkSheet(Sheet e) throws SheetNotFoundException, StoreException {
@@ -53,12 +55,15 @@ public class SheetContainer implements Iterable<Sheet> {
             throw new SheetNotFoundException(e.getName());
         store.deleteSheet(e);
         sheets.remove(e);
-        changes.firePropertyChange("exam removed", e, null);
     }
 
     public void linkSheetLoading(Sheet e) throws SheetAlreadyExistsException {
         if (sheets.contains(e))
             throw new SheetAlreadyExistsException(e.getName());
+        if (e.getNumber() == 99) {
+            if (e.getId() > id)
+                id = e.getId();
+        }
         sheets.add(e);
     }
 
@@ -67,6 +72,13 @@ public class SheetContainer implements Iterable<Sheet> {
      */
     public void modify(Sheet eold, Sheet enew) throws StoreException {
         store.modifySheet(eold, enew);
+        if (eold.getNumber() == 99 && enew.getNumber() != 99) {
+            enew.setId(-100);
+        }
+        if (eold.getNumber() != 99 && enew.getNumber() == 99) {
+            id++;
+            enew.setId(id);
+        }
     }
 
     public Sheet getSheetByIndex(int pos) {
@@ -91,14 +103,6 @@ public class SheetContainer implements Iterable<Sheet> {
 
     public int getSize() {
         return sheets.size();
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener l) {
-        changes.addPropertyChangeListener(l);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener l) {
-        changes.removePropertyChangeListener(l);
     }
 
     public void close() {

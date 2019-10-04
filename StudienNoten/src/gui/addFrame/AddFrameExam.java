@@ -21,7 +21,7 @@ import data.exam.lecture.LectureContainer;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
 
-public class AddFrame extends JDialog {
+public class AddFrameExam extends JDialog {
 
 	/**
 	 * 
@@ -44,7 +44,7 @@ public class AddFrame extends JDialog {
 	 * 
 	 */
 
-	public AddFrame(MainFrame owner, String title) {
+	public AddFrameExam(MainFrame owner, String title) {
 		super(owner, title, true);
 		this.setBounds(300, 400, 717, 128);
 		this.setUndecorated(true);
@@ -147,8 +147,9 @@ public class AddFrame extends JDialog {
 			Lecture lecture = new Lecture(Integer.parseInt((String) comboBoxSem.getSelectedItem()),
 					txtName.getText().replace("'", ""), Integer.parseInt(txtLeistungspunkte.getText()));
 			Exam exam = new Exam(lecture, Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
+			lectureContainer.linkLecture(lecture);
 			examContainer.linkExam(exam);
-		} catch (NumberFormatException | StoreException | IllegalInputException | ExamAlreadyExistsException e) {
+		} catch (NumberFormatException | StoreException | IllegalInputException | ExamAlreadyExistsException | LectureAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		dispose(); 

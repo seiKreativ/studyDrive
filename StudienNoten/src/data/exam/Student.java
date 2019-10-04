@@ -7,10 +7,12 @@ import store.StoreException;
 public class Student {
 
     private String email;
+    private String name;
     private String password;
     private static DataManagement store;
 
     public Student(String name, String email, String password, boolean newStudent) throws IllegalInputException, StoreException {
+        setName(name);
         setEmail(email);
         setPassword(password);
         store = ExamStore.instance();
@@ -18,6 +20,12 @@ public class Student {
             store.newUser(name, email, password);
         if (!newStudent)
             store.setUser(email, password);
+    }
+
+    private void setName(String name) throws IllegalInputException {
+        if (name.length() < 1)
+            throw new IllegalInputException("At least two chars");
+        this.name = name;
     }
 
     private void setEmail(String email) throws IllegalInputException {
