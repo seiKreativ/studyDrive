@@ -60,8 +60,8 @@ public class Lecture {
         } else if (!(o instanceof Exam)) {
             return false;
         }
-        Exam e = (Exam) o;
-        if (e.getLeistungpunkte() == this.getLeistungpunkte() && e.getName().equals(this.getName()) && e.getSemester() == this.getSemester()) {
+        Lecture e = (Lecture) o;
+        if (e.getName().equals(this.getName()) && e.getSemester() == this.getSemester()) {
             return true;
         }
         return false;

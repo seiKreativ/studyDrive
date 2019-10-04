@@ -59,11 +59,13 @@ public class ExamStore implements DataManagement {
 				Lecture tmp = lectures.getLectureByName(ergebnis2.getString("name"), ergebnis2.getInt("semester"));
 				container.linkExamLoading(new Exam(tmp, ergebnis2.getDouble("mark")));
 			}
-			String befehl3 = "SELECT distinct lecture, number, points, maxPoints, semester FROM usersheet WHERE email = '" + email + "'";
+			String befehl3 = "SELECT distinct lecture, number, points, maxPoints, semester, id FROM usersheet WHERE email = '" + email + "'";
 			ResultSet ergebnis3 = abfrage.executeQuery(befehl3);
 			while (ergebnis3.next()) {
 				Lecture tmp = lectures.getLectureByName(ergebnis3.getString("lecture"), ergebnis3.getInt("semester"));
-				sheets.linkSheetLoading(new Sheet(tmp, ergebnis3.getInt("number"), ergebnis3.getDouble("points"), ergebnis3.getDouble("maxPoints")));
+				Sheet s = new Sheet(tmp, ergebnis3.getInt("number"), ergebnis3.getDouble("points"), ergebnis3.getDouble("maxPoints"));
+				s.setId(ergebnis3.getInt("id"));
+				sheets.linkSheetLoading(s);
 			}
 		} catch (SQLException | IllegalInputException | ExamAlreadyExistsException | SheetAlreadyExistsException e) {
 			throw new StoreException("Error while loading: " + e.getMessage(), e);
@@ -73,7 +75,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void addSheet(Sheet s) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "INSERT INTO usersheet VALUES ('" + email + "','" + s.getName() + "', " + s.getNumber() + ", " + s.getPoints() + ", " + s.getMaxPoints() + ", " + s.getSemester() + ");";
+			String befehl = "INSERT INTO usersheet VALUES ('" + email + "','" + s.getName() + "', " + s.getNumber() + ", " + s.getPoints() + ", " + s.getMaxPoints() + ", " + s.getSemester() + ", " + s.getId() + ");";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding sheet " + e1.getMessage(), e1);
@@ -83,7 +85,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void deleteSheet(Sheet s) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "DELETE FROM usersheet WHERE username = '" + email + "' AND semester = " + s.getSemester() + " AND name = '" + s.getName() + "';";
+			String befehl = "DELETE FROM usersheet WHERE username = '" + email + "' AND semester = " + s.getSemester() + " AND name = '" + s.getName() + "' AND id = " + s.getId() + ";";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while deleting lecture " + e1.getMessage(), e1);

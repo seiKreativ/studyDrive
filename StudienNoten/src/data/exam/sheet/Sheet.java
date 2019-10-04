@@ -9,6 +9,7 @@ public class Sheet {
     private Lecture lecture;
     private double points, maxPoints;
     private int number;
+    private int id = -100; //-100 normale Wert ohne Bedeutung
 
     public Sheet(Lecture lecture, int number, double points, double maxPoints) throws IllegalInputException {
         this.setLecture(lecture);
@@ -39,10 +40,17 @@ public class Sheet {
         this.lecture = lecture;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName(){ return lecture.getName(); }
     public int getLeistungpunkte(){ return lecture.getLeistungpunkte(); }
     public int getSemester() { return lecture.getSemester(); }
 
+    public int getId() {
+        return this.id;
+    }
     public Lecture getLecture() { return this.lecture; };
     public int getNumber() { return this.number; };
     public double getPoints() { return this.points; };
@@ -62,7 +70,7 @@ public class Sheet {
             return false;
         }
         Sheet e = (Sheet) o;
-        if (e.getPoints() == this.getPoints() && e.getMaxPoints() == this.getMaxPoints() && e.getNumber() == this.getNumber() && e.getName().equals(this.getName()) && e.getSemester() == this.getSemester()) {
+        if (e.getPoints() == this.getPoints() && e.getMaxPoints() == this.getMaxPoints() && e.getNumber() == this.getNumber() && e.getName().equals(this.getName()) && e.getSemester() == this.getSemester() && e.getId() == this.getId()) {
             return true;
         }
         return false;

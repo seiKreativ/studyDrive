@@ -1,7 +1,5 @@
 package data.exam.lecture;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -14,7 +12,6 @@ public class LectureContainer implements Iterable<Lecture> {
     private static LectureContainer unique = null;
     private Vector<Lecture> lectures;
     private ExamStore store = null;
-    private PropertyChangeSupport changes = new PropertyChangeSupport(this);
     private ExamContainer examContainer;
     private SheetContainer sheetContainer;
 
@@ -43,7 +40,6 @@ public class LectureContainer implements Iterable<Lecture> {
             throw new LectureAlreadyExistsException(e.getName());
         store.addLecture(e);
         lectures.add(e);
-        changes.firePropertyChange("lecture added", null, e);
     }
 
     public void unlinkLecture(Lecture e) throws LectureNotFoundException, StoreException {
@@ -58,7 +54,6 @@ public class LectureContainer implements Iterable<Lecture> {
             throw new LectureNotFoundException(e.getName());
         store.deleteLecture(e);
         lectures.remove(e);
-        changes.firePropertyChange("lecture removed", e, null);
     }
 
     public void linkLectureLoading(Lecture e) throws LectureAlreadyExistsException {
@@ -122,14 +117,6 @@ public class LectureContainer implements Iterable<Lecture> {
 
     public void deleteUser() throws StoreException {
         store.deleteUser();
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener l) {
-        changes.addPropertyChangeListener(l);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener l) {
-        changes.removePropertyChangeListener(l);
     }
 
 }
