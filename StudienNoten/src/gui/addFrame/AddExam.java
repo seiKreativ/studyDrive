@@ -21,7 +21,7 @@ import data.exam.lecture.LectureContainer;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
 
-public class AddFrame extends JDialog {
+public class AddExam extends JDialog {
 
 	/**
 	 * 
@@ -44,7 +44,7 @@ public class AddFrame extends JDialog {
 	 * 
 	 */
 
-	public AddFrame(MainFrame owner, String title) {
+	public AddExam(MainFrame owner, String title) {
 		super(owner, title, true);
 		this.setBounds(300, 400, 717, 128);
 		this.setUndecorated(true);

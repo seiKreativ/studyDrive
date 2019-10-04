@@ -34,7 +34,7 @@ import data.exam.exam.ExamNotFoundException;
 import data.exam.lecture.Lecture;
 import data.exam.lecture.LectureContainer;
 import data.exam.sheet.SheetContainer;
-import gui.addFrame.AddFrame;
+import gui.addFrame.AddExam;
 import gui.registration.SignUpDialog;
 import store.StoreException;
 
@@ -142,19 +142,19 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		btnAddExam.setBackground(Color.GRAY);
 		btnAddExam.setBounds(10, 5, 319, 41);
 		examsOptions.add(btnAddExam);
-		btnAddExam.addActionListener(e -> onAdd());
+		btnAddExam.addActionListener(e -> onAddExam());
 
 		btnDelExam = new JButton("Prüfung löschen ");
 		btnDelExam.setBackground(Color.GRAY);
 		btnDelExam.setBounds(10, 57, 319, 41);
 		examsOptions.add(btnDelExam);
-		btnDelExam.addActionListener(e -> onDel());
+		btnDelExam.addActionListener(e -> onDelExam());
 
 		btnModExam = new JButton("Prüfung verändern");
 		btnModExam.setBackground(Color.GRAY);
 		btnModExam.setBounds(10, 109, 319, 41);
 		examsOptions.add(btnModExam);
-		btnModExam.addActionListener(e -> onModify());
+		btnModExam.addActionListener(e -> onModifyExam());
 
 
 		allExams = new TableExams(examContainer);
@@ -219,16 +219,19 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		JButton btnAddSheet = new JButton("Übungsblatt hinzufügen ");
 		btnAddSheet.setBackground(Color.GRAY);
 		btnAddSheet.setBounds(10, 5, 319, 41);
+		btnAddSheet.addActionListener(e -> onAddSheet());
 		sheetOptions.add(btnAddSheet);
 		
 		JButton btnDelSheet = new JButton("Übungsblatt löschen ");
 		btnDelSheet.setBackground(Color.GRAY);
 		btnDelSheet.setBounds(10, 57, 319, 41);
+		btnDelSheet.addActionListener(e -> onDelSheet());
 		sheetOptions.add(btnDelSheet);
 		
 		JButton btnModSheet = new JButton("Übungsblatt verändern");
 		btnModSheet.setBackground(Color.GRAY);
 		btnModSheet.setBounds(10, 109, 319, 41);
+		btnModSheet.addActionListener(e -> onModifySheet());
 		sheetOptions.add(btnModSheet);
 		
 		TableSheets tableSheets = new TableSheets(sheetContainer);
@@ -276,16 +279,19 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		JButton btnAddLecture = new JButton("Vorlesung hinzufügen ");
 		btnAddLecture.setBackground(Color.GRAY);
 		btnAddLecture.setBounds(10, 5, 319, 41);
+		btnAddLecture.addActionListener(e -> onAddLecture());
 		lectureOptions.add(btnAddLecture);
 		
 		JButton btnDelLecture = new JButton("Vorlesung löschen ");
 		btnDelLecture.setBackground(Color.GRAY);
 		btnDelLecture.setBounds(10, 57, 319, 41);
+		btnDelLecture.addActionListener(e -> onDelLecture());
 		lectureOptions.add(btnDelLecture);
 		
 		JButton btnModLecture = new JButton("Vorlesung verändern");
 		btnModLecture.setBackground(Color.GRAY);
 		btnModLecture.setBounds(10, 109, 319, 41);
+		btnModLecture.addActionListener(e -> onModifyLecture());
 		lectureOptions.add(btnModLecture);
 		
 		TableLectures tableLectures = new TableLectures(lectureContainer);
@@ -320,7 +326,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		durchschnittsnote.setText(new DecimalFormat("0.00").format(durchschnitt));
 	}
 
-	private void onModify() {
+	private void onModifyExam() {
 		// Prüfung verändern
 		if (allExams.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
@@ -336,7 +342,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 				Lecture l = new Lecture(tempSem, tempName, tempLp);
 				Exam e = new Exam(l, tempNote);
 				examContainer.unlinkExam(e);
-				AddFrame addDia = new AddFrame(this, "Prüfung ändern");
+				AddExam addDia = new AddExam(this, "Prüfung ändern");
 				addDia.setData(tempSem, tempName, tempLp, tempNote);
 				addDia.setCancelButtonActivated(false);
 				addDia.setVisible(true);
@@ -349,16 +355,138 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		}
 	}
 
-	private void onAdd() {
+	private void onAddExam() {
 		// Prüfung hinzufügen
-		AddFrame addDia = new AddFrame(this, "Neue Prüfung hinzufügen");
+		AddExam addDia = new AddExam(this, "Neue Prüfung hinzufügen");
 		addDia.setVisible(true);
 		calcDurchschnitt();
 		allExams.load();
 
 	}
 
-	private void onDel() {
+	private void onDelExam() {
+		// Prüfung löschen
+		if (allExams.getTable().getSelectedRow() == -1) {
+			JOptionPane.showMessageDialog(this,
+					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+		} else {
+			JTable tb = allExams.getTable();
+			int row = allExams.getTable().getSelectedRow();
+			try {
+				Lecture l = new Lecture(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
+						Integer.valueOf((String) tb.getValueAt(row, 1)));
+				Exam e = new Exam(l, Double.valueOf((String) tb.getValueAt(row, 3)));
+				examContainer.unlinkExam(e);
+				allExams.load();
+				calcDurchschnitt();
+			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+	
+	private void onModifySheet() {
+		// Prüfung verändern
+		if (allExams.getTable().getSelectedRow() == -1) {
+			JOptionPane.showMessageDialog(this,
+					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+		} else {
+			JTable tb = allExams.getTable();
+			int row = allExams.getTable().getSelectedRow();
+			try {
+				int tempSem = Integer.valueOf((String) tb.getValueAt(row, 0));
+				String tempName = (String) tb.getValueAt(row, 2);
+				int tempLp = Integer.valueOf((String) tb.getValueAt(row, 1));
+				double tempNote = Double.valueOf((String) tb.getValueAt(row, 3));
+				Lecture l = new Lecture(tempSem, tempName, tempLp);
+				Exam e = new Exam(l, tempNote);
+				examContainer.unlinkExam(e);
+				AddExam addDia = new AddExam(this, "Prüfung ändern");
+				addDia.setData(tempSem, tempName, tempLp, tempNote);
+				addDia.setCancelButtonActivated(false);
+				addDia.setVisible(true);
+				calcDurchschnitt();
+				allExams.load();
+			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void onAddSheet() {
+		// Prüfung hinzufügen
+		AddExam addDia = new AddExam(this, "Neue Prüfung hinzufügen");
+		addDia.setVisible(true);
+		calcDurchschnitt();
+		allExams.load();
+
+	}
+
+	private void onDelSheet() {
+		// Prüfung löschen
+		if (allExams.getTable().getSelectedRow() == -1) {
+			JOptionPane.showMessageDialog(this,
+					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+		} else {
+			JTable tb = allExams.getTable();
+			int row = allExams.getTable().getSelectedRow();
+			try {
+				Lecture l = new Lecture(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
+						Integer.valueOf((String) tb.getValueAt(row, 1)));
+				Exam e = new Exam(l, Double.valueOf((String) tb.getValueAt(row, 3)));
+				examContainer.unlinkExam(e);
+				allExams.load();
+				calcDurchschnitt();
+			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+	
+	private void onModifyLecture() {
+		// Prüfung verändern
+		if (allExams.getTable().getSelectedRow() == -1) {
+			JOptionPane.showMessageDialog(this,
+					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+		} else {
+			JTable tb = allExams.getTable();
+			int row = allExams.getTable().getSelectedRow();
+			try {
+				int tempSem = Integer.valueOf((String) tb.getValueAt(row, 0));
+				String tempName = (String) tb.getValueAt(row, 2);
+				int tempLp = Integer.valueOf((String) tb.getValueAt(row, 1));
+				double tempNote = Double.valueOf((String) tb.getValueAt(row, 3));
+				Lecture l = new Lecture(tempSem, tempName, tempLp);
+				Exam e = new Exam(l, tempNote);
+				examContainer.unlinkExam(e);
+				AddExam addDia = new AddExam(this, "Prüfung ändern");
+				addDia.setData(tempSem, tempName, tempLp, tempNote);
+				addDia.setCancelButtonActivated(false);
+				addDia.setVisible(true);
+				calcDurchschnitt();
+				allExams.load();
+			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void onAddLecture() {
+		// Prüfung hinzufügen
+		AddExam addDia = new AddExam(this, "Neue Prüfung hinzufügen");
+		addDia.setVisible(true);
+		calcDurchschnitt();
+		allExams.load();
+
+	}
+
+	private void onDelLecture() {
 		// Prüfung löschen
 		if (allExams.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
