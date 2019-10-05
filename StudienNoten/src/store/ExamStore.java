@@ -85,6 +85,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void deleteSheet(Sheet s) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
+			String befehl = "DELETE FROM usersheet WHERE email = '" + email + "' AND semester = " + s.getSemester() + " AND lecture = '" + s.getName() + "' AND id = " + s.getType() + ";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while deleting lecture " + e1.getMessage(), e1);
