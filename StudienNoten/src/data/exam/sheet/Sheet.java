@@ -7,7 +7,7 @@ import data.exam.exam.Exam;
 public class Sheet {
 
     public static int SHEET_TYPE = 606060;
-    public static int SONSTIGES_TYPE = 707070;
+    public static int OTHER_TYPE = 707070;
     private int type;
     private Lecture lecture;
     private double points, maxPoints;
