@@ -37,11 +37,12 @@ import data.exam.sheet.Sheet;
 import data.exam.sheet.SheetContainer;
 import data.exam.sheet.SheetNotFoundException;
 import gui.addFrame.AddExamFrame;
+import gui.addFrame.AddLectureFrame;
 import gui.addFrame.AddSheetFrame;
 import gui.registration.SignUpDialog;
 import store.StoreException;
 
-public class MainFrame extends JFrame implements PropertyChangeListener{
+public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = -5724418947028211664L;
 	private JPanel examsPane;
@@ -86,6 +87,10 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		JMenuItem mntmLogOut = new JMenuItem("Log out");
 		mntmLogOut.addActionListener(e -> onLogOut());
 		mnAllgemein.add(mntmLogOut);
+
+		JMenuItem mntmRefresh = new JMenuItem("Refresh");
+		mntmRefresh.addActionListener(e -> onRefresh());
+		mnAllgemein.add(mntmRefresh);
 
 		JMenuItem mntmDeleteUser = new JMenuItem("Account Löschen");
 		mntmDeleteUser.addActionListener(e -> onDeleteUser());
@@ -366,8 +371,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 				calcDurchschnitt();
 				allExams.load();
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -377,8 +381,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		AddExamFrame addDia = new AddExamFrame(this, "Neue Prüfung hinzufügen");
 		addDia.setVisible(true);
 		calcDurchschnitt();
-		allSheets.load();
-
+		allExams.load();
 	}
 
 	private void onDelExam() {
@@ -397,22 +400,28 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 				allExams.load();
 				calcDurchschnitt();
 			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
 	}
 	
 	private void onModifySheet() {
-		// Prüfung verändern
+		// Sheet verändern
 		int type;
-		if (allSheets.getTable().getSelectedRow() == -1) {
+		if (allSheets.getTable().getSelectedRow() == -1 && allOther.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
-					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+					"Um ein Übungsblatt zu verändern muss zuerst ein Übungsblatt ausgewäht werden.");
 		} else {
-			JTable tb = allSheets.getTable();
-			int row = allSheets.getTable().getSelectedRow();
+			JTable tb;
+			int row;
+			if (allSheets.getTable().getSelectedRow() == -1) {
+				tb = allOther.getTable();
+				row = allOther.getTable().getSelectedRow();
+			} else {
+				tb = allSheets.getTable();
+				row = allSheets.getTable().getSelectedRow();
+			}
 			try {
 				Lecture lecture = null;
 				for (int i = 0; i < lectureContainer.getSize(); i++) {
@@ -433,31 +442,39 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 				addDia.setData(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 1), Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)), Double.valueOf((String) tb.getValueAt(row, 4)), type);
 				addDia.setCancelButtonActivated(false);
 				addDia.setVisible(true);
+				allOther.load();
 				allSheets.load();
 			} catch (IllegalInputException | StoreException | SheetNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
 	private void onAddSheet() {
-		// Prüfung hinzufügen
+		// Sheet hinzufügen
 		AddSheetFrame addDia = new AddSheetFrame(this, "Neues Übungsblatt hinzufügen");
 		addDia.setVisible(true);
 		allSheets.load();
-
+		allOther.load();
+		insgÜbungsblätter.setText(String.valueOf(sheetContainer.getSize()));
 	}
 
 	private void onDelSheet() {
-		// Prüfung löschen
+		// Sheet löschen
 		int type; 
-		if (allSheets.getTable().getSelectedRow() == -1) {
+		if (allSheets.getTable().getSelectedRow() == -1 && allOther.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
 					"Um eine Leistung zu löschen muss zuerst eine Leistung ausgewäht werden.");
 		} else {
-			JTable tb = allSheets.getTable();
-			int row = allSheets.getTable().getSelectedRow();
+			JTable tb;
+			int row;
+			if (allSheets.getTable().getSelectedRow() == -1) {
+				tb = allOther.getTable();
+				row = allOther.getTable().getSelectedRow();
+			} else {
+				tb = allSheets.getTable();
+				row = allSheets.getTable().getSelectedRow();
+			}
 			try {
 				Lecture lecture = null;
 				for (int i = 0; i < lectureContainer.getSize(); i++) {
@@ -475,10 +492,10 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 				Sheet e = new Sheet(lecture,Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)) ,Double.valueOf((String) tb.getValueAt(row, 4)), type);
 				sheetContainer.unlinkSheet(e);
 				allSheets.load();
-				calcDurchschnitt();
+				allOther.load();
+				insgÜbungsblätter.setText(String.valueOf(sheetContainer.getSize()));
 			} catch (IllegalInputException | StoreException | SheetNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
@@ -507,19 +524,16 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 				calcDurchschnitt();
 				allExams.load();
 			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
 	private void onAddLecture() {
-		// Prüfung hinzufügen
-		AddExamFrame addDia = new AddExamFrame(this, "Neue Prüfung hinzufügen");
+		// Lecture hinzufügen
+		AddLectureFrame addDia = new AddLectureFrame();
 		addDia.setVisible(true);
-		calcDurchschnitt();
-		allExams.load();
-
+		allLectures.load();
 	}
 
 	private void onDelLecture() {
@@ -538,8 +552,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 				allExams.load();
 				calcDurchschnitt();
 			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
@@ -572,8 +585,16 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		}
 	}
 
-	public void propertyChange(PropertyChangeEvent evt) {
-		// TODO Auto-generated method stub
+	private void onRefresh() {
+		try {
+			lectureContainer.load();
+			allOther.load();
+			allSheets.load();
+			allLectures.load();
+			allExams.load();
+		} catch (StoreException e) {
+			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
 
 	}
 

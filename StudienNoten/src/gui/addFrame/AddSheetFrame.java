@@ -164,6 +164,7 @@ public class AddSheetFrame extends JDialog {
 		this.comboBoxSem.setSelectedItem(Integer.toString(sem));
 		this.comboBoxLectures.setSelectedItem(name);
 		this.CheckBoxOther.setSelected(type == Sheet.OTHER_TYPE);
+		isOther = type == Sheet.OTHER_TYPE;
 	}
 
 	public void setCancelButtonActivated(boolean stat) {
@@ -191,12 +192,12 @@ public class AddSheetFrame extends JDialog {
 			} else {
 				type = Sheet.SHEET_TYPE;
 			}
-			Sheet sheet = new Sheet(lecture, Integer.parseInt((String) comboBoxSem.getSelectedItem()),
+			Sheet sheet = new Sheet(lecture, Integer.parseInt((String) comboBoxNummer.getSelectedItem()),
 					Double.parseDouble(txtPoints.getText()), Double.parseDouble(txtPointsMax.getText()), type);
 			sheetContainer.linkSheet(sheet);
+			dispose();
 		} catch (NumberFormatException | StoreException | IllegalInputException | SheetAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
-		dispose();
 	}
 }

@@ -55,6 +55,13 @@ public class AddExamFrame extends JDialog {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
+		try {
+			lectureContainer = LectureContainer.instance();
+			examContainer = ExamContainer.instance();
+		} catch (StoreException e) {
+			// Dieser Fehler kann an der Stelle nicht auftreten
+		}
+
 		JLabel lblSemester = new JLabel("Semester:");
 		lblSemester.setBounds(20, 11, 78, 14);
 		contentPane.add(lblSemester);
@@ -87,7 +94,7 @@ public class AddExamFrame extends JDialog {
 		
 		comboBoxLectures = new JComboBox<>();
 		comboBoxLectures.setBounds(190, 36, 380, 20);
-		for (int i = 0; i <= lectureContainer.getSize(); i++) {
+		for (int i = 0; i < lectureContainer.getSize(); i++) {
 			comboBoxLectures.addItem(lectureContainer.getLectureByIndex(i).getName());
 		}
 		contentPane.add(comboBoxLectures);
@@ -124,20 +131,13 @@ public class AddExamFrame extends JDialog {
 		});
 		btnClose.setBounds(365, 94, 90, 23);
 		contentPane.add(btnClose);
-
-		try {
-			lectureContainer = LectureContainer.instance();
-			examContainer = ExamContainer.instance();
-		} catch (StoreException e) {
-			// Dieser Fehler kann an der Stelle nicht auftreten
-		}
 	}
 
 	public void setData(int sem, String name, int lp, double note) {
 		this.txtLeistungspunkte.setText(Integer.toString(lp));
 		this.comboBoxNoten.setSelectedItem(Double.toString(note));
 		this.comboBoxSem.setSelectedItem(Integer.toString(sem));
-		this.txtName.setText(name);
+		this.comboBoxLectures.setSelectedItem(lectureContainer.getLectureByName(name, sem));
 	}
 
 	public void setCancelButtonActivated(boolean stat) {

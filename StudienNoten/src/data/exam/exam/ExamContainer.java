@@ -51,9 +51,9 @@ public class ExamContainer implements Iterable<Exam> {
 		exams.remove(e);
 	}
 
-	public void linkExamLoading(Exam e) throws ExamAlreadyExistsException {
+	public void linkExamLoading(Exam e) {
 		if (exams.contains(e))
-		    throw new ExamAlreadyExistsException(e.getName());
+		    return;
 		exams.add(e);
 	}
 

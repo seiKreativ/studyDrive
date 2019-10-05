@@ -52,9 +52,9 @@ public class SheetContainer implements Iterable<Sheet> {
         sheets.remove(e);
     }
 
-    public void linkSheetLoading(Sheet e) throws SheetAlreadyExistsException {
+    public void linkSheetLoading(Sheet e) {
         if (sheets.contains(e))
-            throw new SheetAlreadyExistsException(e.getName());
+            return;
         sheets.add(e);
     }
 

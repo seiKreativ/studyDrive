@@ -56,9 +56,9 @@ public class LectureContainer implements Iterable<Lecture> {
         lectures.remove(e);
     }
 
-    public void linkLectureLoading(Lecture e) throws LectureAlreadyExistsException {
+    public void linkLectureLoading(Lecture e) {
         if (lectures.contains(e))
-            throw new LectureAlreadyExistsException(e.getName());
+            return;
         lectures.add(e);
     }
 
