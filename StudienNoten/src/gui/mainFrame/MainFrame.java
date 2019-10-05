@@ -48,7 +48,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 	private JTextField durchschnittsnote;
 	private JTextField insgÜbungsblätter;
 	private JTextField insgVorlesungen;
-	
+	private JTabbedPane sheetTabbedPane; 
 	private ExamContainer examContainer;
 	private LectureContainer lectureContainer;
 	private SheetContainer sheetContainer;
@@ -241,7 +241,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		btnModSheet.addActionListener(e -> onModifySheet());
 		sheetOptions.add(btnModSheet);
 		
-		JTabbedPane sheetTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		sheetTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		sheetTabbedPane.setBounds(359, 11, 422, 364);
 		sheetsPanel.add(sheetTabbedPane);
 		
