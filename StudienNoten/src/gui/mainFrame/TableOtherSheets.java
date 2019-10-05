@@ -18,11 +18,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import data.exam.exam.Exam;
 import data.exam.sheet.Sheet;
 import data.exam.sheet.SheetContainer;
 
-public class TableSheets extends JPanel {
+public class TableOtherSheets extends JPanel {
 
 	/**
 	 * 
@@ -34,7 +33,7 @@ public class TableSheets extends JPanel {
 	private SheetContainer container;
 
 	@SuppressWarnings("serial")
-	public TableSheets(SheetContainer container) {
+	public TableOtherSheets(SheetContainer container) {
 
 		super();
 		this.container = container;
@@ -127,7 +126,7 @@ public class TableSheets extends JPanel {
 			}
 			for (int count = 1; count <= container.getSize(); count++) {
 				Sheet e = container.getSheetByIndex(count - 1);
-				if (e.getType() == Sheet.SHEET_TYPE) {
+				if (e.getType() == Sheet.OTHER_TYPE) {
 				Vector<String> data = new Vector<String>();
 				data.add(Integer.toString(e.getSemester()));
 				data.add(e.getName());
@@ -136,7 +135,6 @@ public class TableSheets extends JPanel {
 				data.add(Double.toString(e.getMaxPoints()));
 				dm.addRow(data);
 				}
-
 			}
 			revalidate();
 		}
@@ -152,14 +150,14 @@ public class TableSheets extends JPanel {
 		}
 		for (int count = 1; count <= container.getSize(); count++) {
 			Sheet e = container.getSheetByIndex(count - 1);
-			if (e.getType() == Sheet.SHEET_TYPE) {
-				Vector<String> data = new Vector<String>();
-				data.add(Integer.toString(e.getSemester()));
-				data.add(e.getName());
-				data.add(Integer.toString(e.getNumber()));
-				data.add(Double.toString(e.getPoints()));
-				data.add(Double.toString(e.getMaxPoints()));
-				dm.addRow(data);
+			if (e.getType() == Sheet.OTHER_TYPE) {
+			Vector<String> data = new Vector<String>();
+			data.add(Integer.toString(e.getSemester()));
+			data.add(e.getName());
+			data.add(Integer.toString(e.getNumber()));
+			data.add(Double.toString(e.getPoints()));
+			data.add(Double.toString(e.getMaxPoints()));
+			dm.addRow(data);
 			}
 
 		}

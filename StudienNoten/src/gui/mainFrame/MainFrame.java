@@ -48,12 +48,14 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 	private JTextField durchschnittsnote;
 	private JTextField insgÜbungsblätter;
 	private JTextField insgVorlesungen;
+	private JTabbedPane sheetTabbedPane; 
 	private ExamContainer examContainer;
 	private LectureContainer lectureContainer;
 	private SheetContainer sheetContainer;
 	private JButton btnAddExam, btnDelExam, btnModExam;
 	private TableExams allExams;
 	private TableSheets allSheets; 
+	private TableOtherSheets allOther;
 	private TableLectures allLectures; 
 	private double durchschnitt;
 
@@ -239,9 +241,19 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 		btnModSheet.addActionListener(e -> onModifySheet());
 		sheetOptions.add(btnModSheet);
 		
+		sheetTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		sheetTabbedPane.setBounds(359, 11, 422, 364);
+		sheetsPanel.add(sheetTabbedPane);
+		
+
 		allSheets = new TableSheets(sheetContainer);
-		allSheets.setBounds(359, 34, 427, 341);
-		sheetsPanel.add(allSheets);
+		
+		sheetTabbedPane.addTab("Sheets",allSheets);
+		
+		allOther = new TableOtherSheets(sheetContainer);
+		
+		sheetTabbedPane.addTab("Other",  allOther);
+		
 		
 		JPanel lecturePanel = new JPanel();
 		lecturePanel.setLayout(null);
@@ -394,6 +406,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 	
 	private void onModifySheet() {
 		// Prüfung verändern
+		int type;
 		if (allSheets.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
 					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
@@ -409,10 +422,15 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 						lecture = e;
 					}
 				}
-				Sheet e = new Sheet(lecture,Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)) ,Double.valueOf((String) tb.getValueAt(row, 4)));
+				if (sheetTabbedPane.getSelectedIndex() == 0) {
+					type = Sheet.SHEET_TYPE;
+				} else {
+					type = Sheet.OTHER_TYPE;
+				}
+				Sheet e = new Sheet(lecture,Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)) ,Double.valueOf((String) tb.getValueAt(row, 4)), type);
 				sheetContainer.unlinkSheet(e);
 				AddSheetFrame addDia = new AddSheetFrame(this, "Übungsblatt ändern");
-				addDia.setData(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 1), Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)), Double.valueOf((String) tb.getValueAt(row, 4)));
+				addDia.setData(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 1), Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)), Double.valueOf((String) tb.getValueAt(row, 4)), type);
 				addDia.setCancelButtonActivated(false);
 				addDia.setVisible(true);
 				allSheets.load();
@@ -433,9 +451,10 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 
 	private void onDelSheet() {
 		// Prüfung löschen
+		int type; 
 		if (allSheets.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
-					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+					"Um eine Leistung zu löschen muss zuerst eine Leistung ausgewäht werden.");
 		} else {
 			JTable tb = allSheets.getTable();
 			int row = allSheets.getTable().getSelectedRow();
@@ -448,7 +467,12 @@ public class MainFrame extends JFrame implements PropertyChangeListener{
 						lecture = e;
 					}
 				}
-				Sheet e = new Sheet(lecture,Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)) ,Double.valueOf((String) tb.getValueAt(row, 4)));
+				if (sheetTabbedPane.getSelectedIndex() == 0) {
+					type = Sheet.SHEET_TYPE;
+				} else {
+					type = Sheet.OTHER_TYPE;
+				}
+				Sheet e = new Sheet(lecture,Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)) ,Double.valueOf((String) tb.getValueAt(row, 4)), type);
 				sheetContainer.unlinkSheet(e);
 				allSheets.load();
 				calcDurchschnitt();

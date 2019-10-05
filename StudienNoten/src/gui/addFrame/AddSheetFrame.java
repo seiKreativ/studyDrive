@@ -20,6 +20,7 @@ import data.exam.sheet.SheetAlreadyExistsException;
 import data.exam.sheet.SheetContainer;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
+import javax.swing.JCheckBox;
 
 public class AddSheetFrame extends JDialog {
 
@@ -33,7 +34,9 @@ public class AddSheetFrame extends JDialog {
 	private SheetContainer sheetContainer;
 	private JButton btnClose;
 	private JTextField txtPoints;
+	private JCheckBox CheckBoxOther; 
 	private JTextField txtPointsMax;
+	private boolean isOther = false; 
 
 	/*
 	 * 
@@ -46,7 +49,7 @@ public class AddSheetFrame extends JDialog {
 
 	public AddSheetFrame(MainFrame owner, String title) {
 		super(owner, title, true);
-		this.setBounds(300, 400, 527, 128);
+		this.setBounds(300, 400, 531, 128);
 		this.setUndecorated(true);
 		try {
 			lectureContainer = LectureContainer.instance();
@@ -135,15 +138,32 @@ public class AddSheetFrame extends JDialog {
 		txtPointsMax.setColumns(10);
 		txtPointsMax.setBounds(444, 36, 50, 20);
 		contentPane.add(txtPointsMax);
+		
+		CheckBoxOther = new JCheckBox("andere Leistung");
+		CheckBoxOther.setBackground(Color.LIGHT_GRAY);
+		CheckBoxOther.setBounds(378, 68, 116, 23);
+		CheckBoxOther.addActionListener((e) -> {
+			if (((JCheckBox) e.getSource()).isSelected()) {
+				comboBoxNummer.setEnabled(false);
+				comboBoxNummer.setSelectedItem("");
+				isOther = true; 
+			} else {
+				comboBoxNummer.setEnabled(true);
+				isOther = false; 
+			}
+			
+		});
+		contentPane.add(CheckBoxOther);
 
 	}
 
-	public void setData(int sem, String name, int num, double points, double maxPoints) {
+	public void setData(int sem, String name, int num, double points, double maxPoints, int type) {
 		this.txtPoints.setText(Double.toString(points));
 		this.txtPointsMax.setText(Double.toString(maxPoints));
 		this.comboBoxNummer.setSelectedItem(Integer.toString(num));
 		this.comboBoxSem.setSelectedItem(Integer.toString(sem));
 		this.comboBoxLectures.setSelectedItem(name);
+		this.CheckBoxOther.setSelected(type == Sheet.OTHER_TYPE);
 	}
 
 	public void setCancelButtonActivated(boolean stat) {
@@ -165,8 +185,14 @@ public class AddSheetFrame extends JDialog {
 				this.dispose();
 			}
 			// Hier noch constraints einfügen sonst wirds unübersichtlich
+			int type; 
+			if (isOther) {
+				type = Sheet.OTHER_TYPE; 
+			} else {
+				type = Sheet.SHEET_TYPE;
+			}
 			Sheet sheet = new Sheet(lecture, Integer.parseInt((String) comboBoxSem.getSelectedItem()),
-					Double.parseDouble(txtPoints.getText()), Double.parseDouble(txtPointsMax.getText()));
+					Double.parseDouble(txtPoints.getText()), Double.parseDouble(txtPointsMax.getText()), type);
 			sheetContainer.linkSheet(sheet);
 		} catch (NumberFormatException | StoreException | IllegalInputException | SheetAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
