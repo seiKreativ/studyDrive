@@ -11,7 +11,6 @@ public class SheetContainer implements Iterable<Sheet> {
     private static SheetContainer unique = null;
     private Vector<Sheet> sheets;
     private ExamStore store = null;
-    private static int id = 0;
 
     private SheetContainer() throws StoreException {
         sheets = new Vector<Sheet>();
@@ -35,10 +34,6 @@ public class SheetContainer implements Iterable<Sheet> {
         }
         if (temp)
             throw new SheetAlreadyExistsException(e.getName());
-        if (e.getNumber() == 99) {
-            id++;
-            e.setId(id);
-        }
         store.addSheet(e);
         sheets.add(e);
     }
@@ -60,10 +55,6 @@ public class SheetContainer implements Iterable<Sheet> {
     public void linkSheetLoading(Sheet e) throws SheetAlreadyExistsException {
         if (sheets.contains(e))
             throw new SheetAlreadyExistsException(e.getName());
-        if (e.getNumber() == 99) {
-            if (e.getId() > id)
-                id = e.getId();
-        }
         sheets.add(e);
     }
 
@@ -72,13 +63,6 @@ public class SheetContainer implements Iterable<Sheet> {
      */
     public void modify(Sheet eold, Sheet enew) throws StoreException {
         store.modifySheet(eold, enew);
-        if (eold.getNumber() == 99 && enew.getNumber() != 99) {
-            enew.setId(-100);
-        }
-        if (eold.getNumber() != 99 && enew.getNumber() == 99) {
-            id++;
-            enew.setId(id);
-        }
     }
 
     public Sheet getSheetByIndex(int pos) {
