@@ -77,6 +77,17 @@ public class SheetContainer implements Iterable<Sheet> {
         return null;
     }
 
+    public int getMaxOtherNumber() {
+        int tmp = 0;
+        for (Sheet e : sheets) {
+            if (e.getType() == Sheet.OTHER_TYPE) {
+                if (e.getNumber() > tmp)
+                    tmp = e.getNumber();
+            }
+        }
+        return tmp;
+    }
+
     public Vector<Sheet> getAllExams() {
         return this.sheets;
     }
