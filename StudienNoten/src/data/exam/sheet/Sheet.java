@@ -6,16 +6,25 @@ import data.exam.exam.Exam;
 
 public class Sheet {
 
+    public static int SHEET_TYPE = 606060;
+    public static int SONSTIGES_TYPE = 707070;
+    private int type;
     private Lecture lecture;
     private double points, maxPoints;
     private int number;
-    private int id = -100; //-100 normale Wert ohne Bedeutung
 
-    public Sheet(Lecture lecture, int number, double points, double maxPoints) throws IllegalInputException {
+    public Sheet(Lecture lecture, int number, double points, double maxPoints, int type) throws IllegalInputException {
         this.setLecture(lecture);
         this.setNumber(number);
         this.setPoints(points);
         this.setMaxPoints(maxPoints);
+        this.setType(type);
+    }
+
+    public void setType(int type) throws IllegalInputException {
+        if (type != 606060 && type != 707070)
+            throw new IllegalInputException("Type must me SHEET_TYPE (606060) or OTHER_TYPE (707070)");
+        this.type = type;
     }
 
     private void setPoints(double points) throws IllegalInputException {
@@ -40,16 +49,12 @@ public class Sheet {
         this.lecture = lecture;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName(){ return lecture.getName(); }
     public int getLeistungpunkte(){ return lecture.getLeistungpunkte(); }
     public int getSemester() { return lecture.getSemester(); }
 
-    public int getId() {
-        return this.id;
+    public int getType() {
+        return this.type;
     }
     public Lecture getLecture() { return this.lecture; };
     public int getNumber() { return this.number; };
@@ -70,7 +75,7 @@ public class Sheet {
             return false;
         }
         Sheet e = (Sheet) o;
-        if (e.getPoints() == this.getPoints() && e.getMaxPoints() == this.getMaxPoints() && e.getNumber() == this.getNumber() && e.getName().equals(this.getName()) && e.getSemester() == this.getSemester() && e.getId() == this.getId()) {
+        if (e.getPoints() == this.getPoints() && e.getMaxPoints() == this.getMaxPoints() && e.getNumber() == this.getNumber() && e.getName().equals(this.getName()) && e.getSemester() == this.getSemester() && e.getType() == this.getType()) {
             return true;
         }
         return false;

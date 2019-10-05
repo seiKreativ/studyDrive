@@ -63,8 +63,7 @@ public class ExamStore implements DataManagement {
 			ResultSet ergebnis3 = abfrage.executeQuery(befehl3);
 			while (ergebnis3.next()) {
 				Lecture tmp = lectures.getLectureByName(ergebnis3.getString("lecture"), ergebnis3.getInt("semester"));
-				Sheet s = new Sheet(tmp, ergebnis3.getInt("number"), ergebnis3.getDouble("points"), ergebnis3.getDouble("maxPoints"));
-				s.setId(ergebnis3.getInt("id"));
+				Sheet s = new Sheet(tmp, ergebnis3.getInt("number"), ergebnis3.getDouble("points"), ergebnis3.getDouble("maxPoints"), ergebnis3.getInt("id"));
 				sheets.linkSheetLoading(s);
 			}
 		} catch (SQLException | IllegalInputException | ExamAlreadyExistsException | SheetAlreadyExistsException e) {
@@ -75,7 +74,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void addSheet(Sheet s) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "INSERT INTO usersheet VALUES ('" + email + "','" + s.getName() + "', " + s.getNumber() + ", " + s.getPoints() + ", " + s.getMaxPoints() + ", " + s.getSemester() + ", " + s.getId() + ");";
+			String befehl = "INSERT INTO usersheet VALUES ('" + email + "','" + s.getName() + "', " + s.getNumber() + ", " + s.getPoints() + ", " + s.getMaxPoints() + ", " + s.getSemester() + ", " + s.getType() + ");";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding sheet " + e1.getMessage(), e1);

@@ -57,7 +57,7 @@ public class Lecture {
     public boolean equals(Object o) {
         if (o == null) {
             return false;
-        } else if (!(o instanceof Exam)) {
+        } else if (!(o instanceof Lecture)) {
             return false;
         }
         Lecture e = (Lecture) o;
