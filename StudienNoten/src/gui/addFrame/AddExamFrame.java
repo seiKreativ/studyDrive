@@ -1,6 +1,7 @@
 package gui.addFrame;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -11,7 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import data.exam.IllegalInputException;
@@ -19,7 +19,6 @@ import data.exam.exam.Exam;
 import data.exam.exam.ExamAlreadyExistsException;
 import data.exam.exam.ExamContainer;
 import data.exam.lecture.Lecture;
-import data.exam.lecture.LectureAlreadyExistsException;
 import data.exam.lecture.LectureContainer;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
@@ -31,8 +30,6 @@ public class AddExamFrame extends JDialog {
 	 */
 	private static final long serialVersionUID = 8023202796137170626L;
 	private JPanel contentPane;
-	private JTextField txtLeistungspunkte;
-	private JTextField txtName;
 	private JComboBox<String> comboBoxSem, comboBoxNoten, comboBoxLectures;
 	private ExamContainer examContainer = null;
 	private LectureContainer lectureContainer;
@@ -49,7 +46,7 @@ public class AddExamFrame extends JDialog {
 
 	public AddExamFrame(MainFrame owner, String title) {
 		super(owner, title, true);
-		this.setBounds(300, 400, 717, 128);
+		this.setBounds(300, 400, 572, 128);
 		this.setUndecorated(true);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.LIGHT_GRAY);
@@ -69,16 +66,12 @@ public class AddExamFrame extends JDialog {
 		lblSemester.setBounds(20, 11, 78, 14);
 		contentPane.add(lblSemester);
 
-		JLabel lblLeistungspunkte = new JLabel("LPs:");
-		lblLeistungspunkte.setBounds(110, 11, 72, 14);
-		contentPane.add(lblLeistungspunkte);
-
 		JLabel lblName = new JLabel("Name:");
-		lblName.setBounds(190, 11, 403, 14);
+		lblName.setBounds(93, 11, 403, 14);
 		contentPane.add(lblName);
 
 		JLabel lblNote = new JLabel("Note:");
-		lblNote.setBounds(600, 11, 90, 14);
+		lblNote.setBounds(503, 11, 90, 14);
 		contentPane.add(lblNote);
 
 		comboBoxSem = new JComboBox<String>();
@@ -86,20 +79,36 @@ public class AddExamFrame extends JDialog {
 		for (int i = 1; i <= 12; i++) {
 			comboBoxSem.addItem(Integer.toString(i));
 		}
-		comboBoxSem.setSelectedItem("1");
+		comboBoxSem.setSelectedItem(null);
 		comboBoxSem.setBounds(20, 36, 50, 20);
+		comboBoxSem.addActionListener((e) -> {
+			@SuppressWarnings("unchecked")
+			int semTemp = Integer.parseInt((String) ((JComboBox<String>) e.getSource()).getSelectedItem());
+			int itemCount = comboBoxLectures.getItemCount();
+			comboBoxLectures.setSelectedItem(null);
+			for (int i = 0; i < itemCount; i++) {
+				comboBoxLectures.removeItemAt(0);
+			}
+			for (int i = 0; i < lectureContainer.getSize(); i++) {
+				Lecture l = lectureContainer.getLectureByIndex(i);
+				if (l.getSemester() == semTemp) {
+					boolean isExisting = false;
+					for (int j = 0; j < examContainer.getSize(); j++) {
+						Exam ex = examContainer.getExamByIndex(j);
+						if (ex.getLecture().equals(l)) {
+							isExisting = true;
+						}
+					}
+					if (!isExisting) {
+						comboBoxLectures.addItem(l.getName());
+					}
+				}
+			}
+		});
 		contentPane.add(comboBoxSem);
 
-		txtLeistungspunkte = new JTextField();
-		txtLeistungspunkte.setBounds(108, 36, 50, 20);
-		contentPane.add(txtLeistungspunkte);
-		txtLeistungspunkte.setColumns(10);
-		
 		comboBoxLectures = new JComboBox<>();
-		comboBoxLectures.setBounds(190, 36, 380, 20);
-		for (int i = 0; i < lectureContainer.getSize(); i++) {
-			comboBoxLectures.addItem(lectureContainer.getLectureByIndex(i).getName());
-		}
+		comboBoxLectures.setBounds(93, 36, 380, 20);
 		contentPane.add(comboBoxLectures);
 
 		comboBoxNoten = new JComboBox<String>();
@@ -112,14 +121,14 @@ public class AddExamFrame extends JDialog {
 		}
 		comboBoxNoten.addItem("5.0");
 		comboBoxNoten.setSelectedItem("1.0");
-		comboBoxNoten.setBounds(600, 36, 50, 20);
+		comboBoxNoten.setBounds(503, 36, 50, 20);
 		contentPane.add(comboBoxNoten);
 
 		JButton btnApply = new JButton("Apply");
 		btnApply.setBackground(Color.GRAY);
 		btnApply.addActionListener(e -> onAdd());
 
-		btnApply.setBounds(265, 94, 90, 23);
+		btnApply.setBounds(162, 94, 90, 23);
 		contentPane.add(btnApply);
 
 		btnClose = new JButton("Close");
@@ -132,15 +141,15 @@ public class AddExamFrame extends JDialog {
 
 			}
 		});
-		btnClose.setBounds(365, 94, 90, 23);
+		btnClose.setBounds(262, 94, 90, 23);
 		contentPane.add(btnClose);
 
 		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
 		keyListenerComponents.add(btnApply);
-		//sonst kann man nicht mehr mit enter werte auswählen
-		//keyListenerComponents.add(comboBoxSem);
-		//keyListenerComponents.add(comboBoxLectures);
-		//keyListenerComponents.add(comboBoxNoten);
+		// sonst kann man nicht mehr mit enter werte auswählen
+		// keyListenerComponents.add(comboBoxSem);
+		// keyListenerComponents.add(comboBoxLectures);
+		// keyListenerComponents.add(comboBoxNoten);
 		for (Component c : keyListenerComponents) {
 			c.addKeyListener(new KeyAdapter() {
 				@Override
@@ -148,8 +157,9 @@ public class AddExamFrame extends JDialog {
 					if (e.getKeyCode() == KeyEvent.VK_ENTER)
 						onAdd();
 					if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-						if (JOptionPane.showConfirmDialog(null, "Soll ohne die Werte zu speichern wirklich geschlossen werden?",
-								"Warnung!", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+						if (JOptionPane.showConfirmDialog(null,
+								"Soll ohne die Werte zu speichern wirklich geschlossen werden?", "Warnung!",
+								JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 							AddExamFrame.this.dispose(); // yes option
 						} else {
 
@@ -161,10 +171,11 @@ public class AddExamFrame extends JDialog {
 	}
 
 	public void setData(int sem, String name, int lp, double note) {
-		this.txtLeistungspunkte.setText(Integer.toString(lp));
 		this.comboBoxNoten.setSelectedItem(Double.toString(note));
 		this.comboBoxSem.setSelectedItem(Integer.toString(sem));
 		this.comboBoxLectures.setSelectedItem(lectureContainer.getLectureByName(name, sem));
+		this.comboBoxLectures.setEnabled(false);
+		this.comboBoxSem.setEnabled(false);
 	}
 
 	public void setCancelButtonActivated(boolean stat) {
@@ -175,9 +186,10 @@ public class AddExamFrame extends JDialog {
 		try {
 			Lecture lecture = null;
 			for (int i = 0; i < lectureContainer.getSize(); i++) {
-				Lecture e = lectureContainer.getLectureByIndex(i); 
-				if (e.getName().equals(comboBoxLectures.getSelectedItem()) && e.getSemester() == Integer.parseInt((String) comboBoxSem.getSelectedItem())) {
-					lecture = e; 
+				Lecture e = lectureContainer.getLectureByIndex(i);
+				if (e.getName().equals(comboBoxLectures.getSelectedItem())
+						&& e.getSemester() == Integer.parseInt((String) comboBoxSem.getSelectedItem())) {
+					lecture = e;
 				}
 			}
 			if (lecture == null) {

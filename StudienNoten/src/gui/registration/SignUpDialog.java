@@ -93,11 +93,12 @@ public class SignUpDialog extends JDialog {
 				public void keyPressed(KeyEvent e) {
 					if (e.getKeyCode() == KeyEvent.VK_ENTER)
 						onSignIn();
+					/* An sich echt gute idee aber sobald man ein N in der Email oder im passwort hat ist es unmöglich sich einzuloggen
 					if (e.getKeyCode() == KeyEvent.VK_N) {
 						SignUpDialog.this.dispose();
 						RegistrationDialog dia = new RegistrationDialog();
 						dia.setVisible(true);
-					}
+					}*/
 				}
 			});
 		}

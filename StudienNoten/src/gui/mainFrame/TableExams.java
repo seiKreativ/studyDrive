@@ -48,7 +48,7 @@ public class TableExams extends JPanel {
 				return false;
 			}
 		};
-		String header[] = new String[] { "Sem", "LPs", "Name", "Note" };
+		String header[] = new String[] { "Sem", "Name", "LPs", "Note" };
 		dm.setColumnIdentifiers(header);
 
 		// Table row should be red if exam not passed
@@ -81,7 +81,7 @@ public class TableExams extends JPanel {
 		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
 		tblTaskList.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 		tblTaskList.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-		tblTaskList.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+		tblTaskList.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 
 		// Table Sorter
 		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(tblTaskList.getModel());
@@ -90,8 +90,8 @@ public class TableExams extends JPanel {
 
 		List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
 		sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-		sortKeys.add(new RowSorter.SortKey(1, SortOrder.DESCENDING));
-		sortKeys.add(new RowSorter.SortKey(2, SortOrder.ASCENDING));
+		sortKeys.add(new RowSorter.SortKey(2, SortOrder.DESCENDING));
+		sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
 		sorter.setSortKeys(sortKeys);
 
 		load();
@@ -138,8 +138,8 @@ public class TableExams extends JPanel {
 				} else {
 					Vector<String> data = new Vector<String>();
 					data.add(Integer.toString(e.getSemester()));
-					data.add(Integer.toString(e.getLeistungpunkte()));
 					data.add(e.getName());
+					data.add(Integer.toString(e.getLeistungpunkte()));
 					data.add(Double.toString(e.getNote()));
 					dm.addRow(data);
 				}
@@ -160,8 +160,8 @@ public class TableExams extends JPanel {
 			Vector<String> data = new Vector<String>();
 			Exam e = container.getExamByIndex(count - 1);
 			data.add(Integer.toString(e.getSemester()));
-			data.add(Integer.toString(e.getLeistungpunkte()));
 			data.add(e.getName());
+			data.add(Integer.toString(e.getLeistungpunkte()));
 			data.add(Double.toString(e.getNote()));
 			dm.addRow(data);
 		}

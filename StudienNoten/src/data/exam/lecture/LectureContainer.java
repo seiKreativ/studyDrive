@@ -1,5 +1,6 @@
 package data.exam.lecture;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -85,6 +86,15 @@ public class LectureContainer implements Iterable<Lecture> {
                 return e;
         }
         return null;
+    }
+    
+    public ArrayList<Lecture> getLecturesByName(String name) {
+    	ArrayList<Lecture> lecs = new ArrayList<Lecture>(); 
+        for (Lecture e : lectures) {
+            if (e.getName().equals(name))
+                lecs.add(e);
+        }
+        return lecs;
     }
 
     public Vector<Lecture> getAllLectures() {

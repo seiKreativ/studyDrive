@@ -1,5 +1,6 @@
 package data.exam.sheet;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -69,12 +70,13 @@ public class SheetContainer implements Iterable<Sheet> {
         return sheets.get(pos);
     }
 
-    public Sheet getSheetByName(String name, int semester) {
+    public ArrayList<Sheet> getSheetByName(String name, int semester) {
+    	ArrayList<Sheet> temp = new ArrayList<Sheet>(); 
         for (Sheet e : sheets) {
             if (e.getName().equals(name) && e.getSemester() == semester)
-                return e;
+                temp.add(e);
         }
-        return null;
+        return temp; 
     }
 
     public int getMaxOtherNumber() {
