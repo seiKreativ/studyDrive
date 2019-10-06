@@ -17,7 +17,7 @@ public interface DataManagement {
 
     public String getPassword() throws StoreException;
 
-    public void deleteUser() throws StoreException;
+    public void deleteUser(LectureContainer c1, ExamContainer c2, SheetContainer c3) throws StoreException;
 
     public void addExam(Exam e) throws StoreException;
 

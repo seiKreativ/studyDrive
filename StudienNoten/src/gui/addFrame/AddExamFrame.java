@@ -1,6 +1,9 @@
 package gui.addFrame;
 
-import java.awt.Color;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -55,6 +58,13 @@ public class AddExamFrame extends JDialog {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
+		try {
+			lectureContainer = LectureContainer.instance();
+			examContainer = ExamContainer.instance();
+		} catch (StoreException e) {
+			// Dieser Fehler kann an der Stelle nicht auftreten
+		}
+
 		JLabel lblSemester = new JLabel("Semester:");
 		lblSemester.setBounds(20, 11, 78, 14);
 		contentPane.add(lblSemester);
@@ -87,7 +97,7 @@ public class AddExamFrame extends JDialog {
 		
 		comboBoxLectures = new JComboBox<>();
 		comboBoxLectures.setBounds(190, 36, 380, 20);
-		for (int i = 0; i <= lectureContainer.getSize(); i++) {
+		for (int i = 0; i < lectureContainer.getSize(); i++) {
 			comboBoxLectures.addItem(lectureContainer.getLectureByIndex(i).getName());
 		}
 		contentPane.add(comboBoxLectures);
@@ -125,11 +135,28 @@ public class AddExamFrame extends JDialog {
 		btnClose.setBounds(365, 94, 90, 23);
 		contentPane.add(btnClose);
 
-		try {
-			lectureContainer = LectureContainer.instance();
-			examContainer = ExamContainer.instance();
-		} catch (StoreException e) {
-			// Dieser Fehler kann an der Stelle nicht auftreten
+		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
+		keyListenerComponents.add(btnApply);
+		//sonst kann man nicht mehr mit enter werte auswählen
+		//keyListenerComponents.add(comboBoxSem);
+		//keyListenerComponents.add(comboBoxLectures);
+		//keyListenerComponents.add(comboBoxNoten);
+		for (Component c : keyListenerComponents) {
+			c.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_ENTER)
+						onAdd();
+					if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+						if (JOptionPane.showConfirmDialog(null, "Soll ohne die Werte zu speichern wirklich geschlossen werden?",
+								"Warnung!", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+							AddExamFrame.this.dispose(); // yes option
+						} else {
+
+						}
+					}
+				}
+			});
 		}
 	}
 
@@ -137,7 +164,7 @@ public class AddExamFrame extends JDialog {
 		this.txtLeistungspunkte.setText(Integer.toString(lp));
 		this.comboBoxNoten.setSelectedItem(Double.toString(note));
 		this.comboBoxSem.setSelectedItem(Integer.toString(sem));
-		this.txtName.setText(name);
+		this.comboBoxLectures.setSelectedItem(lectureContainer.getLectureByName(name, sem));
 	}
 
 	public void setCancelButtonActivated(boolean stat) {
@@ -159,9 +186,9 @@ public class AddExamFrame extends JDialog {
 			}
 			Exam exam = new Exam(lecture, Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
 			examContainer.linkExam(exam);
+			dispose();
 		} catch (NumberFormatException | StoreException | IllegalInputException | ExamAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
-		dispose(); 
 	}
 }

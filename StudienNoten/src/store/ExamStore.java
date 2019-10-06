@@ -49,7 +49,7 @@ public class ExamStore implements DataManagement {
 				try {
 					Lecture l = new Lecture(ergebnis.getInt("semester"), ergebnis.getString("lecture"), ergebnis.getInt("credits"));
 					lectures.linkLectureLoading(l);
-				} catch (IllegalInputException | SQLException | LectureAlreadyExistsException e) {
+				} catch (IllegalInputException | SQLException e) {
 					throw new StoreException("Loading failed: " + e.getMessage(), e);
 				}
 			}
@@ -66,7 +66,7 @@ public class ExamStore implements DataManagement {
 				Sheet s = new Sheet(tmp, ergebnis3.getInt("number"), ergebnis3.getDouble("points"), ergebnis3.getDouble("maxPoints"), ergebnis3.getInt("id"));
 				sheets.linkSheetLoading(s);
 			}
-		} catch (SQLException | IllegalInputException | ExamAlreadyExistsException | SheetAlreadyExistsException e) {
+		} catch (SQLException | IllegalInputException e) {
 			throw new StoreException("Error while loading: " + e.getMessage(), e);
 		}
 	}
@@ -84,7 +84,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void deleteSheet(Sheet s) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "DELETE FROM usersheet WHERE email = '" + email + "' AND semester = " + s.getSemester() + " AND lecture = '" + s.getName() + "' AND id = " + s.getType() + ";
+			String befehl = "DELETE FROM usersheet WHERE email = '" + email + "' AND semester = " + s.getSemester() + " AND lecture = '" + s.getName() + "' AND id = " + s.getType() + ";";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while deleting lecture " + e1.getMessage(), e1);
@@ -93,7 +93,13 @@ public class ExamStore implements DataManagement {
 
 	@Override
 	public void modifySheet(Sheet sold, Sheet snew) throws StoreException {
-		// noch zu implementiere. was kann man hier verändern?
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "UPDATE usersheet set semester = " + snew.getSemester() + " AND lecture = '" + snew.getName() + "' AND id = " + snew.getType() + " AND points = " + snew.getPoints() + " AND maxPoints = " + snew.getMaxPoints() +
+					" WHERE email = '" + email + "' AND semester = " + sold.getSemester() + " AND lecture = '" + sold.getName() + "' AND id = " + sold.getType() + ";";
+			abfrage.executeUpdate(befehl);
+		} catch (SQLException e1) {
+			throw new StoreException("Error while adding sheet " + e1.getMessage(), e1);
+		}
 	}
 
 	private static String hashPassword(String password_plaintext) {
@@ -162,14 +168,20 @@ public class ExamStore implements DataManagement {
 	}
 
 	@Override
-	public void deleteUser() throws StoreException {
+	public void deleteUser(LectureContainer c1, ExamContainer c2, SheetContainer c3) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "DELETE FROM exams WHERE username = '" + email + "';";
-			abfrage.executeUpdate(befehl);
-			String befehl1 = "DELETE FROM userlecture WHERE email = '" + email + "';";
-			abfrage.executeUpdate(befehl1);
-			String befehl2 = "DELETE FROM usersheets WHERE email = '" + email + "';";
-			abfrage.executeUpdate(befehl2);
+			if (c2.getSize() != 0) {
+				String befehl = "DELETE FROM exams WHERE username = '" + email + "';";
+				abfrage.executeUpdate(befehl);
+			}
+			if (c1.getSize() != 0) {
+				String befehl1 = "DELETE FROM userlecture WHERE email = '" + email + "';";
+				abfrage.executeUpdate(befehl1);
+			}
+			if (c3.getSize() != 0) {
+				String befehl2 = "DELETE FROM usersheets WHERE email = '" + email + "';";
+				abfrage.executeUpdate(befehl2);
+			}
 			String befehl3 = "DELETE FROM users WHERE email = '" + email + "';";
 			abfrage.executeUpdate(befehl3);
 		} catch (SQLException e1) {

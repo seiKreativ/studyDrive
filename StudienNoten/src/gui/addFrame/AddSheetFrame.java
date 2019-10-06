@@ -1,6 +1,9 @@
 package gui.addFrame;
 
-import java.awt.Color;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -155,6 +158,33 @@ public class AddSheetFrame extends JDialog {
 		});
 		contentPane.add(CheckBoxOther);
 
+		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
+		keyListenerComponents.add(btnApply);
+		//Sonst kann man nicht mehr mit enter werte auswählen
+		//keyListenerComponents.add(comboBoxSem);
+		//keyListenerComponents.add(comboBoxLectures);
+		//keyListenerComponents.add(comboBoxNummer);
+		keyListenerComponents.add(txtPoints);
+		keyListenerComponents.add(txtPointsMax);
+		keyListenerComponents.add(CheckBoxOther);
+		for (Component c : keyListenerComponents) {
+			c.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_ENTER)
+						onAdd();
+					if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+						if (JOptionPane.showConfirmDialog(null, "Soll ohne die Werte zu speichern wirklich geschlossen werden?",
+								"Warnung!", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+							AddSheetFrame.this.dispose(); // yes option
+						} else {
+
+						}
+					}
+				}
+			});
+		}
+
 	}
 
 	public void setData(int sem, String name, int num, double points, double maxPoints, int type) {
@@ -164,6 +194,7 @@ public class AddSheetFrame extends JDialog {
 		this.comboBoxSem.setSelectedItem(Integer.toString(sem));
 		this.comboBoxLectures.setSelectedItem(name);
 		this.CheckBoxOther.setSelected(type == Sheet.OTHER_TYPE);
+		isOther = type == Sheet.OTHER_TYPE;
 	}
 
 	public void setCancelButtonActivated(boolean stat) {
@@ -185,18 +216,25 @@ public class AddSheetFrame extends JDialog {
 				this.dispose();
 			}
 			// Hier noch constraints einfügen sonst wirds unübersichtlich
-			int type; 
+			int type;
+			int nummer;
 			if (isOther) {
-				type = Sheet.OTHER_TYPE; 
+				type = Sheet.OTHER_TYPE;
+				nummer = 1;
+				for (Sheet s : sheetContainer) {
+					if (s.getType() == Sheet.OTHER_TYPE && s.getLecture().equals(lecture))
+						nummer++;
+				}
 			} else {
 				type = Sheet.SHEET_TYPE;
+				nummer = Integer.parseInt((String) comboBoxNummer.getSelectedItem());
 			}
-			Sheet sheet = new Sheet(lecture, Integer.parseInt((String) comboBoxSem.getSelectedItem()),
+			Sheet sheet = new Sheet(lecture, nummer,
 					Double.parseDouble(txtPoints.getText()), Double.parseDouble(txtPointsMax.getText()), type);
 			sheetContainer.linkSheet(sheet);
+			dispose();
 		} catch (NumberFormatException | StoreException | IllegalInputException | SheetAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
-		dispose();
 	}
 }
