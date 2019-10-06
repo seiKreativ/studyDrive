@@ -1,12 +1,13 @@
 package gui.mainFrame;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -27,6 +28,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import data.exam.IllegalInputException;
 import data.exam.exam.Exam;
@@ -40,8 +43,12 @@ import data.exam.sheet.SheetNotFoundException;
 import gui.addFrame.AddExamFrame;
 import gui.addFrame.AddLectureFrame;
 import gui.addFrame.AddSheetFrame;
+import gui.registration.PasswordDialog;
 import gui.registration.SignUpDialog;
 import store.StoreException;
+import javax.swing.BoxLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MainFrame extends JFrame {
 
@@ -60,6 +67,7 @@ public class MainFrame extends JFrame {
 	private TableOtherSheets allOther;
 	private TableLectures allLectures; 
 	private double durchschnitt;
+	private JTextField textFieldEmail;
 
 	
 	/**
@@ -207,14 +215,14 @@ public class MainFrame extends JFrame {
 		insgÜbungsblätter.setBackground(Color.WHITE);
 		insgÜbungsblätter.setFont(new Font("Tahoma", Font.PLAIN, 48));
 		insgÜbungsblätter.setHorizontalAlignment(SwingConstants.CENTER);
-		insgÜbungsblätter.setText(Integer.toString(sheetContainer.getAllExams().size()));
+		insgÜbungsblätter.setText(Integer.toString(sheetContainer.getCountSheetType()));
 		insgÜbungsblätter.setBorder(emptyBorder);
 		insgÜbungsblätter.setEditable(false);
 		insgÜbungsblätter.setOpaque(true);
 		countSheet.add(insgÜbungsblätter, BorderLayout.CENTER);
 		insgÜbungsblätter.setColumns(100);
 		
-		JLabel lblInsgÜbungsblätter = new JLabel("Übungsblätter insgesamt");
+		JLabel lblInsgÜbungsblätter = new JLabel("Alle Le insgesamt");
 		lblInsgÜbungsblätter.setBackground(Color.WHITE);
 		lblInsgÜbungsblätter.setOpaque(true);
 		countSheet.add(lblInsgÜbungsblätter, BorderLayout.NORTH);
@@ -249,6 +257,17 @@ public class MainFrame extends JFrame {
 		
 		sheetTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		sheetTabbedPane.setBounds(359, 11, 422, 364);
+		sheetTabbedPane.addChangeListener(new ChangeListener() {
+		    public void stateChanged(ChangeEvent e) {
+		        if (((JTabbedPane)e.getSource()).getTitleAt(((JTabbedPane)e.getSource()).getSelectedIndex()) == "Other") {
+		        	lblInsgÜbungsblätter.setText("Andere Leistungen insgesamt");
+		        	insgÜbungsblätter.setText(Integer.toString(sheetContainer.getCountOtherType()));
+		        } else {
+		        	lblInsgÜbungsblätter.setText("Übungsblätter insgesamt");
+		        	insgÜbungsblätter.setText(Integer.toString(sheetContainer.getCountSheetType()));
+		        }
+		    }
+		});
 		sheetsPanel.add(sheetTabbedPane);
 		
 
@@ -351,6 +370,32 @@ public class MainFrame extends JFrame {
 		keyListenerComponents.add(countLecture);
 		keyListenerComponents.add(insgVorlesungen);
 		keyListenerComponents.add(lblInsgVorlesungen);
+		
+		JPanel accountTab = new JPanel();
+		tabbedPane.addTab("Account", accountTab);
+		accountTab.setLayout(null);
+		
+		JLabel lblEmail = new JLabel("E-Mail:");
+		lblEmail.setBounds(34, 33, 49, 14);
+		accountTab.add(lblEmail);
+		
+		textFieldEmail = new JTextField();
+		textFieldEmail.setEditable(false);
+		textFieldEmail.setBounds(86, 30, 157, 20);
+		accountTab.add(textFieldEmail);
+		textFieldEmail.setColumns(10);
+		
+		JButton btnPasswortAendern = new JButton("Passwort ändern");
+		btnPasswortAendern.addActionListener((e) -> {
+				new PasswordDialog((JFrame) this); 
+		
+		});
+		btnPasswortAendern.setBounds(34, 77, 137, 23);
+		accountTab.add(btnPasswortAendern);
+		
+		JButton btnAccountLoeschen = new JButton("Account löschen");
+		btnAccountLoeschen.setBounds(34, 111, 137, 23);
+		accountTab.add(btnAccountLoeschen);
 		for (Component c : keyListenerComponents) {
 			c.addKeyListener(new KeyAdapter() {
 				@Override
@@ -447,8 +492,8 @@ public class MainFrame extends JFrame {
 			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
 			try {
-				Lecture l = new Lecture(Integer.parseInt((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
-						Integer.parseInt((String) tb.getValueAt(row, 1)));
+				Lecture l = new Lecture(Integer.parseInt((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 1),
+						Integer.parseInt((String) tb.getValueAt(row, 2)));
 				Exam e = new Exam(l, Double.parseDouble((String) tb.getValueAt(row, 3)));
 				examContainer.unlinkExam(e);
 				allExams.load();
@@ -536,8 +581,8 @@ public class MainFrame extends JFrame {
 			int row = allExams.getTable().getSelectedRow();
 			try {
 				int tempSem = Integer.parseInt((String) tb.getValueAt(row, 0));
-				String tempName = (String) tb.getValueAt(row, 2);
-				int tempLp = Integer.parseInt((String) tb.getValueAt(row, 1));
+				String tempName = (String) tb.getValueAt(row, 1);
+				int tempLp = Integer.parseInt((String) tb.getValueAt(row, 2));
 				double tempNote = Double.parseDouble((String) tb.getValueAt(row, 3));
 				Lecture l = new Lecture(tempSem, tempName, tempLp);
 				Exam e = new Exam(l, tempNote);
