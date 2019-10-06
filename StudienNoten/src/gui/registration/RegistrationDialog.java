@@ -1,9 +1,11 @@
 package gui.registration;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -131,6 +133,26 @@ public class RegistrationDialog extends JDialog {
 		lblX.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 22));
 		lblX.setBounds(298, 16, 21, 32);
 		contentPane.add(lblX);
+
+		ArrayList<Component> keyListenerComponents = new ArrayList<>();
+		keyListenerComponents.add(emailTextfield);
+		keyListenerComponents.add(nameTextfield);
+		keyListenerComponents.add(passwordTextfield);
+		keyListenerComponents.add(repeatPasswordTextfield);
+		keyListenerComponents.add(btnSignUp);
+		for (Component c : keyListenerComponents) {
+			c.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_ENTER)
+						onSignUp();
+					if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+						RegistrationDialog.this.dispose();
+						new SignUpDialog();
+					}
+				}
+			});
+		}
 
 		setUndecorated(true); 
 		setVisible(true);

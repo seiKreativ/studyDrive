@@ -168,14 +168,20 @@ public class ExamStore implements DataManagement {
 	}
 
 	@Override
-	public void deleteUser() throws StoreException {
+	public void deleteUser(LectureContainer c1, ExamContainer c2, SheetContainer c3) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "DELETE FROM exams WHERE username = '" + email + "';";
-			abfrage.executeUpdate(befehl);
-			String befehl1 = "DELETE FROM userlecture WHERE email = '" + email + "';";
-			abfrage.executeUpdate(befehl1);
-			String befehl2 = "DELETE FROM usersheets WHERE email = '" + email + "';";
-			abfrage.executeUpdate(befehl2);
+			if (c2.getSize() != 0) {
+				String befehl = "DELETE FROM exams WHERE username = '" + email + "';";
+				abfrage.executeUpdate(befehl);
+			}
+			if (c1.getSize() != 0) {
+				String befehl1 = "DELETE FROM userlecture WHERE email = '" + email + "';";
+				abfrage.executeUpdate(befehl1);
+			}
+			if (c3.getSize() != 0) {
+				String befehl2 = "DELETE FROM usersheets WHERE email = '" + email + "';";
+				abfrage.executeUpdate(befehl2);
+			}
 			String befehl3 = "DELETE FROM users WHERE email = '" + email + "';";
 			abfrage.executeUpdate(befehl3);
 		} catch (SQLException e1) {

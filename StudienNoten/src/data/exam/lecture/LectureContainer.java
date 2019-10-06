@@ -116,7 +116,7 @@ public class LectureContainer implements Iterable<Lecture> {
     }
 
     public void deleteUser() throws StoreException {
-        store.deleteUser();
+        store.deleteUser(this, examContainer, sheetContainer);
     }
 
 }

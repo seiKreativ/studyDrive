@@ -5,9 +5,10 @@ import data.exam.Student;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -81,6 +82,25 @@ public class SignUpDialog extends JDialog {
 			dia.setVisible(true);
 		});
 		Options.add(btnRegisterNow);
+
+		ArrayList<Component> keyListenerComponents = new ArrayList<>();
+		keyListenerComponents.add(btnSignIn);
+		keyListenerComponents.add(txtUsername);
+		keyListenerComponents.add(txtPassword);
+		for (Component c : keyListenerComponents) {
+			c.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_ENTER)
+						onSignIn();
+					if (e.getKeyCode() == KeyEvent.VK_N) {
+						SignUpDialog.this.dispose();
+						RegistrationDialog dia = new RegistrationDialog();
+						dia.setVisible(true);
+					}
+				}
+			});
+		}
 
 		this.setVisible(true);
 

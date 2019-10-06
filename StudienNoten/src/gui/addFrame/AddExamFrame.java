@@ -1,6 +1,9 @@
 package gui.addFrame;
 
-import java.awt.Color;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -131,6 +134,30 @@ public class AddExamFrame extends JDialog {
 		});
 		btnClose.setBounds(365, 94, 90, 23);
 		contentPane.add(btnClose);
+
+		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
+		keyListenerComponents.add(btnApply);
+		//sonst kann man nicht mehr mit enter werte auswählen
+		//keyListenerComponents.add(comboBoxSem);
+		//keyListenerComponents.add(comboBoxLectures);
+		//keyListenerComponents.add(comboBoxNoten);
+		for (Component c : keyListenerComponents) {
+			c.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_ENTER)
+						onAdd();
+					if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+						if (JOptionPane.showConfirmDialog(null, "Soll ohne die Werte zu speichern wirklich geschlossen werden?",
+								"Warnung!", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+							AddExamFrame.this.dispose(); // yes option
+						} else {
+
+						}
+					}
+				}
+			});
+		}
 	}
 
 	public void setData(int sem, String name, int lp, double note) {
@@ -159,9 +186,9 @@ public class AddExamFrame extends JDialog {
 			}
 			Exam exam = new Exam(lecture, Double.parseDouble((String) comboBoxNoten.getSelectedItem()));
 			examContainer.linkExam(exam);
+			dispose();
 		} catch (NumberFormatException | StoreException | IllegalInputException | ExamAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
-		dispose(); 
 	}
 }

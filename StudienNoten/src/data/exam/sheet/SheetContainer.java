@@ -88,6 +88,24 @@ public class SheetContainer implements Iterable<Sheet> {
         return tmp;
     }
 
+    public int getCountOtherType() {
+        int count = 0;
+        for (Sheet s : sheets) {
+            if (s.getType() == Sheet.OTHER_TYPE)
+                count++;
+        }
+        return count;
+    }
+
+    public int getCountSheetType() {
+        int count = 0;
+        for (Sheet s : sheets) {
+            if (s.getType() == Sheet.SHEET_TYPE)
+                count++;
+        }
+        return count;
+    }
+
     public Vector<Sheet> getAllExams() {
         return this.sheets;
     }

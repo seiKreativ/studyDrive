@@ -1,13 +1,14 @@
 package gui.mainFrame;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -331,6 +332,67 @@ public class MainFrame extends JFrame {
 				System.exit(0);
 			}
 		});
+
+		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
+		keyListenerComponents.add(allExams.getTable());
+		keyListenerComponents.add(allLectures.getTable());
+		keyListenerComponents.add(allSheets.getTable());
+		keyListenerComponents.add(allOther.getTable());
+		keyListenerComponents.add(tabbedPane);
+		keyListenerComponents.add(sheetTabbedPane);
+		keyListenerComponents.add(examsPane);
+		keyListenerComponents.add(durchschnittsnote);
+		keyListenerComponents.add(grade);
+		keyListenerComponents.add(lblDurchschnittsnote);
+		keyListenerComponents.add(sheetsPanel);
+		keyListenerComponents.add(countSheet);
+		keyListenerComponents.add(insgÜbungsblätter);
+		keyListenerComponents.add(lecturePanel);
+		keyListenerComponents.add(countLecture);
+		keyListenerComponents.add(insgVorlesungen);
+		keyListenerComponents.add(lblInsgVorlesungen);
+		for (Component c : keyListenerComponents) {
+			c.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_1) {
+						if (tabbedPane.getSelectedIndex() == 0)
+							onAddExam();
+						if (tabbedPane.getSelectedIndex() == 1)
+							onAddSheet();
+						if (tabbedPane.getSelectedIndex() == 2)
+							onAddLecture();
+					}
+					if (e.getKeyCode() == KeyEvent.VK_2) {
+						if (tabbedPane.getSelectedIndex() == 0)
+							onDelExam();
+						if (tabbedPane.getSelectedIndex() == 1)
+							onDelSheet();
+						if (tabbedPane.getSelectedIndex() == 2)
+							onDelLecture();
+					}
+					if (e.getKeyCode() == KeyEvent.VK_3) {
+						if (tabbedPane.getSelectedIndex() == 0)
+							onModifyExam();
+						if (tabbedPane.getSelectedIndex() == 1)
+							onModifySheet();
+						if (tabbedPane.getSelectedIndex() == 2)
+							onModifyLecture();
+					}
+					if (e.getKeyCode() == KeyEvent.VK_F1)
+						tabbedPane.setSelectedIndex(0);
+					if (e.getKeyCode() == KeyEvent.VK_F2)
+						tabbedPane.setSelectedIndex(1);
+					if (e.getKeyCode() == KeyEvent.VK_F3)
+						tabbedPane.setSelectedIndex(2);
+					if (e.getKeyCode() == KeyEvent.VK_A && tabbedPane.getSelectedIndex() == 1)
+						sheetTabbedPane.setSelectedIndex(0);
+					if (e.getKeyCode() == KeyEvent.VK_B && tabbedPane.getSelectedIndex() == 1)
+						sheetTabbedPane.setSelectedIndex(1);
+				}
+			});
+		}
+
 		setVisible(true);
 	}
 
@@ -348,6 +410,122 @@ public class MainFrame extends JFrame {
 		durchschnittsnote.setText(new DecimalFormat("0.00").format(durchschnitt));
 	}
 
+	// Add exam, lecture, sheet
+
+	private void onAddExam() {
+		// Prüfung hinzufügen
+		AddExamFrame addDia = new AddExamFrame(this, "Neue Prüfung hinzufügen");
+		addDia.setVisible(true);
+		calcDurchschnitt();
+		allExams.load();
+	}
+
+	private void onAddLecture() {
+		// Lecture hinzufügen
+		AddLectureFrame addDia = new AddLectureFrame();
+		addDia.setVisible(true);
+		allLectures.load();
+	}
+
+	private void onAddSheet() {
+		// Sheet hinzufügen
+		AddSheetFrame addDia = new AddSheetFrame(this, "Neues Übungsblatt hinzufügen");
+		addDia.setVisible(true);
+		allSheets.load();
+		allOther.load();
+		insgÜbungsblätter.setText(String.valueOf(sheetContainer.getSize()));
+	}
+
+	// Delete exam, lecture, sheet
+
+	private void onDelExam() {
+		// Prüfung löschen
+		if (allExams.getTable().getSelectedRow() == -1) {
+			JOptionPane.showMessageDialog(this,
+					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+		} else {
+			JTable tb = allExams.getTable();
+			int row = allExams.getTable().getSelectedRow();
+			try {
+				Lecture l = new Lecture(Integer.parseInt((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
+						Integer.parseInt((String) tb.getValueAt(row, 1)));
+				Exam e = new Exam(l, Double.parseDouble((String) tb.getValueAt(row, 3)));
+				examContainer.unlinkExam(e);
+				allExams.load();
+				calcDurchschnitt();
+			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+
+	}
+
+	private void onDelLecture() {
+		// Prüfung löschen
+		if (allExams.getTable().getSelectedRow() == -1) {
+			JOptionPane.showMessageDialog(this,
+					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+		} else {
+			JTable tb = allExams.getTable();
+			int row = allExams.getTable().getSelectedRow();
+			try {
+				Lecture l = new Lecture(Integer.parseInt((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
+						Integer.parseInt((String) tb.getValueAt(row, 1)));
+				Exam e = new Exam(l, Double.parseDouble((String) tb.getValueAt(row, 3)));
+				examContainer.unlinkExam(e);
+				allExams.load();
+				calcDurchschnitt();
+			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+
+	}
+
+	private void onDelSheet() {
+		// Sheet löschen
+		int type;
+		if (allSheets.getTable().getSelectedRow() == -1 && allOther.getTable().getSelectedRow() == -1) {
+			JOptionPane.showMessageDialog(this,
+					"Um eine Leistung zu löschen muss zuerst eine Leistung ausgewäht werden.");
+		} else {
+			JTable tb;
+			int row;
+			if (allSheets.getTable().getSelectedRow() == -1) {
+				tb = allOther.getTable();
+				row = allOther.getTable().getSelectedRow();
+			} else {
+				tb = allSheets.getTable();
+				row = allSheets.getTable().getSelectedRow();
+			}
+			try {
+				Lecture lecture = null;
+				for (int i = 0; i < lectureContainer.getSize(); i++) {
+					Lecture e = lectureContainer.getLectureByIndex(i);
+					if (e.getName().equals((String) tb.getValueAt(row, 1))
+							&& e.getSemester() == Integer.parseInt((String) tb.getValueAt(row, 0))) {
+						lecture = e;
+					}
+				}
+				if (sheetTabbedPane.getSelectedIndex() == 0) {
+					type = Sheet.SHEET_TYPE;
+				} else {
+					type = Sheet.OTHER_TYPE;
+				}
+				Sheet e = new Sheet(lecture,Integer.parseInt((String) tb.getValueAt(row, 2)), Double.parseDouble((String) tb.getValueAt(row, 3)) ,Double.parseDouble((String) tb.getValueAt(row, 4)), type);
+				sheetContainer.unlinkSheet(e);
+				allSheets.load();
+				allOther.load();
+				insgÜbungsblätter.setText(String.valueOf(sheetContainer.getSize()));
+			} catch (IllegalInputException | StoreException | SheetNotFoundException e) {
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+
+	}
+
+	// Modify Exam, lecture, sheet
+
 	private void onModifyExam() {
 		// Prüfung verändern
 		if (allExams.getTable().getSelectedRow() == -1) {
@@ -357,10 +535,10 @@ public class MainFrame extends JFrame {
 			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
 			try {
-				int tempSem = Integer.valueOf((String) tb.getValueAt(row, 0));
+				int tempSem = Integer.parseInt((String) tb.getValueAt(row, 0));
 				String tempName = (String) tb.getValueAt(row, 2);
-				int tempLp = Integer.valueOf((String) tb.getValueAt(row, 1));
-				double tempNote = Double.valueOf((String) tb.getValueAt(row, 3));
+				int tempLp = Integer.parseInt((String) tb.getValueAt(row, 1));
+				double tempNote = Double.parseDouble((String) tb.getValueAt(row, 3));
 				Lecture l = new Lecture(tempSem, tempName, tempLp);
 				Exam e = new Exam(l, tempNote);
 				examContainer.unlinkExam(e);
@@ -376,16 +554,8 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void onAddExam() {
-		// Prüfung hinzufügen
-		AddExamFrame addDia = new AddExamFrame(this, "Neue Prüfung hinzufügen");
-		addDia.setVisible(true);
-		calcDurchschnitt();
-		allExams.load();
-	}
-
-	private void onDelExam() {
-		// Prüfung löschen
+	private void onModifyLecture() {
+		// Prüfung verändern
 		if (allExams.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
 					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
@@ -393,17 +563,23 @@ public class MainFrame extends JFrame {
 			JTable tb = allExams.getTable();
 			int row = allExams.getTable().getSelectedRow();
 			try {
-				Lecture l = new Lecture(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
-						Integer.valueOf((String) tb.getValueAt(row, 1)));
-				Exam e = new Exam(l, Double.valueOf((String) tb.getValueAt(row, 3)));
+				int tempSem = Integer.parseInt((String) tb.getValueAt(row, 0));
+				String tempName = (String) tb.getValueAt(row, 2);
+				int tempLp = Integer.parseInt((String) tb.getValueAt(row, 1));
+				double tempNote = Double.parseDouble((String) tb.getValueAt(row, 3));
+				Lecture l = new Lecture(tempSem, tempName, tempLp);
+				Exam e = new Exam(l, tempNote);
 				examContainer.unlinkExam(e);
-				allExams.load();
+				AddExamFrame addDia = new AddExamFrame(this, "Prüfung ändern");
+				addDia.setData(tempSem, tempName, tempLp, tempNote);
+				addDia.setCancelButtonActivated(false);
+				addDia.setVisible(true);
 				calcDurchschnitt();
-			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
+				allExams.load();
+			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
 				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
-
 	}
 	
 	private void onModifySheet() {
@@ -436,10 +612,10 @@ public class MainFrame extends JFrame {
 				} else {
 					type = Sheet.OTHER_TYPE;
 				}
-				Sheet e = new Sheet(lecture,Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)) ,Double.valueOf((String) tb.getValueAt(row, 4)), type);
+				Sheet e = new Sheet(lecture,Integer.parseInt((String) tb.getValueAt(row, 2)), Double.parseDouble((String) tb.getValueAt(row, 3)) ,Double.parseDouble((String) tb.getValueAt(row, 4)), type);
 				sheetContainer.unlinkSheet(e);
 				AddSheetFrame addDia = new AddSheetFrame(this, "Übungsblatt ändern");
-				addDia.setData(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 1), Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)), Double.valueOf((String) tb.getValueAt(row, 4)), type);
+				addDia.setData(Integer.parseInt((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 1), Integer.parseInt((String) tb.getValueAt(row, 2)), Double.parseDouble((String) tb.getValueAt(row, 3)), Double.parseDouble((String) tb.getValueAt(row, 4)), type);
 				addDia.setCancelButtonActivated(false);
 				addDia.setVisible(true);
 				allOther.load();
@@ -450,113 +626,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void onAddSheet() {
-		// Sheet hinzufügen
-		AddSheetFrame addDia = new AddSheetFrame(this, "Neues Übungsblatt hinzufügen");
-		addDia.setVisible(true);
-		allSheets.load();
-		allOther.load();
-		insgÜbungsblätter.setText(String.valueOf(sheetContainer.getSize()));
-	}
-
-	private void onDelSheet() {
-		// Sheet löschen
-		int type; 
-		if (allSheets.getTable().getSelectedRow() == -1 && allOther.getTable().getSelectedRow() == -1) {
-			JOptionPane.showMessageDialog(this,
-					"Um eine Leistung zu löschen muss zuerst eine Leistung ausgewäht werden.");
-		} else {
-			JTable tb;
-			int row;
-			if (allSheets.getTable().getSelectedRow() == -1) {
-				tb = allOther.getTable();
-				row = allOther.getTable().getSelectedRow();
-			} else {
-				tb = allSheets.getTable();
-				row = allSheets.getTable().getSelectedRow();
-			}
-			try {
-				Lecture lecture = null;
-				for (int i = 0; i < lectureContainer.getSize(); i++) {
-					Lecture e = lectureContainer.getLectureByIndex(i);
-					if (e.getName().equals((String) tb.getValueAt(row, 1))
-							&& e.getSemester() == Integer.parseInt((String) tb.getValueAt(row, 0))) {
-						lecture = e;
-					}
-				}
-				if (sheetTabbedPane.getSelectedIndex() == 0) {
-					type = Sheet.SHEET_TYPE;
-				} else {
-					type = Sheet.OTHER_TYPE;
-				}
-				Sheet e = new Sheet(lecture,Integer.valueOf((String) tb.getValueAt(row, 2)), Double.valueOf((String) tb.getValueAt(row, 3)) ,Double.valueOf((String) tb.getValueAt(row, 4)), type);
-				sheetContainer.unlinkSheet(e);
-				allSheets.load();
-				allOther.load();
-				insgÜbungsblätter.setText(String.valueOf(sheetContainer.getSize()));
-			} catch (IllegalInputException | StoreException | SheetNotFoundException e) {
-				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-
-	}
-	
-	private void onModifyLecture() {
-		// Prüfung verändern
-		if (allExams.getTable().getSelectedRow() == -1) {
-			JOptionPane.showMessageDialog(this,
-					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
-		} else {
-			JTable tb = allExams.getTable();
-			int row = allExams.getTable().getSelectedRow();
-			try {
-				int tempSem = Integer.valueOf((String) tb.getValueAt(row, 0));
-				String tempName = (String) tb.getValueAt(row, 2);
-				int tempLp = Integer.valueOf((String) tb.getValueAt(row, 1));
-				double tempNote = Double.valueOf((String) tb.getValueAt(row, 3));
-				Lecture l = new Lecture(tempSem, tempName, tempLp);
-				Exam e = new Exam(l, tempNote);
-				examContainer.unlinkExam(e);
-				AddExamFrame addDia = new AddExamFrame(this, "Prüfung ändern");
-				addDia.setData(tempSem, tempName, tempLp, tempNote);
-				addDia.setCancelButtonActivated(false);
-				addDia.setVisible(true);
-				calcDurchschnitt();
-				allExams.load();
-			} catch (IllegalInputException | ExamNotFoundException | StoreException e) {
-				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
-
-	private void onAddLecture() {
-		// Lecture hinzufügen
-		AddLectureFrame addDia = new AddLectureFrame();
-		addDia.setVisible(true);
-		allLectures.load();
-	}
-
-	private void onDelLecture() {
-		// Prüfung löschen
-		if (allExams.getTable().getSelectedRow() == -1) {
-			JOptionPane.showMessageDialog(this,
-					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
-		} else {
-			JTable tb = allExams.getTable();
-			int row = allExams.getTable().getSelectedRow();
-			try {
-				Lecture l = new Lecture(Integer.valueOf((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 2),
-						Integer.valueOf((String) tb.getValueAt(row, 1)));
-				Exam e = new Exam(l, Double.valueOf((String) tb.getValueAt(row, 3)));
-				examContainer.unlinkExam(e);
-				allExams.load();
-				calcDurchschnitt();
-			} catch (IllegalInputException | StoreException | ExamNotFoundException e) {
-				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-
-	}
+	//Menü-Methoden
 
 	private void onLogOut() {
 		try {
