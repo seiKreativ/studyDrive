@@ -11,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class SignUpDialog extends JDialog {
 	/**
@@ -87,6 +89,17 @@ public class SignUpDialog extends JDialog {
 		keyListenerComponents.add(btnSignIn);
 		keyListenerComponents.add(txtUsername);
 		keyListenerComponents.add(txtPassword);
+		
+		JLabel lblPasswortVergessen = new JLabel("Passwort vergessen");
+		lblPasswortVergessen.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				new PasswordForgetDialog(SignUpDialog.this); 
+			}
+		});
+		lblPasswortVergessen.setForeground(Color.BLUE);
+		lblPasswortVergessen.setBounds(35, 126, 137, 14);
+		panel.add(lblPasswortVergessen);
 		for (Component c : keyListenerComponents) {
 			c.addKeyListener(new KeyAdapter() {
 				@Override

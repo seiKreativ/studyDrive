@@ -1,7 +1,6 @@
 package data.exam.lecture;
 
 import data.exam.IllegalInputException;
-import data.exam.exam.Exam;
 
 public class Lecture {
 

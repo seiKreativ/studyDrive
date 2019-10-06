@@ -10,8 +10,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
+import java.awt.Font;
 
-public class PasswordDialog extends JDialog {
+public class PasswordForgetDialog extends JDialog {
 
 	/**
 	 * 
@@ -19,51 +21,40 @@ public class PasswordDialog extends JDialog {
 	private static final long serialVersionUID = 8052600036105942804L;
 	private final JPanel contentPanel = new JPanel();
 	private JPasswordField altesPasswortField;
-	private JPasswordField neuesPasswortField;
-	private JPasswordField neuesPasswortReField;
 
 
-	public PasswordDialog(JFrame owner) {
-		super(owner);
+	public PasswordForgetDialog(SignUpDialog signUpDialog) {
+		super(signUpDialog);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		setBounds(100, 100, 363, 206);
+		setBounds(100, 100, 363, 179);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		{
-			JLabel lblNewLabel = new JLabel("Altes Passwort:");
-			lblNewLabel.setBounds(28, 10, 155, 14);
+			JLabel lblNewLabel = new JLabel("E-mail:");
+			lblNewLabel.setBounds(25, 63, 155, 14);
 			contentPanel.add(lblNewLabel);
-		}
-		{
-			JLabel lblNeuesPasswort = new JLabel("Neues Passwort:");
-			lblNeuesPasswort.setBounds(28, 50, 155, 14);
-			contentPanel.add(lblNeuesPasswort);
-		}
-		{
-			JLabel lblNeuesPasswortWiederholen = new JLabel("Neues Passwort wiederholen:");
-			lblNeuesPasswortWiederholen.setBounds(28, 90, 155, 14);
-			contentPanel.add(lblNeuesPasswortWiederholen);
 		}
 		
 		altesPasswortField = new JPasswordField();
-		altesPasswortField.setBounds(28, 25, 210, 20);
+		altesPasswortField.setBounds(25, 78, 210, 20);
 		contentPanel.add(altesPasswortField);
 		
-		neuesPasswortField = new JPasswordField();
-		neuesPasswortField.setBounds(28, 65, 210, 20);
-		contentPanel.add(neuesPasswortField);
-		
-		neuesPasswortReField = new JPasswordField();
-		neuesPasswortReField.setBounds(28, 105, 210, 20);
-		contentPanel.add(neuesPasswortReField);
+		JTextArea txtrBitteGebenSie = new JTextArea();
+		txtrBitteGebenSie.setEditable(false);
+		txtrBitteGebenSie.setFont(new Font("Arial Nova Light", Font.PLAIN, 13));
+		txtrBitteGebenSie.setOpaque(true);
+		txtrBitteGebenSie.setBackground(null);
+		txtrBitteGebenSie.setText("Bitte geben Sie hier Ihre E-Mail ein und wir senden Ihnen \r\nin Kürze ein neues Passwort");
+		txtrBitteGebenSie.setBounds(25, 11, 314, 34);
+		contentPanel.add(txtrBitteGebenSie);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("Passwort ändern");
+				JButton okButton = new JButton("Neues Passwort zusenden");
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);

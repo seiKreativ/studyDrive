@@ -1,11 +1,13 @@
 package gui.addFrame;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -15,8 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import data.exam.IllegalInputException;
-import data.exam.exam.Exam;
-import data.exam.exam.ExamAlreadyExistsException;
 import data.exam.lecture.Lecture;
 import data.exam.lecture.LectureContainer;
 import data.exam.sheet.Sheet;
@@ -24,7 +24,6 @@ import data.exam.sheet.SheetAlreadyExistsException;
 import data.exam.sheet.SheetContainer;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
-import javax.swing.JCheckBox;
 
 public class AddSheetFrame extends JDialog {
 
@@ -197,7 +196,7 @@ public class AddSheetFrame extends JDialog {
 		CheckBoxOther.addActionListener((e) -> {
 			if (((JCheckBox) e.getSource()).isSelected()) {
 				comboBoxNummer.setEnabled(false);
-				comboBoxNummer.setSelectedItem("");
+				comboBoxNummer.setSelectedItem(null);
 				isOther = true;
 			} else {
 				comboBoxNummer.setEnabled(true);
@@ -264,7 +263,6 @@ public class AddSheetFrame extends JDialog {
 				JOptionPane.showMessageDialog(this, "this lecture does not exist");
 				this.dispose();
 			}
-			// Hier noch constraints einfügen sonst wirds unübersichtlich
 			int type;
 			int nummer;
 			if (isOther) {
@@ -278,8 +276,22 @@ public class AddSheetFrame extends JDialog {
 				type = Sheet.SHEET_TYPE;
 				nummer = Integer.parseInt((String) comboBoxNummer.getSelectedItem());
 			}
-			Sheet sheet = new Sheet(lecture, nummer, Double.parseDouble(txtPoints.getText()),
-					Double.parseDouble(txtPointsMax.getText()), type);
+			double points;
+			double pointsMax;
+			try {
+				points = Double.parseDouble(txtPoints.getText());
+				pointsMax = Double.parseDouble(txtPointsMax.getText());
+			  } catch (NumberFormatException e) {
+					throw new IllegalInputException("Punkte konnten nicht in eine Zahl umgewandelt werden.");
+			  }
+			
+			if (points < 0 || pointsMax < 1 ) {
+				throw new IllegalInputException("Punkte können nicht negativ sein und max Punkte kann nicht kleiner als 1 sein.");
+			} else if (points > pointsMax) {
+				throw new IllegalInputException("Die erreichte Punktezahl kann nicht größer als die zu erreichende Punktzahl sein.");
+			}
+			
+			Sheet sheet = new Sheet(lecture, nummer, points, pointsMax, type);
 			sheetContainer.linkSheet(sheet);
 			dispose();
 		} catch (NumberFormatException | StoreException | IllegalInputException | SheetAlreadyExistsException e) {

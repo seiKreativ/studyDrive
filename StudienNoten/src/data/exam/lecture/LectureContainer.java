@@ -128,5 +128,16 @@ public class LectureContainer implements Iterable<Lecture> {
     public void deleteUser() throws StoreException {
         store.deleteUser(this, examContainer, sheetContainer);
     }
+    
+
+	public boolean contains(Lecture l) {
+		for (int i = 0; i < this.getSize(); i++) {
+			Lecture temp = this.getLectureByIndex(i); 
+			if (l.getName().equals(temp.getName()) && l.getSemester() == temp.getSemester()) {
+				return true; 
+			}
+		}
+		return false; 
+	}
 
 }
