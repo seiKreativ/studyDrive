@@ -1,18 +1,20 @@
 package store;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import data.exam.*;
+import org.mindrot.jbcrypt.BCrypt;
+
+import data.exam.IllegalInputException;
 import data.exam.exam.Exam;
-import data.exam.exam.ExamAlreadyExistsException;
 import data.exam.exam.ExamContainer;
 import data.exam.lecture.Lecture;
-import data.exam.lecture.LectureAlreadyExistsException;
 import data.exam.lecture.LectureContainer;
 import data.exam.sheet.Sheet;
-import data.exam.sheet.SheetAlreadyExistsException;
 import data.exam.sheet.SheetContainer;
-import org.mindrot.jbcrypt.BCrypt;
 
 public class ExamStore implements DataManagement {
 
@@ -232,7 +234,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void deleteLecture(Lecture e) throws StoreException{
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "DELETE FROM userlecture WHERE username = '" + email + "' AND semester = " + e.getSemester() + " AND name = '" + e.getName() + "';";
+			String befehl = "DELETE FROM userlecture WHERE email = '" + email + "' AND semester = " + e.getSemester() + " AND lecture = '" + e.getName() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while deleting lecture " + e1.getMessage(), e1);

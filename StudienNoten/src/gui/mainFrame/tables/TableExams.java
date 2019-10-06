@@ -1,4 +1,4 @@
-package gui.mainFrame;
+package gui.mainFrame.tables;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -69,12 +69,15 @@ public class TableExams extends JPanel {
 					c.setBackground(super.getBackground());
 					c.setForeground(super.getForeground());
 				}
+				if (isRowSelected(row)) {
+                    c.setBackground(Color.lightGray);
+                } else {
+                    c.setBackground(Color.white);
+                }
 				return c;
 			}
 		};
-		tblTaskList.setShowVerticalLines(true);
-		tblTaskList.setCellSelectionEnabled(false);
-		tblTaskList.setRowSelectionAllowed(true);
+		
 
 		// Table Cell Renderer
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -83,6 +86,9 @@ public class TableExams extends JPanel {
 		tblTaskList.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
 		tblTaskList.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 
+		tblTaskList.setShowVerticalLines(true);
+		tblTaskList.setCellSelectionEnabled(false);
+		tblTaskList.setRowSelectionAllowed(true);
 		// Table Sorter
 		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(tblTaskList.getModel());
 		tblTaskList.setRowSorter(sorter);

@@ -1,7 +1,8 @@
-package gui.mainFrame;
+package gui.mainFrame.tables;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +16,10 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import data.exam.exam.Exam;
 import data.exam.lecture.Lecture;
 import data.exam.lecture.LectureContainer;
 
@@ -58,18 +59,15 @@ public class TableLectures extends JPanel {
 			}
 
 //			@Override
-//			public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
-//				Component c = super.prepareRenderer(renderer, row, col);
-//				String status = (String) getValueAt(row, 3);
-//				if (Double.parseDouble(status) > 4.0) {
-//					c.setBackground(Color.RED);
-//					c.setForeground(Color.WHITE);
-//				} else {
-//					c.setBackground(super.getBackground());
-//					c.setForeground(super.getForeground());
-//				}
-//				return c;
-//			}
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
+				Component c = super.prepareRenderer(renderer, row, col);
+				if (isRowSelected(row)) {
+                    c.setBackground(Color.lightGray);
+                } else {
+                    c.setBackground(Color.white);
+                }
+				return c;
+			}
 		};
 		tblTaskList.setShowVerticalLines(true);
 		tblTaskList.setCellSelectionEnabled(false);

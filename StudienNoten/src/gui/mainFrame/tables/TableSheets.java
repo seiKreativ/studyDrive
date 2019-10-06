@@ -1,7 +1,8 @@
-package gui.mainFrame;
+package gui.mainFrame.tables;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +16,14 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import data.exam.sheet.Sheet;
 import data.exam.sheet.SheetContainer;
 
-public class TableOtherSheets extends JPanel {
+public class TableSheets extends JPanel {
 
 	/**
 	 * 
@@ -33,7 +35,7 @@ public class TableOtherSheets extends JPanel {
 	private SheetContainer container;
 
 	@SuppressWarnings("serial")
-	public TableOtherSheets(SheetContainer container) {
+	public TableSheets(SheetContainer container) {
 
 		super();
 		this.container = container;
@@ -55,14 +57,17 @@ public class TableOtherSheets extends JPanel {
 			public Dimension getPreferredScrollableViewportSize() {
 				return new Dimension(350, 150);
 			}
-			/*
-			 * @Override public Component prepareRenderer(TableCellRenderer renderer, int
-			 * row, int col) { Component c = super.prepareRenderer(renderer, row, col);
-			 * String status = (String) getValueAt(row, 3); if (Double.parseDouble(status) >
-			 * 4.0) { c.setBackground(Color.RED); c.setForeground(Color.WHITE); } else {
-			 * c.setBackground(super.getBackground());
-			 * c.setForeground(super.getForeground()); } return c; }
-			 */
+
+			@Override
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
+				Component c = super.prepareRenderer(renderer, row, col);
+				if (isRowSelected(row)) {
+					c.setBackground(Color.lightGray);
+				} else {
+					c.setBackground(Color.white);
+				}
+				return c;
+			}
 		};
 		tblTaskList.setShowVerticalLines(true);
 		tblTaskList.setCellSelectionEnabled(false);
@@ -126,15 +131,16 @@ public class TableOtherSheets extends JPanel {
 			}
 			for (int count = 1; count <= container.getSize(); count++) {
 				Sheet e = container.getSheetByIndex(count - 1);
-				if (e.getType() == Sheet.OTHER_TYPE) {
-				Vector<String> data = new Vector<String>();
-				data.add(Integer.toString(e.getSemester()));
-				data.add(e.getName());
-				data.add(Integer.toString(e.getNumber()));
-				data.add(Double.toString(e.getPoints()));
-				data.add(Double.toString(e.getMaxPoints()));
-				dm.addRow(data);
+				if (e.getType() == Sheet.SHEET_TYPE) {
+					Vector<String> data = new Vector<String>();
+					data.add(Integer.toString(e.getSemester()));
+					data.add(e.getName());
+					data.add(Integer.toString(e.getNumber()));
+					data.add(Double.toString(e.getPoints()));
+					data.add(Double.toString(e.getMaxPoints()));
+					dm.addRow(data);
 				}
+
 			}
 			revalidate();
 		}
@@ -150,14 +156,14 @@ public class TableOtherSheets extends JPanel {
 		}
 		for (int count = 1; count <= container.getSize(); count++) {
 			Sheet e = container.getSheetByIndex(count - 1);
-			if (e.getType() == Sheet.OTHER_TYPE) {
-			Vector<String> data = new Vector<String>();
-			data.add(Integer.toString(e.getSemester()));
-			data.add(e.getName());
-			data.add(Integer.toString(e.getNumber()));
-			data.add(Double.toString(e.getPoints()));
-			data.add(Double.toString(e.getMaxPoints()));
-			dm.addRow(data);
+			if (e.getType() == Sheet.SHEET_TYPE) {
+				Vector<String> data = new Vector<String>();
+				data.add(Integer.toString(e.getSemester()));
+				data.add(e.getName());
+				data.add(Integer.toString(e.getNumber()));
+				data.add(Double.toString(e.getPoints()));
+				data.add(Double.toString(e.getMaxPoints()));
+				dm.addRow(data);
 			}
 
 		}
