@@ -207,10 +207,6 @@ public class AddSheetFrame extends JDialog {
 
 		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
 		keyListenerComponents.add(btnApply);
-		// Sonst kann man nicht mehr mit enter werte auswählen
-		// keyListenerComponents.add(comboBoxSem);
-		// keyListenerComponents.add(comboBoxLectures);
-		// keyListenerComponents.add(comboBoxNummer);
 		keyListenerComponents.add(txtPoints);
 		keyListenerComponents.add(txtPointsMax);
 		keyListenerComponents.add(CheckBoxOther);

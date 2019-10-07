@@ -117,8 +117,8 @@ public class LectureContainer implements Iterable<Lecture> {
         unique = null;
     }
 
-    public String getUser() throws StoreException {
-        return store.getUser();
+    public String getUserName() throws StoreException {
+        return store.getUserEmail();
     }
 
     public String getPassword() throws StoreException {
@@ -129,6 +129,9 @@ public class LectureContainer implements Iterable<Lecture> {
         store.deleteUser(this, examContainer, sheetContainer);
     }
     
+    public void changePassword(String newPassword) throws StoreException {
+        store.changePasswort(newPassword);
+    }
 
 	public boolean contains(Lecture l) {
 		for (int i = 0; i < this.getSize(); i++) {

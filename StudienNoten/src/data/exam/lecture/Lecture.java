@@ -28,15 +28,6 @@ public class Lecture {
     }
 
     private void setName(String name2) throws IllegalInputException{
-		/*try {
-			ExamContainer container = ExamContainer.instance();
-			for (Exam e : container) {
-				if (e.getName().equals(name2))
-						throw new IllegalInputException("name already exists");
-			}
-		} catch (StoreException e) {
-
-		}*/
         if (name2.length() < 1) {
             throw new IllegalInputException("Name not correct");
         }

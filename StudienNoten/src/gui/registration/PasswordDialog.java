@@ -1,15 +1,15 @@
 package gui.registration;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import data.exam.lecture.LectureContainer;
+import store.StoreException;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
 
 public class PasswordDialog extends JDialog {
 
@@ -18,9 +18,9 @@ public class PasswordDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = 8052600036105942804L;
 	private final JPanel contentPanel = new JPanel();
-	private JPasswordField altesPasswortField;
-	private JPasswordField neuesPasswortField;
-	private JPasswordField neuesPasswortReField;
+	private JTextField altesPasswortField;
+	private JTextField neuesPasswortField;
+	private JTextField neuesPasswortReField;
 
 
 	public PasswordDialog(JFrame owner) {
@@ -58,6 +58,12 @@ public class PasswordDialog extends JDialog {
 		neuesPasswortReField = new JPasswordField();
 		neuesPasswortReField.setBounds(28, 105, 210, 20);
 		contentPanel.add(neuesPasswortReField);
+
+		ArrayList<Component> keyListenerComponents = new ArrayList<>();
+		keyListenerComponents.add(altesPasswortField);
+		keyListenerComponents.add(neuesPasswortField);
+		keyListenerComponents.add(neuesPasswortReField);
+
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -65,6 +71,8 @@ public class PasswordDialog extends JDialog {
 			{
 				JButton okButton = new JButton("Passwort ändern");
 				okButton.setActionCommand("OK");
+				keyListenerComponents.add(okButton);
+				okButton.addActionListener(e -> onOk());
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
@@ -77,6 +85,42 @@ public class PasswordDialog extends JDialog {
 				});
 			}
 		}
+
+		for (Component c : keyListenerComponents) {
+			c.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_ENTER)
+						onOk();
+					if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+						dispose();
+					}
+				}
+			});
+		}
 		setVisible(true);
+	}
+
+	private void onOk() {
+		try {
+			LectureContainer con = LectureContainer.instance();
+			if (!altesPasswortField.getText().equals(con.getPassword())) {
+				JOptionPane.showMessageDialog(this, "Error: Falsches altes Passwort", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if (!neuesPasswortField.getText().equals(neuesPasswortReField.getText())) {
+				JOptionPane.showMessageDialog(this, "Error: Passwörter stimmen nicht überein", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if (neuesPasswortField.getText().length() <= 2) {
+				JOptionPane.showMessageDialog(this, "Error: Passwortmuss mindestens drei Zeichen haben", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			con.changePassword(neuesPasswortField.getText());
+			JOptionPane.showMessageDialog(this, "Passwort erfolgreich geändert", "Bestätigung", JOptionPane.INFORMATION_MESSAGE);
+			dispose();
+		} catch (StoreException e) {
+			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }

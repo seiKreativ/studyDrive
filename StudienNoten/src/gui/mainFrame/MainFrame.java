@@ -103,10 +103,6 @@ public class MainFrame extends JFrame {
 		mntmRefresh.addActionListener(e -> onRefresh());
 		mnAllgemein.add(mntmRefresh);
 
-		JMenuItem mntmDeleteUser = new JMenuItem("Account Löschen");
-		mntmDeleteUser.addActionListener(e -> onDeleteUser());
-		mnAllgemein.add(mntmDeleteUser);
-
 		JMenuItem mntmInformation = new JMenuItem("Information");
 		mntmInformation.addActionListener(e -> {
 			JOptionPane.showMessageDialog(this, "Version 1.0");
@@ -354,6 +350,38 @@ public class MainFrame extends JFrame {
 			}
 		});
 
+		JPanel accountTab = new JPanel();
+		tabbedPane.addTab("Account", accountTab);
+		accountTab.setLayout(null);
+
+		JLabel lblEmail = new JLabel("E-Mail:");
+		lblEmail.setBounds(34, 33, 49, 14);
+		accountTab.add(lblEmail);
+
+		textFieldEmail = new JTextField();
+		try {
+			textFieldEmail.setText(lectureContainer.getUserName());
+		} catch (StoreException e) {
+			//Fehler tritt hier nicht auf
+			e.printStackTrace();
+		}
+		textFieldEmail.setEditable(false);
+		textFieldEmail.setBounds(86, 30, 157, 20);
+		accountTab.add(textFieldEmail);
+		textFieldEmail.setColumns(10);
+
+		JButton btnPasswortAendern = new JButton("Passwort ändern");
+		btnPasswortAendern.addActionListener((e) -> {
+			new PasswordDialog((JFrame) this);
+		});
+		btnPasswortAendern.setBounds(34, 77, 137, 23);
+		accountTab.add(btnPasswortAendern);
+
+		JButton btnAccountLoeschen = new JButton("Account löschen");
+		btnAccountLoeschen.setBounds(34, 111, 137, 23);
+		btnAccountLoeschen.addActionListener(e -> onDeleteUser());
+		accountTab.add(btnAccountLoeschen);
+
 		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
 		keyListenerComponents.add(allExams.getTable());
 		keyListenerComponents.add(allLectures.getTable());
@@ -365,39 +393,28 @@ public class MainFrame extends JFrame {
 		keyListenerComponents.add(durchschnittsnote);
 		keyListenerComponents.add(grade);
 		keyListenerComponents.add(lblDurchschnittsnote);
+		keyListenerComponents.add(btnAddLecture);
+		keyListenerComponents.add(btnDelLecture);
+		keyListenerComponents.add(btnModLecture);
 		keyListenerComponents.add(sheetsPanel);
 		keyListenerComponents.add(countSheet);
 		keyListenerComponents.add(insgÜbungsblätter);
+		keyListenerComponents.add(btnAddSheet);
+		keyListenerComponents.add(btnDelSheet);
+		keyListenerComponents.add(btnModSheet);
 		keyListenerComponents.add(lecturePanel);
 		keyListenerComponents.add(countLecture);
 		keyListenerComponents.add(insgVorlesungen);
 		keyListenerComponents.add(lblInsgVorlesungen);
-		
-		JPanel accountTab = new JPanel();
-		tabbedPane.addTab("Account", accountTab);
-		accountTab.setLayout(null);
-		
-		JLabel lblEmail = new JLabel("E-Mail:");
-		lblEmail.setBounds(34, 33, 49, 14);
-		accountTab.add(lblEmail);
-		
-		textFieldEmail = new JTextField();
-		textFieldEmail.setEditable(false);
-		textFieldEmail.setBounds(86, 30, 157, 20);
-		accountTab.add(textFieldEmail);
-		textFieldEmail.setColumns(10);
-		
-		JButton btnPasswortAendern = new JButton("Passwort ändern");
-		btnPasswortAendern.addActionListener((e) -> {
-				new PasswordDialog((JFrame) this); 
-		
-		});
-		btnPasswortAendern.setBounds(34, 77, 137, 23);
-		accountTab.add(btnPasswortAendern);
-		
-		JButton btnAccountLoeschen = new JButton("Account löschen");
-		btnAccountLoeschen.setBounds(34, 111, 137, 23);
-		accountTab.add(btnAccountLoeschen);
+		keyListenerComponents.add(btnAddLecture);
+		keyListenerComponents.add(btnDelLecture);
+		keyListenerComponents.add(btnModLecture);
+		keyListenerComponents.add(accountTab);
+		keyListenerComponents.add(btnAccountLoeschen);
+		keyListenerComponents.add(btnPasswortAendern);
+		keyListenerComponents.add(textFieldEmail);
+		keyListenerComponents.add(lblEmail);
+
 		for (Component c : keyListenerComponents) {
 			c.addKeyListener(new KeyAdapter() {
 				@Override
@@ -432,6 +449,8 @@ public class MainFrame extends JFrame {
 						tabbedPane.setSelectedIndex(1);
 					if (e.getKeyCode() == KeyEvent.VK_F3)
 						tabbedPane.setSelectedIndex(2);
+					if (e.getKeyCode() == KeyEvent.VK_F4)
+						tabbedPane.setSelectedIndex(3);
 					if (e.getKeyCode() == KeyEvent.VK_A && tabbedPane.getSelectedIndex() == 1)
 						sheetTabbedPane.setSelectedIndex(0);
 					if (e.getKeyCode() == KeyEvent.VK_B && tabbedPane.getSelectedIndex() == 1)
@@ -469,9 +488,10 @@ public class MainFrame extends JFrame {
 
 	private void onAddLecture() {
 		// Lecture hinzufügen
-		AddLectureFrame addDia = new AddLectureFrame(this, "New Lecture");
+		AddLectureFrame addDia = new AddLectureFrame(this, "Neue Vorlesung");
 		addDia.setVisible(true);
 		allLectures.load();
+		insgVorlesungen.setText(String.valueOf(lectureContainer.getSize()));
 	}
 
 	private void onAddSheet() {
@@ -508,10 +528,10 @@ public class MainFrame extends JFrame {
 	}
 
 	private void onDelLecture() {
-		// Prüfung löschen
+		// Lecture löschen
 		if (allLectures.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
-					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+					"Um eine Vorlesung zu löschen muss zuerst eine Vorlesung ausgewäht werden.");
 		} else {
 			JTable tb = allLectures.getTable();
 			int row = allLectures.getTable().getSelectedRow();
@@ -519,7 +539,7 @@ public class MainFrame extends JFrame {
 				Lecture l = new Lecture(Integer.parseInt((String) tb.getValueAt(row, 0)), (String) tb.getValueAt(row, 1),
 						Integer.parseInt((String) tb.getValueAt(row, 2)));
 				lectureContainer.unlinkLecture(l);
-				insgVorlesungen.setText(Integer.toString(lectureContainer.getAllLectures().size()));
+				insgVorlesungen.setText(Integer.toString(lectureContainer.getSize()));
 				allLectures.load();
 			} catch (IllegalInputException | StoreException | LectureNotFoundException e) {
 				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -601,10 +621,10 @@ public class MainFrame extends JFrame {
 	}
 
 	private void onModifyLecture() {
-		// Prüfung verändern
+		// Lecture verändern
 		if (allLectures.getTable().getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(this,
-					"Um eine Prüfung zu löschen muss zuerst eine Prüfung ausgewäht werden.");
+					"Um eine Vorlesung zu ändern muss zuerst eine Vorlesung ausgewäht werden.");
 		} else {
 			JTable tb = allLectures.getTable();
 			int row = allLectures.getTable().getSelectedRow();
@@ -614,7 +634,7 @@ public class MainFrame extends JFrame {
 				int tempLp = Integer.parseInt((String) tb.getValueAt(row, 2));
 				Lecture l = new Lecture(tempSem, tempName, tempLp);
 				lectureContainer.unlinkLecture(l);
-				AddLectureFrame editLec = new AddLectureFrame(this, "Prüfung ändern");
+				AddLectureFrame editLec = new AddLectureFrame(this, "Vorlesung ändern");
 				editLec.setData(tempSem, tempName, tempLp);
 				editLec.setCancelButtonActivated(false);
 				editLec.setVisible(true);
@@ -683,10 +703,10 @@ public class MainFrame extends JFrame {
 
 	private void onDeleteUser() {
 		try {
-			String tmpPassword = JOptionPane.showInputDialog(this, "Zum Löschen Passwort für User " + lectureContainer.getUser() + " eingeben.", "Acoount Löschen", JOptionPane.INFORMATION_MESSAGE);
+			String tmpPassword = JOptionPane.showInputDialog(this, "Zum Löschen Passwort für User " + lectureContainer.getUserName() + " eingeben.", "Acoount Löschen", JOptionPane.INFORMATION_MESSAGE);
 			if (tmpPassword.equals(lectureContainer.getPassword())) {
 				lectureContainer.deleteUser();
-				JOptionPane.showMessageDialog(this, "User " + lectureContainer.getUser() + " erfolgreich gelöscht", "Information", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Account mit Email " + lectureContainer.getUserName() + " erfolgreich gelöscht", "Information", JOptionPane.INFORMATION_MESSAGE);
 				onLogOut();
 			}
 			else {
