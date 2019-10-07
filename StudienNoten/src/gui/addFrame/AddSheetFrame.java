@@ -52,8 +52,8 @@ public class AddSheetFrame extends JDialog {
 
 	public AddSheetFrame(MainFrame owner, String title) {
 		super(owner, title, true);
-		this.setBounds(300, 400, 531, 128);
-		this.setUndecorated(true);
+		this.setBounds(300, 400, 531, 163);
+		
 		try {
 			lectureContainer = LectureContainer.instance();
 			sheetContainer = SheetContainer.instance();
@@ -61,7 +61,7 @@ public class AddSheetFrame extends JDialog {
 			// Dieser Fehler kann an der Stelle nicht auftreten
 		}
 		contentPane = new JPanel();
-		contentPane.setBackground(Color.LIGHT_GRAY);
+		contentPane.setBackground(Color.WHITE);
 		contentPane.setForeground(Color.LIGHT_GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -98,7 +98,7 @@ public class AddSheetFrame extends JDialog {
 		btnApply.setBackground(Color.GRAY);
 		btnApply.addActionListener(e -> onAdd());
 
-		btnApply.setBounds(173, 94, 90, 23);
+		btnApply.setBounds(304, 98, 90, 23);
 		contentPane.add(btnApply);
 
 		btnClose = new JButton("Close");
@@ -111,7 +111,7 @@ public class AddSheetFrame extends JDialog {
 
 			}
 		});
-		btnClose.setBounds(273, 94, 90, 23);
+		btnClose.setBounds(404, 98, 90, 23);
 		contentPane.add(btnClose);
 
 		comboBoxLectures = new JComboBox<>();
@@ -137,8 +137,8 @@ public class AddSheetFrame extends JDialog {
 		contentPane.add(txtPointsMax);
 
 		CheckBoxOther = new JCheckBox("andere Leistung");
-		CheckBoxOther.setBackground(Color.LIGHT_GRAY);
-		CheckBoxOther.setBounds(378, 68, 116, 23);
+		CheckBoxOther.setBackground(Color.WHITE);
+		CheckBoxOther.setBounds(384, 63, 116, 23);
 		contentPane.add(CheckBoxOther);
 		
 		comboBoxSem.addActionListener((e) -> {
