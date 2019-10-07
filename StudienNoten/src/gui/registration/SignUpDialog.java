@@ -94,7 +94,7 @@ public class SignUpDialog extends JDialog {
 		lblPasswortVergessen.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				new PasswordForgetDialog(SignUpDialog.this); 
+				onPasswordForgot(); 
 			}
 		});
 		lblPasswortVergessen.setForeground(Color.BLUE);
@@ -127,5 +127,16 @@ public class SignUpDialog extends JDialog {
 		} catch (StoreException | IllegalInputException e) {
 			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	private void onPasswordForgot() {
+		if (txtUsername.getText().length() <5) {
+			try {
+				throw new IllegalInputException("E-Mail muss zuvor in das E-Mail Fenster eingegeben werden.");
+			} catch (IllegalInputException e) {
+				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		new PasswordForgetDialog(SignUpDialog.this, txtUsername.getText()); 
 	}
 }
