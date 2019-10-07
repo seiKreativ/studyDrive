@@ -146,10 +146,6 @@ public class AddExamFrame extends JDialog {
 
 		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
 		keyListenerComponents.add(btnApply);
-		// sonst kann man nicht mehr mit enter werte auswählen
-		// keyListenerComponents.add(comboBoxSem);
-		// keyListenerComponents.add(comboBoxLectures);
-		// keyListenerComponents.add(comboBoxNoten);
 		for (Component c : keyListenerComponents) {
 			c.addKeyListener(new KeyAdapter() {
 				@Override

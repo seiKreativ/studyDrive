@@ -111,17 +111,15 @@ public class AddLectureFrame extends JDialog {
 		btnClose.setBounds(262, 94, 90, 23);
 		contentPane.add(btnClose);
 
-		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
-		keyListenerComponents.add(btnApply);
-
 		txtName = new JTextField();
 		txtName.setBounds(93, 36, 381, 20);
 		contentPane.add(txtName);
 		txtName.setColumns(10);
-		// sonst kann man nicht mehr mit enter werte auswählen
-		// keyListenerComponents.add(comboBoxSem);
-		// keyListenerComponents.add(comboBoxLectures);
-		// keyListenerComponents.add(comboBoxNoten);
+
+		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();
+		keyListenerComponents.add(btnApply);
+		keyListenerComponents.add(txtName);
+
 		for (Component c : keyListenerComponents) {
 			c.addKeyListener(new KeyAdapter() {
 				@Override

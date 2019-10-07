@@ -9,13 +9,19 @@ import data.exam.sheet.SheetContainer;
 
 public interface DataManagement {
 
-    public void newUser(String name, String username, String password) throws StoreException;
+    public void newUser(String name, String email, String password) throws StoreException;
 
-    public void setUser(String username, String password) throws StoreException;
+    public void setUser(String email, String password) throws StoreException;
 
-    public String getUser() throws StoreException;
+    public boolean checkEmail(String email) throws StoreException;
+
+    public String getUserEmail() throws StoreException;
+
+    public String getUserName() throws StoreException;
 
     public String getPassword() throws StoreException;
+
+    public void changePasswort(String newPassword) throws StoreException;
 
     public void deleteUser(LectureContainer c1, ExamContainer c2, SheetContainer c3) throws StoreException;
 

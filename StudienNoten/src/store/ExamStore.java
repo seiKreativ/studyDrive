@@ -41,6 +41,136 @@ public class ExamStore implements DataManagement {
 			unique = new ExamStore();
 		return unique;
 	}
+
+	private static String hashPassword(String password_plaintext) {
+		int workload = 10;
+		String salt = BCrypt.gensalt(workload);
+
+		return(BCrypt.hashpw(password_plaintext, salt));
+	}
+
+	@Override
+	public void newUser(String name, String email, String password) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			/*
+			checking, if the username alredy exists
+			 */
+			String befehl = "select * from users;";
+			ResultSet ergebnis = abfrage.executeQuery(befehl);
+			while (ergebnis.next()) {
+				if (ergebnis.getString("email").equals(email))
+					throw new StoreException("Username alredy exists", null);
+			}
+			/*
+			adding user
+			 */
+			String hashed_password = ExamStore.hashPassword(password);
+			String befehl2 = "INSERT INTO users (name, email, password) VALUES ('" + name + "','" + email + "','" + hashed_password + "');";
+			abfrage.executeUpdate(befehl2);
+		} catch (SQLException e1) {
+			throw new StoreException("Error: " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public void setUser(String email, String password) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+		/*
+		checking, if the user exists and setting the username
+		 */
+			String befehl = "select * from users;";
+			ResultSet ergebnis = abfrage.executeQuery(befehl);
+			boolean tmp = false;
+			while (ergebnis.next()) {
+				if (ergebnis.getString("email").equals(email) && BCrypt.checkpw(password, ergebnis.getString("password"))) {
+					this.email = email;
+					this.password = password;
+					tmp = true;
+				}
+			}
+			if (!tmp)
+				throw new StoreException("Username or password wrong", null);
+		} catch (SQLException e1) {
+			throw new StoreException("Error while setting user " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public boolean checkEmail(String email) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			/*
+			checking, if the email exists
+			 */
+			String befehl = "select distinct email from users;";
+			ResultSet ergebnis = abfrage.executeQuery(befehl);
+			boolean tmp = false;
+			while (ergebnis.next()) {
+				if (ergebnis.getString("email").equals(email)) {
+					tmp = true;
+					this.email = email;
+					break;
+				}
+			}
+			return tmp;
+		} catch (SQLException e1) {
+			throw new StoreException("Error: " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public String getUserEmail() throws StoreException {
+		return this.email;
+	}
+
+	@Override
+	public String getUserName() throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl1 = "select distinct name from users where email = '" + email + "';";
+			ResultSet ergebnis1 = abfrage.executeQuery(befehl1);
+			ergebnis1.next();
+			return ergebnis1.getString("name");
+		} catch (SQLException e1) {
+			throw new StoreException("Error while getting user " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public String getPassword() throws StoreException {
+		return this.password;
+	}
+
+	@Override
+	public void changePasswort(String newPassword) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String password = ExamStore.hashPassword(newPassword);
+			String befehl = "update users set password = '" + password + "' where email = '" + email + "';";
+			abfrage.executeUpdate(befehl);
+		} catch (SQLException e1) {
+			throw new StoreException("Error: " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public void deleteUser(LectureContainer c1, ExamContainer c2, SheetContainer c3) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			if (c2.getSize() != 0) {
+				String befehl = "DELETE FROM exams WHERE username = '" + email + "';";
+				abfrage.executeUpdate(befehl);
+			}
+			if (c1.getSize() != 0) {
+				String befehl1 = "DELETE FROM userlecture WHERE email = '" + email + "';";
+				abfrage.executeUpdate(befehl1);
+			}
+			if (c3.getSize() != 0) {
+				String befehl2 = "DELETE FROM usersheets WHERE email = '" + email + "';";
+				abfrage.executeUpdate(befehl2);
+			}
+			String befehl3 = "DELETE FROM users WHERE email = '" + email + "';";
+			abfrage.executeUpdate(befehl3);
+		} catch (SQLException e1) {
+			throw new StoreException("Error while deleting user " + e1.getMessage(), e1);
+		}
+	}
  
 	@Override
 	public void load(LectureContainer lectures, ExamContainer container, SheetContainer sheets) throws StoreException {
@@ -101,93 +231,6 @@ public class ExamStore implements DataManagement {
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding sheet " + e1.getMessage(), e1);
-		}
-	}
-
-	private static String hashPassword(String password_plaintext) {
-		int workload = 10;
-		String salt = BCrypt.gensalt(workload);
-
-		return(BCrypt.hashpw(password_plaintext, salt));
-	}
-
-	@Override
-	public void newUser(String name, String email, String password) throws StoreException {
-		try (Statement abfrage = con.createStatement()) {
-			/*
-			checking, if the username alredy exists
-			 */
-			String befehl = "select * from users;";
-			ResultSet ergebnis = abfrage.executeQuery(befehl);
-			while (ergebnis.next()) {
-				if (ergebnis.getString("email").equals(email))
-					throw new StoreException("Username alredy exists", null);
-			}
-			/*
-			adding user
-			 */
-			String hashed_password = ExamStore.hashPassword(password);
-			String befehl2 = "INSERT INTO users (name, email, password) VALUES ('" + name + "','" + email + "','" + hashed_password + "');";
-			abfrage.executeUpdate(befehl2);
-			this.email = email;
-			this.password = password;
-		} catch (SQLException e1) {
-			throw new StoreException("Error: " + e1.getMessage(), e1);
-		}
-	}
-
-	@Override
-	public void setUser(String email, String password) throws StoreException {
-		try (Statement abfrage = con.createStatement()) {
-		/*
-		checking, if the user exists and setting the username
-		 */
-		String befehl = "select * from users;";
-		ResultSet ergebnis = abfrage.executeQuery(befehl);
-		boolean tmp = false;
-		while (ergebnis.next()) {
-			if (ergebnis.getString("email").equals(email) && BCrypt.checkpw(password, ergebnis.getString("password"))) {
-				this.email = email;
-				this.password = password;
-				tmp = true;
-			}
-		}
-		if (!tmp)
-			throw new StoreException("Username or password wrong", null);
-		} catch (SQLException e1) {
-			throw new StoreException("Error while setting user " + e1.getMessage(), e1);
-		}
-	}
-
-	@Override
-	public String getUser() throws StoreException {
-		return this.email;
-	}
-
-	@Override
-	public String getPassword() throws StoreException {
-		return this.password;
-	}
-
-	@Override
-	public void deleteUser(LectureContainer c1, ExamContainer c2, SheetContainer c3) throws StoreException {
-		try (Statement abfrage = con.createStatement()) {
-			if (c2.getSize() != 0) {
-				String befehl = "DELETE FROM exams WHERE username = '" + email + "';";
-				abfrage.executeUpdate(befehl);
-			}
-			if (c1.getSize() != 0) {
-				String befehl1 = "DELETE FROM userlecture WHERE email = '" + email + "';";
-				abfrage.executeUpdate(befehl1);
-			}
-			if (c3.getSize() != 0) {
-				String befehl2 = "DELETE FROM usersheets WHERE email = '" + email + "';";
-				abfrage.executeUpdate(befehl2);
-			}
-			String befehl3 = "DELETE FROM users WHERE email = '" + email + "';";
-			abfrage.executeUpdate(befehl3);
-		} catch (SQLException e1) {
-			throw new StoreException("Error while deleting user " + e1.getMessage(), e1);
 		}
 	}
 
