@@ -10,9 +10,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class SignUpDialog extends JDialog {
 	/**
@@ -23,6 +26,14 @@ public class SignUpDialog extends JDialog {
 	private JTextField txtPassword;
 
 	public SignUpDialog() {
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(this.getClass().getResource("\\signup-icon.png"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		this.setIconImage(image);
 		setBounds(100, 100, 397, 255);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -130,13 +141,6 @@ public class SignUpDialog extends JDialog {
 	}
 	
 	private void onPasswordForgot() {
-		if (txtUsername.getText().length() <5) {
-			try {
-				throw new IllegalInputException("E-Mail muss zuvor in das E-Mail Fenster eingegeben werden.");
-			} catch (IllegalInputException e) {
-				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
 		new PasswordForgetDialog(SignUpDialog.this, txtUsername.getText()); 
 	}
 }

@@ -237,7 +237,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void addExam(Exam e) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "INSERT INTO exams VALUES (" + e.getSemester() + ",'" + e.getName() + "', " + e.getLeistungpunkte() + ", " + e.getNote() + ", '" + email + "');";
+			String befehl = "INSERT INTO exams VALUES (" + e.getSemester() + ",'" + e.getName() + "', "+ e.getNote() + ", '" + email + "');";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding exam " + e1.getMessage(), e1);

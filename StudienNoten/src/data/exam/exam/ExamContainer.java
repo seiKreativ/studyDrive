@@ -8,8 +8,8 @@ import store.StoreException;
 
 public class ExamContainer implements Iterable<Exam> {
 	private static ExamContainer unique = null;
-	private Vector<Exam> exams = null;
-	private ExamStore store = null;
+	private Vector<Exam> exams;
+	private ExamStore store;
 
 	private ExamContainer() throws StoreException {
 		exams = new Vector<Exam>();

@@ -5,8 +5,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -39,6 +42,14 @@ public class RegistrationDialog extends JDialog {
 	
 	
 	public RegistrationDialog() {
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(this.getClass().getResource("\\signup-icon.png"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		this.setIconImage(image);
 		setBackground(Color.WHITE);
 		//setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBounds(100, 100, 343, 364);

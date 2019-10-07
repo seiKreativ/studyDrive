@@ -33,7 +33,6 @@ public class AddLectureFrame extends JDialog {
 	private LectureContainer lectureContainer;
 	private JButton btnClose;
 	private JTextField txtName;
-
 	/*
 	 * 
 	 * public static void main(String[] args) { EventQueue.invokeLater(new
@@ -45,10 +44,10 @@ public class AddLectureFrame extends JDialog {
 
 	public AddLectureFrame(MainFrame owner, String title) {
 		super(owner, title, true);
-		this.setBounds(300, 400, 572, 128);
-		this.setUndecorated(true);
+		this.setBounds(300, 400, 572, 161);
+		
 		contentPane = new JPanel();
-		contentPane.setBackground(Color.LIGHT_GRAY);
+		contentPane.setBackground(Color.WHITE);
 		contentPane.setForeground(Color.LIGHT_GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -95,7 +94,7 @@ public class AddLectureFrame extends JDialog {
 		btnApply.setBackground(Color.GRAY);
 		btnApply.addActionListener(e -> onAdd());
 
-		btnApply.setBounds(162, 94, 90, 23);
+		btnApply.setBounds(363, 90, 90, 23);
 		contentPane.add(btnApply);
 
 		btnClose = new JButton("Close");
@@ -108,7 +107,7 @@ public class AddLectureFrame extends JDialog {
 
 			}
 		});
-		btnClose.setBounds(262, 94, 90, 23);
+		btnClose.setBounds(463, 90, 90, 23);
 		contentPane.add(btnClose);
 
 		txtName = new JTextField();
@@ -144,6 +143,8 @@ public class AddLectureFrame extends JDialog {
 		this.comboBoxLp.setSelectedItem(Integer.toString(lp));
 		this.comboBoxSem.setSelectedItem(Integer.toString(sem));
 		this.txtName.setText(name);
+		this.txtName.setEnabled(false);
+		this.comboBoxSem.setEnabled(false);		
 	}
 
 	public void setCancelButtonActivated(boolean stat) {
@@ -151,15 +152,17 @@ public class AddLectureFrame extends JDialog {
 	}
 
 	private void onAdd() {
+		int newLp = Integer.parseInt((String)comboBoxLp.getSelectedItem());
 		try {
 			if (txtName.getText().length() < 4) {
 				throw new IllegalInputException("Name muss länger als 3 Buchstaben sein");
 			} 
-			Lecture lecture = new Lecture(Integer.parseInt((String)comboBoxSem.getSelectedItem()), txtName.getText(), Integer.parseInt((String)comboBoxLp.getSelectedItem())); 
+			Lecture lecture = new Lecture(Integer.parseInt((String)comboBoxSem.getSelectedItem()), txtName.getText(), newLp); 
 			if (lectureContainer.contains(lecture)) {
 				throw new IllegalInputException("Lecture existiert bereits"); 
 			}
 			lectureContainer.linkLecture(lecture);
+			
 			dispose();
 		} catch (NumberFormatException | StoreException | IllegalInputException | LectureAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
