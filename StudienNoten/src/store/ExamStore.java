@@ -173,7 +173,7 @@ public class ExamStore implements DataManagement {
 	}
 
 	@Override
-	public boolean checkActivation(String email) throws StoreException {
+	public boolean checkAccountIsActivated(String email) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
 			this.email = email;
 			String befehl = "select status from users where email = '" + email + "';";
@@ -283,6 +283,7 @@ public class ExamStore implements DataManagement {
 		}
 	}
 
+	@Override
     public void deleteExam(Exam e) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
 			String befehl = "DELETE FROM exams WHERE username = '" + email + "' AND semester = " + e.getSemester() + " AND name = '" + e.getName() + "';";

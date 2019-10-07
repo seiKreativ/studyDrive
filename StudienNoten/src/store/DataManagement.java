@@ -23,7 +23,7 @@ public interface DataManagement {
 
     public void changePasswort(String newPassword) throws StoreException;
 
-    public boolean checkActivation(String email) throws StoreException;
+    public boolean checkAccountIsActivated(String email) throws StoreException;
 
     public boolean checkActivationCode(String code) throws StoreException;
 
