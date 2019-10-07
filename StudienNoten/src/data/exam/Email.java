@@ -48,6 +48,58 @@ public class Email {
         Transport.send( msg );
     }
 
+    public void postNewActivationMail(String recipient, String name, boolean isNewCode) throws MessagingException, UnsupportedEncodingException, StoreException {
+
+        Message msg = new MimeMessage(Email.getGMailSession());
+        msg.setFrom(new InternetAddress("study0acc@gmail.com", "StudyAcc"));
+        InternetAddress addressTo = new InternetAddress( recipient );
+        msg.setRecipient( Message.RecipientType.TO, addressTo );
+
+        String code = Email.generateActivationCode();
+
+        String teilNachricht;
+        String betreff;
+        if (isNewCode) {
+            teilNachricht = "Der neue";
+            betreff = "StudyAcc: Dein neuer Activierungs-Code";
+        }
+        else {
+            teilNachricht = "Der";
+            betreff = "StudyAcc: Dein Activierungs-Code";
+        }
+
+        String message = "Hallo " + name +",\n" +
+                "\n" +
+                teilNachricht + "Aktivierungs-Code f\u00fcr deinen StudyAcc-Account lautet: \n" +
+                "\n" +
+                code + "\n" +
+                "\n" +
+                "Du wirst aufgefordert, ihn beim ersten Log-In einzugeben. \n" +
+                "\n" +
+                "Viele Gr\u00fc\u00dfe, \n" +
+                "\n" +
+                "dein Team von StudyAcc";
+
+        msg.setSubject( betreff );
+        msg.setContent( message, "text/plain" );
+
+        Transport.send( msg );
+    }
+
+    private static String generateActivationCode() {
+        ArrayList<Integer> asciiCodes = new ArrayList<>();
+        for (int i = 48; i < 58; i++)
+            asciiCodes.add(i);
+        Random r = new Random();
+        String code = "";
+        for (int i = 0; i < 5; i++) {
+            int random = r.nextInt(asciiCodes.size());
+            char tmp = (char) (int) asciiCodes.get(random);
+            code = code.concat(String.valueOf(tmp));
+        }
+        return code;
+    }
+
     private static Session getGMailSession() {
         final Properties props = new Properties();
 

@@ -55,11 +55,11 @@ public class ExamStore implements DataManagement {
 			/*
 			checking, if the username alredy exists
 			 */
-			String befehl = "select * from users;";
+			String befehl = "select email from users;";
 			ResultSet ergebnis = abfrage.executeQuery(befehl);
 			while (ergebnis.next()) {
 				if (ergebnis.getString("email").equals(email))
-					throw new StoreException("Username alredy exists", null);
+					throw new StoreException("Email alredy registert", null);
 			}
 			/*
 			adding user
@@ -78,7 +78,7 @@ public class ExamStore implements DataManagement {
 		/*
 		checking, if the user exists and setting the username
 		 */
-			String befehl = "select * from users;";
+			String befehl = "select email, password from users;";
 			ResultSet ergebnis = abfrage.executeQuery(befehl);
 			boolean tmp = false;
 			while (ergebnis.next()) {
@@ -169,6 +169,45 @@ public class ExamStore implements DataManagement {
 			abfrage.executeUpdate(befehl3);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while deleting user " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public boolean checkActivation(String email) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			this.email = email;
+			String befehl = "select status from users where email = '" + email + "';";
+			ResultSet ergebnis = abfrage.executeQuery(befehl);
+			ergebnis.next();
+			int status = ergebnis.getInt("status");
+			if (status == 1)
+				return true;
+			else
+				return false;
+		} catch (SQLException e1) {
+			throw new StoreException("Error: " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public void setActivationCode(String code) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "update users set code = '" + code + "' where email = '" + email + "';";
+			abfrage.executeUpdate(befehl);
+		} catch (SQLException e1) {
+			throw new StoreException("Error: " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public boolean checkActivationCode(String code) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "select code from users where email = '" + email + "';";
+			ResultSet ergebnis = abfrage.executeQuery(befehl);
+			ergebnis.next();
+			return code.equals(ergebnis.getString("code"));
+		} catch (SQLException e1) {
+			throw new StoreException("Error: " + e1.getMessage(), e1);
 		}
 	}
  

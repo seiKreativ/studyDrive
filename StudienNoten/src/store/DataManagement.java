@@ -23,6 +23,12 @@ public interface DataManagement {
 
     public void changePasswort(String newPassword) throws StoreException;
 
+    public boolean checkActivation(String email) throws StoreException;
+
+    public boolean checkActivationCode(String code) throws StoreException;
+
+    public void setActivationCode(String code) throws StoreException;
+
     public void deleteUser(LectureContainer c1, ExamContainer c2, SheetContainer c3) throws StoreException;
 
     public void addExam(Exam e) throws StoreException;
