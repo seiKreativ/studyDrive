@@ -48,6 +48,7 @@ import gui.mainFrame.tables.TableExams;
 import gui.mainFrame.tables.TableLectures;
 import gui.mainFrame.tables.TableOtherSheets;
 import gui.mainFrame.tables.TableSheets;
+import gui.mainFrame.tables.TableSheetsLecture;
 import gui.registration.PasswordDialog;
 import gui.registration.SignUpDialog;
 import store.StoreException;
@@ -68,6 +69,7 @@ public class MainFrame extends JFrame {
 	private TableSheets allSheets; 
 	private TableOtherSheets allOther;
 	private TableLectures allLectures; 
+	private TableSheetsLecture allSheetLecture;
 	private double durchschnitt;
 	private JTextField textFieldEmail;
 
@@ -276,6 +278,10 @@ public class MainFrame extends JFrame {
 		allOther = new TableOtherSheets(sheetContainer);
 		
 		sheetTabbedPane.addTab("Other",  allOther);
+		
+		allSheetLecture = new TableSheetsLecture(sheetContainer, lectureContainer);
+		
+		sheetTabbedPane.addTab("Vorlesungen",  allSheetLecture);
 		
 		
 		JPanel lecturePanel = new JPanel();

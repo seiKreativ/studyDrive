@@ -9,5 +9,7 @@
 	<classpathentry kind="lib" path="C:/Users/sebas/OneDrive/Desktop/mysql-connector-java-8.0.16.jar"/>
 	<classpathentry kind="lib" path="C:/Users/sebas/Downloads/jBCrypt-0.4.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/sebas/Downloads/bcrypt-0.4.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sebas/OneDrive/Desktop/activation.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sebas/OneDrive/Desktop/javax.mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

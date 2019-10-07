@@ -20,10 +20,10 @@ public class PasswordForgetDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = 8052600036105942804L;
 	private final JPanel contentPanel = new JPanel();
-	private JTextField altesPasswortField;
+	private JTextField emailField;
 
 
-	public PasswordForgetDialog(SignUpDialog signUpDialog) {
+	public PasswordForgetDialog(SignUpDialog signUpDialog, String email) {
 		super(signUpDialog);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 363, 179);
@@ -37,12 +37,13 @@ public class PasswordForgetDialog extends JDialog {
 			contentPanel.add(lblNewLabel);
 		}
 		
-		altesPasswortField = new JTextField();
-		altesPasswortField.setBounds(25, 78, 210, 20);
-		contentPanel.add(altesPasswortField);
+		emailField = new JTextField();
+		emailField.setBounds(25, 78, 210, 20);
+		emailField.setText(email);
+		contentPanel.add(emailField);
 
 		ArrayList<Component> keyListenerComponents = new ArrayList<>();
-		keyListenerComponents.add(altesPasswortField);
+		keyListenerComponents.add(emailField);
 		
 		JTextArea txtrBitteGebenSie = new JTextArea();
 		txtrBitteGebenSie.setEditable(false);
@@ -92,8 +93,8 @@ public class PasswordForgetDialog extends JDialog {
 	private void onOk() {
 		try {
 			Email email = new Email();
-			if (email.checkEmail(altesPasswortField.getText())) {
-				email.postNewPasswortMail(altesPasswortField.getText());
+			if (email.checkEmail(emailField.getText())) {
+				email.postNewPasswortMail(emailField.getText());
 				JOptionPane.showMessageDialog(this, "Email wurde zugesandt", "Bestätigung", JOptionPane.INFORMATION_MESSAGE);
 				dispose();
 			}
