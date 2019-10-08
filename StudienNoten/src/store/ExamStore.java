@@ -245,7 +245,6 @@ public class ExamStore implements DataManagement {
 	public void setActivationCode(String code) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
 			String befehl = "update users set code = '" + code + "' where email = '" + email + "';";
-			System.out.println(befehl);
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error: " + e1.getMessage(), e1);
