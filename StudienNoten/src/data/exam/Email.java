@@ -1,22 +1,27 @@
 package data.exam;
 
-import store.ExamStore;
-import store.StoreException;
-
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import store.StoreException;
+import store.UserInformationStore;
+
 public class Email {
 
-    private static ExamStore store;
+    private static UserInformationStore store;
 
     public Email() throws StoreException {
-        store = ExamStore.instance();
+        store = UserInformationStore.instance();
     }
 
     public void postNewPasswortMail(String recipient) throws MessagingException, UnsupportedEncodingException, StoreException {
@@ -57,7 +62,7 @@ public class Email {
 
         String code;
         String betreff;
-        store = ExamStore.instance();
+        store = UserInformationStore.instance();
 
         if (isNewCode) {
             betreff = "StudyAcc: Dein Activierungs-Code";

@@ -8,6 +8,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -31,6 +32,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import data.exam.IllegalInputException;
+import data.exam.PDFDatei;
 import data.exam.exam.Exam;
 import data.exam.exam.ExamContainer;
 import data.exam.exam.ExamNotFoundException;
@@ -106,6 +108,10 @@ public class MainFrame extends JFrame {
 		JMenuItem mntmRefresh = new JMenuItem("Refresh");
 		mntmRefresh.addActionListener(e -> onRefresh());
 		mnAllgemein.add(mntmRefresh);
+		
+		JMenuItem mntmPdf = new JMenuItem("Print to Pdf");
+		mntmPdf.addActionListener(e -> onPrintPdf());
+		mnAllgemein.add(mntmPdf);
 
 		JMenuItem mntmInformation = new JMenuItem("Information");
 		mntmInformation.addActionListener(e -> {
@@ -499,6 +505,17 @@ public class MainFrame extends JFrame {
 		}
 
 		setVisible(true);
+	}
+
+	private void onPrintPdf() {
+		// hier wird noch das Fenster eingefügt um die scheiße auszuwählen
+		System.out.println("hello");
+		try {
+			new PDFDatei(lectureContainer, sheetContainer, examContainer, (JFrame) this);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 	}
 
 	private void calcDurchschnitt() {

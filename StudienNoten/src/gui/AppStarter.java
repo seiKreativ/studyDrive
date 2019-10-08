@@ -7,6 +7,7 @@ import gui.registration.SignUpDialog;
 
 public class AppStarter {
 	public static void main(String args[]) {
+		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			
