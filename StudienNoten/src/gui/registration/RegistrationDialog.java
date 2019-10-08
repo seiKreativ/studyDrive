@@ -62,8 +62,8 @@ public class RegistrationDialog extends JDialog {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JButton btnSignUp = new JButton("Aktivierungs-Code senden");
-		btnSignUp.setBackground(Color.DARK_GRAY);
+		JButton btnSignUp = new JButton("Sign Up");
+		btnSignUp.setBackground(Color.GRAY);
 		btnSignUp.setForeground(Color.WHITE);
 		btnSignUp.setFont(new Font("Arial Nova Light", Font.PLAIN, 12));
 		btnSignUp.setBounds(70, 297, 200, 32);
@@ -130,7 +130,8 @@ public class RegistrationDialog extends JDialog {
 		separator_3.setBounds(75, 311, 1, 2);
 		contentPane.add(separator_3);
 		
-		JLabel lblRegistration = new JLabel("Registrierungs");
+		JLabel lblRegistration = new JLabel("Register");
+		lblRegistration.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRegistration.setFont(new Font("Arial Nova Light", Font.PLAIN, 26));
 		lblRegistration.setBounds(96, 11, 139, 40);
 		contentPane.add(lblRegistration);

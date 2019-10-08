@@ -1,21 +1,28 @@
 package gui.registration;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
 import data.exam.IllegalInputException;
 import data.exam.Student;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
-
-import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class SignUpDialog extends JDialog {
 	/**
@@ -138,7 +145,7 @@ public class SignUpDialog extends JDialog {
 				new MainFrame();
 			} else {
 				dispose();
-				new ActicationDialog();
+				new ActivationDialog();
 			}
 		} catch (StoreException | IllegalInputException e) {
 			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

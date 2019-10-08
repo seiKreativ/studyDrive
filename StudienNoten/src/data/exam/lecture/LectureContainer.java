@@ -6,19 +6,19 @@ import java.util.Vector;
 
 import data.exam.exam.ExamContainer;
 import data.exam.sheet.SheetContainer;
-import store.ExamStore;
+import store.UserInformationStore;
 import store.StoreException;
 
 public class LectureContainer implements Iterable<Lecture> {
     private static LectureContainer unique = null;
     private Vector<Lecture> lectures;
-    private ExamStore store = null;
+    private UserInformationStore store = null;
     private ExamContainer examContainer;
     private SheetContainer sheetContainer;
 
     private LectureContainer() throws StoreException {
         lectures = new Vector<Lecture>();
-        store = ExamStore.instance();
+        store = UserInformationStore.instance();
         load();
     }
 
@@ -156,6 +156,11 @@ public class LectureContainer implements Iterable<Lecture> {
     public String getUsercode() throws StoreException {
         return store.getUsercode();
     }
+    public String getUserDate() throws StoreException {
+		// TODO Auto-generated method stub
+		return store.getUserDate();
+	}
+
 
 	public boolean contains(Lecture l) {
 		for (int i = 0; i < this.getSize(); i++) {

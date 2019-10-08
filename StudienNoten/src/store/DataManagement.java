@@ -18,6 +18,8 @@ public interface DataManagement {
     public String getUserEmail() throws StoreException;
 
     public String getUserName() throws StoreException;
+    
+    public String getUserDate() throws StoreException;
 
     public String getPassword() throws StoreException;
 
