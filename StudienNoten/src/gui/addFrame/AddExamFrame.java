@@ -46,10 +46,10 @@ public class AddExamFrame extends JDialog {
 
 	public AddExamFrame(MainFrame owner, String title) {
 		super(owner, title, true);
-		this.setBounds(300, 400, 572, 128);
-		this.setUndecorated(true);
+		this.setBounds(300, 400, 572, 155);
+		this.setUndecorated(false);
 		contentPane = new JPanel();
-		contentPane.setBackground(Color.LIGHT_GRAY);
+		contentPane.setBackground(Color.WHITE);
 		contentPane.setForeground(Color.LIGHT_GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -128,7 +128,7 @@ public class AddExamFrame extends JDialog {
 		btnApply.setBackground(Color.GRAY);
 		btnApply.addActionListener(e -> onAdd());
 
-		btnApply.setBounds(162, 94, 90, 23);
+		btnApply.setBounds(363, 84, 90, 23);
 		contentPane.add(btnApply);
 
 		btnClose = new JButton("Close");
@@ -141,7 +141,7 @@ public class AddExamFrame extends JDialog {
 
 			}
 		});
-		btnClose.setBounds(262, 94, 90, 23);
+		btnClose.setBounds(463, 84, 90, 23);
 		contentPane.add(btnClose);
 
 		ArrayList<Component> keyListenerComponents = new ArrayList<Component>();

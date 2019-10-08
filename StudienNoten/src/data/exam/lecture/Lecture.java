@@ -13,21 +13,21 @@ public class Lecture {
         this.setLeistungsPunkte(leistungsPunkte);
     }
 
-    private void setLeistungsPunkte(int leistungsPunkte2) throws IllegalInputException{
+    public void setLeistungsPunkte(int leistungsPunkte2) throws IllegalInputException{
         if (leistungsPunkte2 < 2 || leistungsPunkte > 30) {
             throw new IllegalInputException("Leistungspunkte not correct");
         }
         this.leistungsPunkte = leistungsPunkte2;
     }
 
-    private void setSemester(int semester2) throws IllegalInputException{
+    public void setSemester(int semester2) throws IllegalInputException{
         if (semester2 < 1 || semester2 > 12) {
             throw new IllegalInputException("Semester not correct");
         }
         this.semester = semester2;
     }
 
-    private void setName(String name2) throws IllegalInputException{
+    public void setName(String name2) throws IllegalInputException{
         if (name2.length() < 1) {
             throw new IllegalInputException("Name not correct");
         }
@@ -56,4 +56,5 @@ public class Lecture {
         }
         return false;
     }
+
 }

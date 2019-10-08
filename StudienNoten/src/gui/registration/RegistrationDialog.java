@@ -5,8 +5,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+import javax.mail.MessagingException;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -18,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import data.exam.Email;
 import data.exam.IllegalInputException;
 import data.exam.Student;
 import gui.mainFrame.MainFrame;
@@ -39,6 +45,14 @@ public class RegistrationDialog extends JDialog {
 	
 	
 	public RegistrationDialog() {
+		/*BufferedImage image = null;
+		try {
+			image = ImageIO.read(this.getClass().getResource("\\signup-icon.png"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		this.setIconImage(image);*/
 		setBackground(Color.WHITE);
 		//setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBounds(100, 100, 343, 364);
@@ -48,11 +62,11 @@ public class RegistrationDialog extends JDialog {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JButton btnSignUp = new JButton("Register");
+		JButton btnSignUp = new JButton("Aktivierungs-Code senden");
 		btnSignUp.setBackground(Color.DARK_GRAY);
 		btnSignUp.setForeground(Color.WHITE);
-		btnSignUp.setFont(new Font("Arial Nova Light", Font.PLAIN, 20));
-		btnSignUp.setBounds(88, 297, 147, 32);
+		btnSignUp.setFont(new Font("Arial Nova Light", Font.PLAIN, 12));
+		btnSignUp.setBounds(70, 297, 200, 32);
 		btnSignUp.setBorderPainted(false);
 		contentPane.add(btnSignUp);
 		btnSignUp.addActionListener(e -> onSignUp());
@@ -116,7 +130,7 @@ public class RegistrationDialog extends JDialog {
 		separator_3.setBounds(75, 311, 1, 2);
 		contentPane.add(separator_3);
 		
-		JLabel lblRegistration = new JLabel("Registration");
+		JLabel lblRegistration = new JLabel("Registrierungs");
 		lblRegistration.setFont(new Font("Arial Nova Light", Font.PLAIN, 26));
 		lblRegistration.setBounds(96, 11, 139, 40);
 		contentPane.add(lblRegistration);
@@ -162,9 +176,12 @@ public class RegistrationDialog extends JDialog {
 		if (passwordTextfield.getText().equals(repeatPasswordTextfield.getText())) {
 			try {
 				new Student(nameTextfield.getText(), emailTextfield.getText(), passwordTextfield.getText(), true);
+				Email.postNewActivationMail(emailTextfield.getText(), nameTextfield.getText(), false);
+				JOptionPane.showMessageDialog(this, "Ein Aktivierungs-Code wurde dir per Mail geschickt. \n" +
+						"Du wirst beim ersten Log-In aufgefordert, ihn einzugeben.", "Bestätigung", JOptionPane.INFORMATION_MESSAGE);
 				dispose();
-				new MainFrame();
-			} catch (StoreException | IllegalInputException e) {
+				new SignUpDialog();
+			} catch (StoreException | IllegalInputException | UnsupportedEncodingException | MessagingException e) {
 				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}

@@ -16,9 +16,13 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import data.exam.IllegalInputException;
+import data.exam.exam.Exam;
+import data.exam.exam.ExamContainer;
 import data.exam.lecture.Lecture;
 import data.exam.lecture.LectureAlreadyExistsException;
 import data.exam.lecture.LectureContainer;
+import data.exam.sheet.Sheet;
+import data.exam.sheet.SheetContainer;
 import gui.mainFrame.MainFrame;
 import store.StoreException;
 
@@ -33,7 +37,7 @@ public class AddLectureFrame extends JDialog {
 	private LectureContainer lectureContainer;
 	private JButton btnClose;
 	private JTextField txtName;
-
+	private Lecture zuModLecture;
 	/*
 	 * 
 	 * public static void main(String[] args) { EventQueue.invokeLater(new
@@ -43,12 +47,12 @@ public class AddLectureFrame extends JDialog {
 	 * 
 	 */
 
-	public AddLectureFrame(MainFrame owner, String title) {
+	public AddLectureFrame(MainFrame owner, String title, Lecture zuModLecture) {
 		super(owner, title, true);
-		this.setBounds(300, 400, 572, 128);
-		this.setUndecorated(true);
+		this.setBounds(300, 400, 572, 161);
+		
 		contentPane = new JPanel();
-		contentPane.setBackground(Color.LIGHT_GRAY);
+		contentPane.setBackground(Color.WHITE);
 		contentPane.setForeground(Color.LIGHT_GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -60,6 +64,8 @@ public class AddLectureFrame extends JDialog {
 		} catch (StoreException e) {
 			// Dieser Fehler kann an der Stelle nicht auftreten
 		}
+
+		this.zuModLecture = zuModLecture;
 
 		JLabel lblSemester = new JLabel("Semester:");
 		lblSemester.setBounds(20, 11, 78, 14);
@@ -95,7 +101,7 @@ public class AddLectureFrame extends JDialog {
 		btnApply.setBackground(Color.GRAY);
 		btnApply.addActionListener(e -> onAdd());
 
-		btnApply.setBounds(162, 94, 90, 23);
+		btnApply.setBounds(363, 90, 90, 23);
 		contentPane.add(btnApply);
 
 		btnClose = new JButton("Close");
@@ -108,7 +114,7 @@ public class AddLectureFrame extends JDialog {
 
 			}
 		});
-		btnClose.setBounds(262, 94, 90, 23);
+		btnClose.setBounds(463, 90, 90, 23);
 		contentPane.add(btnClose);
 
 		txtName = new JTextField();
@@ -151,15 +157,46 @@ public class AddLectureFrame extends JDialog {
 	}
 
 	private void onAdd() {
+		int newLp = Integer.parseInt((String)comboBoxLp.getSelectedItem());
 		try {
 			if (txtName.getText().length() < 4) {
 				throw new IllegalInputException("Name muss länger als 3 Buchstaben sein");
 			} 
-			Lecture lecture = new Lecture(Integer.parseInt((String)comboBoxSem.getSelectedItem()), txtName.getText(), Integer.parseInt((String)comboBoxLp.getSelectedItem())); 
-			if (lectureContainer.contains(lecture)) {
-				throw new IllegalInputException("Lecture existiert bereits"); 
+			Lecture lecture = new Lecture(Integer.parseInt((String)comboBoxSem.getSelectedItem()), txtName.getText(), newLp);
+
+			if (zuModLecture == null) {
+				if (lectureContainer.contains(lecture)) {
+					throw new IllegalInputException("Lecture existiert bereits");
+				}
+				lectureContainer.linkLecture(lecture);
+			} else {
+
+				// Lecture auch in den anderen Containern verändern auf Datenbank
+
+				ExamContainer examContainer = ExamContainer.instance();
+				for (Exam e : examContainer) {
+					if (e.getSemester() == zuModLecture.getSemester() && e.getName().equals(zuModLecture.getName())) {
+						Exam eold = new Exam(e.getLecture(), e.getNote());
+						e.setLecture(lecture);
+						examContainer.modify(eold, e);
+					}
+				}
+				SheetContainer sheetContainer = SheetContainer.instance();
+				for (Sheet e : sheetContainer) {
+					if (e.getSemester() == zuModLecture.getSemester() && e.getName().equals(zuModLecture.getName())) {
+						Sheet eold = new Sheet(e.getLecture(), e.getNumber(), e.getPoints(), e.getMaxPoints(), e.getType());
+						e.setLecture(lecture);
+						sheetContainer.modify(eold, e);
+						System.out.println("Zu ändern: " + eold.toString() + " zu: " + e.toString());
+					}
+				}
+
+				lectureContainer.modify(zuModLecture, lecture);
+				zuModLecture.setSemester(lecture.getSemester());
+				zuModLecture.setLeistungsPunkte(lecture.getLeistungpunkte());
+				zuModLecture.setName(lecture.getName());
 			}
-			lectureContainer.linkLecture(lecture);
+
 			dispose();
 		} catch (NumberFormatException | StoreException | IllegalInputException | LectureAlreadyExistsException e) {
 			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
