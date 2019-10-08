@@ -5,6 +5,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -16,18 +20,18 @@ import data.exam.lecture.LectureContainer;
 import data.exam.sheet.Sheet;
 import data.exam.sheet.SheetContainer;
 
-public class ExamStore implements DataManagement {
+public class UserInformationStore implements DataManagement {
 
 	private final static String connection = "jdbc:mysql://www.remotemysql.com:3306/oUyCsXhXyi";
 	private final static String user = "oUyCsXhXyi";
 	private final static String passworddatabase = "IzgttKiqZr";
 	private final static String driverDB = "com.mysql.cj.jdbc.Driver";
 	private Connection con = null;
-	private static ExamStore unique;
+	private static UserInformationStore unique;
     private String email;
     private String password;
 
-	private ExamStore() throws StoreException{
+	private UserInformationStore() throws StoreException{
 		try {
 			Class.forName(driverDB);
 			con = DriverManager.getConnection(connection, user, passworddatabase);
@@ -36,9 +40,9 @@ public class ExamStore implements DataManagement {
 		}
 	}
 
-	public static ExamStore instance() throws StoreException {
+	public static UserInformationStore instance() throws StoreException {
 		if (unique == null)
-			unique = new ExamStore();
+			unique = new UserInformationStore();
 		return unique;
 	}
 
@@ -64,7 +68,7 @@ public class ExamStore implements DataManagement {
 			/*
 			adding user
 			 */
-			String hashed_password = ExamStore.hashPassword(password);
+			String hashed_password = UserInformationStore.hashPassword(password);
 			String befehl2 = "INSERT INTO users (name, email, password) VALUES ('" + name + "','" + email + "','" + hashed_password + "');";
 			this.email = email;
 			this.password = password;
@@ -185,6 +189,20 @@ public class ExamStore implements DataManagement {
 			throw new StoreException("Error while getting code " + e1.getMessage(), e1);
 		}
 	}
+	
+
+	public String getUserDate() throws StoreException {
+		String pattern = "MM/dd/yyyy";
+		DateFormat df = new SimpleDateFormat(pattern);
+		try (Statement abfrage = con.createStatement()) {
+			String befehl1 = "select distinct createdAt from users where email = '" + email + "';";
+			ResultSet ergebnis1 = abfrage.executeQuery(befehl1);
+			ergebnis1.next();
+			return df.format(ergebnis1.getDate("createdAt"));
+		} catch (SQLException e1) {
+			throw new StoreException("Error while getting code " + e1.getMessage(), e1);
+		}
+	}
 
 	@Override
 	public String getPassword() throws StoreException {
@@ -194,7 +212,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void changePasswort(String newPassword) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String password = ExamStore.hashPassword(newPassword);
+			String password = UserInformationStore.hashPassword(newPassword);
 			String befehl = "update users set password = '" + password + "' where email = '" + email + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {

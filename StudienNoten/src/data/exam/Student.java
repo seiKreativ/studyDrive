@@ -1,7 +1,7 @@
 package data.exam;
 
 import store.DataManagement;
-import store.ExamStore;
+import store.UserInformationStore;
 import store.StoreException;
 
 public class Student {
@@ -15,7 +15,7 @@ public class Student {
         setName(name);
         setEmail(email);
         setPassword(password);
-        store = ExamStore.instance();
+        store = UserInformationStore.instance();
         if (newStudent)
             store.newUser(name, email, password);
         if (!newStudent)

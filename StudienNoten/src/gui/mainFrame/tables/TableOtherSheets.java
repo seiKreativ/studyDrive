@@ -48,7 +48,7 @@ public class TableOtherSheets extends JPanel {
 				return false;
 			}
 		};
-		String header[] = new String[] { "Sem", "Vorlesung", "Nummer", "Punkte", "Punkte insg." };
+		String header[] = new String[] { "Sem", "Vorlesung", "No.", "pts.", "max." };
 		dm.setColumnIdentifiers(header);
 
 		// Table row should be red if exam not passed
@@ -94,10 +94,10 @@ public class TableOtherSheets extends JPanel {
 
 		load();
 		tblTaskList.getColumn("Sem").setPreferredWidth(10);
-		tblTaskList.getColumn("Vorlesung").setPreferredWidth(200);
-		tblTaskList.getColumn("Nummer").setPreferredWidth(10);
-		tblTaskList.getColumn("Punkte").setPreferredWidth(10);
-		tblTaskList.getColumn("Punkte insg.").setPreferredWidth(10);
+		tblTaskList.getColumn("Vorlesung").setPreferredWidth(190);
+		tblTaskList.getColumn("No.").setPreferredWidth(10);
+		tblTaskList.getColumn("pts.").setPreferredWidth(15);
+		tblTaskList.getColumn("max.").setPreferredWidth(15);
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(tblTaskList));
 

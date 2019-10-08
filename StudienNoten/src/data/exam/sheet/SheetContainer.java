@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
-import store.ExamStore;
+import store.UserInformationStore;
 import store.StoreException;
 
 public class SheetContainer implements Iterable<Sheet> {
 
     private static SheetContainer unique = null;
     private Vector<Sheet> sheets;
-    private ExamStore store = null;
+    private UserInformationStore store = null;
 
     private SheetContainer() throws StoreException {
         sheets = new Vector<Sheet>();
-        store = ExamStore.instance();
+        store = UserInformationStore.instance();
     }
 
     public static SheetContainer instance() throws StoreException {
