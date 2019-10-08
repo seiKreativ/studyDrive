@@ -21,6 +21,8 @@ public interface DataManagement {
 
     public String getPassword() throws StoreException;
 
+    public void setNewMail(String mail) throws StoreException;
+
     public void changePasswort(String newPassword) throws StoreException;
 
     public boolean checkAccountIsActivated(String email) throws StoreException;
@@ -28,6 +30,12 @@ public interface DataManagement {
     public boolean checkActivationCode(String code) throws StoreException;
 
     public void setActivationCode(String code) throws StoreException;
+
+    public String getUsercode() throws StoreException;
+
+    public void setActivated() throws StoreException;
+
+    public boolean checkMailAreadyExists(String email) throws StoreException;
 
     public void deleteUser(LectureContainer c1, ExamContainer c2, SheetContainer c3) throws StoreException;
 

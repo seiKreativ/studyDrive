@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class Email {
 
-    private ExamStore store;
+    private static ExamStore store;
 
     public Email() throws StoreException {
         store = ExamStore.instance();
@@ -32,7 +32,7 @@ public class Email {
 
         String message = "Hallo " + name +",\n" +
                 "\n" +
-                "Das neue Passwort f\u00fcr deinen StudyAcc-Account lautet: \n" +
+                "das neue Passwort f\u00fcr deinen StudyAcc-Account lautet: \n" +
                 "\n" +
                 newPassword + "\n" +
                 "\n" +
@@ -48,29 +48,30 @@ public class Email {
         Transport.send( msg );
     }
 
-    public void postNewActivationMail(String recipient, String name, boolean isNewCode) throws MessagingException, UnsupportedEncodingException, StoreException {
+    public static void postNewActivationMail(String recipient, String name, boolean isNewCode) throws MessagingException, UnsupportedEncodingException, StoreException {
 
         Message msg = new MimeMessage(Email.getGMailSession());
         msg.setFrom(new InternetAddress("study0acc@gmail.com", "StudyAcc"));
         InternetAddress addressTo = new InternetAddress( recipient );
         msg.setRecipient( Message.RecipientType.TO, addressTo );
 
-        String code = Email.generateActivationCode();
-
-        String teilNachricht;
+        String code;
         String betreff;
+        store = ExamStore.instance();
+
         if (isNewCode) {
-            teilNachricht = "Der neue";
-            betreff = "StudyAcc: Dein neuer Activierungs-Code";
+            betreff = "StudyAcc: Dein Activierungs-Code";
+            code = store.getUsercode();
         }
         else {
-            teilNachricht = "Der";
             betreff = "StudyAcc: Dein Activierungs-Code";
+            code = Email.generateActivationCode();
+            store.setActivationCode(code);
         }
 
         String message = "Hallo " + name +",\n" +
                 "\n" +
-                teilNachricht + "Aktivierungs-Code f\u00fcr deinen StudyAcc-Account lautet: \n" +
+                "der Aktivierungs-Code f\u00fcr deinen StudyAcc-Account lautet: \n" +
                 "\n" +
                 code + "\n" +
                 "\n" +

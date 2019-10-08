@@ -66,6 +66,8 @@ public class ExamStore implements DataManagement {
 			 */
 			String hashed_password = ExamStore.hashPassword(password);
 			String befehl2 = "INSERT INTO users (name, email, password) VALUES ('" + name + "','" + email + "','" + hashed_password + "');";
+			this.email = email;
+			this.password = password;
 			abfrage.executeUpdate(befehl2);
 		} catch (SQLException e1) {
 			throw new StoreException("Error: " + e1.getMessage(), e1);
@@ -92,6 +94,44 @@ public class ExamStore implements DataManagement {
 				throw new StoreException("Username or password wrong", null);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while setting user " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public void setNewMail(String mail) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl2 = "update users set email = '" + mail + "' where email = '" + email + "';";
+			abfrage.executeUpdate(befehl2);
+			this.email = mail;
+		} catch (SQLException e1) {
+			throw new StoreException("Error while setting new email " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public boolean checkMailAreadyExists(String email) throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl = "select email from users;";
+			ResultSet ergebnis = abfrage.executeQuery(befehl);
+			boolean tmp = false;
+			while (ergebnis.next()) {
+				if (ergebnis.getString("email").equals(email)) {
+					tmp = true;
+				}
+			}
+			return tmp;
+		} catch (SQLException e1) {
+			throw new StoreException("Error while setting user " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public void setActivated() throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl2 = "update users set status = 1 where email = '" + email + "';";
+			abfrage.executeUpdate(befehl2);
+		} catch (SQLException e1) {
+			throw new StoreException("Error while setting status " + e1.getMessage(), e1);
 		}
 	}
 
@@ -131,6 +171,18 @@ public class ExamStore implements DataManagement {
 			return ergebnis1.getString("name");
 		} catch (SQLException e1) {
 			throw new StoreException("Error while getting user " + e1.getMessage(), e1);
+		}
+	}
+
+	@Override
+	public String getUsercode() throws StoreException {
+		try (Statement abfrage = con.createStatement()) {
+			String befehl1 = "select distinct code from users where email = '" + email + "';";
+			ResultSet ergebnis1 = abfrage.executeQuery(befehl1);
+			ergebnis1.next();
+			return ergebnis1.getString("code");
+		} catch (SQLException e1) {
+			throw new StoreException("Error while getting code " + e1.getMessage(), e1);
 		}
 	}
 
@@ -193,6 +245,7 @@ public class ExamStore implements DataManagement {
 	public void setActivationCode(String code) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
 			String befehl = "update users set code = '" + code + "' where email = '" + email + "';";
+			System.out.println(befehl);
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error: " + e1.getMessage(), e1);
@@ -265,7 +318,7 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void modifySheet(Sheet sold, Sheet snew) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "UPDATE usersheet set semester = " + snew.getSemester() + " AND lecture = '" + snew.getName() + "' AND id = " + snew.getType() + " AND points = " + snew.getPoints() + " AND maxPoints = " + snew.getMaxPoints() +
+			String befehl = "UPDATE usersheet set semester = " + snew.getSemester() + ", lecture = '" + snew.getName() + "', id = " + snew.getType() + ", points = " + snew.getPoints() + ", maxPoints = " + snew.getMaxPoints() +
 					" WHERE email = '" + email + "' AND semester = " + sold.getSemester() + " AND lecture = '" + sold.getName() + "' AND id = " + sold.getType() + ";";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
@@ -296,7 +349,7 @@ public class ExamStore implements DataManagement {
     @Override
     public void modifyExam(Exam eold, Exam enew) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "update exams set note = '" + enew.getNote() + "' " +
+			String befehl = "update exams set mark = " + enew.getNote() + ", semester = " + enew.getSemester() + ", name = '" + enew.getName() + "' " +
 					"WHERE username = '" + email + "' AND semester = " + eold.getSemester() + " AND name = '"+ eold.getName() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e) {
@@ -327,8 +380,8 @@ public class ExamStore implements DataManagement {
 	@Override
 	public void modifyLecture(Lecture eold, Lecture enew) throws StoreException{
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "update userlecture set credits = " + enew.getLeistungpunkte() + " " +
-					"WHERE username = '" + email + "' AND semester = " + eold.getSemester() + " AND name = '"+ eold.getName() + "';";
+			String befehl = "update userlecture set credits = " + enew.getLeistungpunkte() + ", semester = " + enew.getSemester() + ", lecture = '" + enew.getName() + "' " +
+					"WHERE email = '" + email + "' AND semester = " + eold.getSemester() + " AND lecture = '"+ eold.getName() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e) {
 			throw new StoreException("Error while modifying lecture " + e.getMessage(), e);

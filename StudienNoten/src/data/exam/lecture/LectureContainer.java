@@ -117,12 +117,28 @@ public class LectureContainer implements Iterable<Lecture> {
         unique = null;
     }
 
-    public String getUserName() throws StoreException {
+    public String getUserEmail() throws StoreException {
         return store.getUserEmail();
+    }
+
+    public String getUserName() throws StoreException {
+        return store.getUserName();
     }
 
     public String getPassword() throws StoreException {
         return store.getPassword();
+    }
+
+    public void setNewMail(String mail) throws StoreException {
+        store.setNewMail(mail);
+    }
+
+    public boolean checkMailAreadyExists(String email) throws StoreException {
+        return store.checkMailAreadyExists(email);
+    }
+
+    public void setActivated() throws StoreException {
+        store.setActivated();
     }
 
     public void deleteUser() throws StoreException {
@@ -131,6 +147,14 @@ public class LectureContainer implements Iterable<Lecture> {
     
     public void changePassword(String newPassword) throws StoreException {
         store.changePasswort(newPassword);
+    }
+
+    public boolean checkActivationCode(String code) throws StoreException {
+        return store.checkActivationCode(code);
+    }
+
+    public String getUsercode() throws StoreException {
+        return store.getUsercode();
     }
 
 	public boolean contains(Lecture l) {

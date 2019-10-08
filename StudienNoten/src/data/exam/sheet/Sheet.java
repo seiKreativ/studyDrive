@@ -44,7 +44,7 @@ public class Sheet {
         this.maxPoints = maxPoints;
     }
 
-    private void setLecture(Lecture lecture) {
+    public void setLecture(Lecture lecture) {
         this.lecture = lecture;
     }
 
