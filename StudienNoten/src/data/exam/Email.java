@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class Email {
 
-    private ExamStore store;
+    private static ExamStore store;
 
     public Email() throws StoreException {
         store = ExamStore.instance();
@@ -32,7 +32,7 @@ public class Email {
 
         String message = "Hallo " + name +",\n" +
                 "\n" +
-                "Das neue Passwort f\u00fcr deinen StudyAcc-Account lautet: \n" +
+                "das neue Passwort f\u00fcr deinen StudyAcc-Account lautet: \n" +
                 "\n" +
                 newPassword + "\n" +
                 "\n" +
@@ -46,6 +46,59 @@ public class Email {
         msg.setContent( message, "text/plain" );
 
         Transport.send( msg );
+    }
+
+    public static void postNewActivationMail(String recipient, String name, boolean isNewCode) throws MessagingException, UnsupportedEncodingException, StoreException {
+
+        Message msg = new MimeMessage(Email.getGMailSession());
+        msg.setFrom(new InternetAddress("study0acc@gmail.com", "StudyAcc"));
+        InternetAddress addressTo = new InternetAddress( recipient );
+        msg.setRecipient( Message.RecipientType.TO, addressTo );
+
+        String code;
+        String betreff;
+        store = ExamStore.instance();
+
+        if (isNewCode) {
+            betreff = "StudyAcc: Dein Activierungs-Code";
+            code = store.getUsercode();
+        }
+        else {
+            betreff = "StudyAcc: Dein Activierungs-Code";
+            code = Email.generateActivationCode();
+            store.setActivationCode(code);
+        }
+
+        String message = "Hallo " + name +",\n" +
+                "\n" +
+                "der Aktivierungs-Code f\u00fcr deinen StudyAcc-Account lautet: \n" +
+                "\n" +
+                code + "\n" +
+                "\n" +
+                "Du wirst aufgefordert, ihn beim ersten Log-In einzugeben. \n" +
+                "\n" +
+                "Viele Gr\u00fc\u00dfe, \n" +
+                "\n" +
+                "dein Team von StudyAcc";
+
+        msg.setSubject( betreff );
+        msg.setContent( message, "text/plain" );
+
+        Transport.send( msg );
+    }
+
+    private static String generateActivationCode() {
+        ArrayList<Integer> asciiCodes = new ArrayList<>();
+        for (int i = 48; i < 58; i++)
+            asciiCodes.add(i);
+        Random r = new Random();
+        String code = "";
+        for (int i = 0; i < 5; i++) {
+            int random = r.nextInt(asciiCodes.size());
+            char tmp = (char) (int) asciiCodes.get(random);
+            code = code.concat(String.valueOf(tmp));
+        }
+        return code;
     }
 
     private static Session getGMailSession() {

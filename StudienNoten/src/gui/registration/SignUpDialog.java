@@ -26,14 +26,14 @@ public class SignUpDialog extends JDialog {
 	private JTextField txtPassword;
 
 	public SignUpDialog() {
-		BufferedImage image = null;
+		/*BufferedImage image = null;
 		try {
 			image = ImageIO.read(this.getClass().getResource("\\signup-icon.png"));
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		this.setIconImage(image);
+		this.setIconImage(image);*/
 		setBounds(100, 100, 397, 255);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -133,8 +133,13 @@ public class SignUpDialog extends JDialog {
 	private void onSignIn() {
 		try {
 			new Student("Unnötig", txtUsername.getText(), txtPassword.getText(), false);
-			dispose();
-			new MainFrame();
+			if (Student.checkStatusStudent(txtUsername.getText())) {
+				dispose();
+				new MainFrame();
+			} else {
+				dispose();
+				new ActicationDialog();
+			}
 		} catch (StoreException | IllegalInputException e) {
 			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}

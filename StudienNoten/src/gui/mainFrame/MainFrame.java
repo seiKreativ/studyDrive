@@ -8,12 +8,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -27,8 +24,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
@@ -80,9 +75,7 @@ public class MainFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public MainFrame() {
-		try {
-			
-			System.out.println("\\study-icon-19.png");
+/*		try {
 			BufferedImage  image = ImageIO.read(this.getClass().getResource("\\study-icon-19.png"));
 			this.setIconImage(image);
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
@@ -90,7 +83,7 @@ public class MainFrame extends JFrame {
 				| UnsupportedLookAndFeelException | IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
-		}
+		}*/
 		setTitle("Studium Noten Manager");
 		setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -372,7 +365,7 @@ public class MainFrame extends JFrame {
 
 		textFieldEmail = new JTextField();
 		try {
-			textFieldEmail.setText(lectureContainer.getUserName());
+			textFieldEmail.setText(lectureContainer.getUserEmail());
 		} catch (StoreException e) {
 			// Fehler tritt hier nicht auf
 			e.printStackTrace();
@@ -426,6 +419,7 @@ public class MainFrame extends JFrame {
 		keyListenerComponents.add(btnPasswortAendern);
 		keyListenerComponents.add(textFieldEmail);
 		keyListenerComponents.add(lblEmail);
+		keyListenerComponents.add(allSheetLecture.getTable());
 
 		for (Component c : keyListenerComponents) {
 			c.addKeyListener(new KeyAdapter() {
@@ -467,6 +461,8 @@ public class MainFrame extends JFrame {
 						sheetTabbedPane.setSelectedIndex(0);
 					if (e.getKeyCode() == KeyEvent.VK_B && tabbedPane.getSelectedIndex() == 1)
 						sheetTabbedPane.setSelectedIndex(1);
+                    if (e.getKeyCode() == KeyEvent.VK_C && tabbedPane.getSelectedIndex() == 1)
+                        sheetTabbedPane.setSelectedIndex(2);
 				}
 			});
 		}
@@ -501,9 +497,13 @@ public class MainFrame extends JFrame {
 
 	private void onAddLecture() {
 		// Lecture hinzufügen
-		AddLectureFrame addDia = new AddLectureFrame(this, "Neue Vorlesung");
+		AddLectureFrame addDia = new AddLectureFrame(this, "Neue Vorlesung", null);
 		addDia.setVisible(true);
 		allLectures.load();
+		allExams.load();
+		allSheetLecture.load();
+		allSheets.load();
+		allOther.load();
 		insgVorlesungen.setText(String.valueOf(lectureContainer.getSize()));
 	}
 
@@ -513,6 +513,7 @@ public class MainFrame extends JFrame {
 		addDia.setVisible(true);
 		allSheets.load();
 		allOther.load();
+		allSheetLecture.load();
 		insgÜbungsblätter.setText(String.valueOf(sheetContainer.getSize()));
 	}
 
@@ -552,9 +553,32 @@ public class MainFrame extends JFrame {
 				Lecture l = new Lecture(Integer.parseInt((String) tb.getValueAt(row, 0)),
 						(String) tb.getValueAt(row, 1), Integer.parseInt((String) tb.getValueAt(row, 2)));
 				lectureContainer.unlinkLecture(l);
+
+				//Alle Exams und sheets löschen, die damit zusammenhängen:
+
+                ArrayList<Sheet> sheetsDel = new ArrayList<>();
+                for (Sheet s : sheetContainer) {
+                    if (s.getLecture().equals(l))
+                        sheetsDel.add(s);
+                }
+                for (Sheet s : sheetsDel)
+                    sheetContainer.unlinkSheet(s);
+
+                ArrayList<Exam> examsDel = new ArrayList<>();
+                for (Exam e : examContainer) {
+                    if (e.getLecture().equals(l))
+                        examsDel.add(e);
+                }
+                for (Exam e : examsDel)
+                    examContainer.unlinkExam(e);
+
 				insgVorlesungen.setText(Integer.toString(lectureContainer.getSize()));
 				allLectures.load();
-			} catch (IllegalInputException | StoreException | LectureNotFoundException e) {
+                allExams.load();
+                allSheetLecture.load();
+                allSheets.load();
+                allOther.load();
+			} catch (IllegalInputException | StoreException | LectureNotFoundException | SheetNotFoundException | ExamNotFoundException e) {
 				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -597,6 +621,7 @@ public class MainFrame extends JFrame {
 				sheetContainer.unlinkSheet(e);
 				allSheets.load();
 				allOther.load();
+				allSheetLecture.load();
 				insgÜbungsblätter.setText(String.valueOf(sheetContainer.getSize()));
 			} catch (IllegalInputException | StoreException | SheetNotFoundException e) {
 				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -643,21 +668,20 @@ public class MainFrame extends JFrame {
 		} else {
 			JTable tb = allLectures.getTable();
 			int row = allLectures.getTable().getSelectedRow();
-			try {
-				int tempSem = Integer.parseInt((String) tb.getValueAt(row, 0));
-				String tempName = (String) tb.getValueAt(row, 1);
-				int tempLp = Integer.parseInt((String) tb.getValueAt(row, 2));
-				Lecture l = new Lecture(tempSem, tempName, tempLp);
-				lectureContainer.unlinkLecture(l);
-				AddLectureFrame editLec = new AddLectureFrame(this, "Vorlesung ändern");
-				editLec.setData(tempSem, tempName, tempLp);
-				editLec.setCancelButtonActivated(false);
-				editLec.setVisible(true);
-				allLectures.load();
-			} catch (IllegalInputException | StoreException | LectureNotFoundException e) {
-				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
+            int tempSem = Integer.parseInt((String) tb.getValueAt(row, 0));
+            String tempName = (String) tb.getValueAt(row, 1);
+            int tempLp = Integer.parseInt((String) tb.getValueAt(row, 2));
+            Lecture l = lectureContainer.getLectureByName(tempName, tempSem);
+            AddLectureFrame editLec = new AddLectureFrame(this, "Vorlesung ändern", l);
+            editLec.setData(tempSem, tempName, tempLp);
+            editLec.setCancelButtonActivated(false);
+            editLec.setVisible(true);
+            allLectures.load();
+            allExams.load();
+            allSheetLecture.load();
+            allSheets.load();
+            allOther.load();
+        }
 	}
 
 	private void onModifySheet() {
@@ -703,6 +727,7 @@ public class MainFrame extends JFrame {
 				addDia.setVisible(true);
 				allOther.load();
 				allSheets.load();
+				allSheetLecture.load();
 			} catch (IllegalInputException | StoreException | SheetNotFoundException e) {
 				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
@@ -724,12 +749,12 @@ public class MainFrame extends JFrame {
 	private void onDeleteUser() {
 		try {
 			String tmpPassword = JOptionPane.showInputDialog(this,
-					"Zum Löschen Passwort für User " + lectureContainer.getUserName() + " eingeben.", "Acoount Löschen",
+					"Zum Löschen Passwort für User " + lectureContainer.getUserEmail() + " eingeben.", "Acoount Löschen",
 					JOptionPane.INFORMATION_MESSAGE);
 			if (tmpPassword.equals(lectureContainer.getPassword())) {
 				lectureContainer.deleteUser();
 				JOptionPane.showMessageDialog(this,
-						"Account mit Email " + lectureContainer.getUserName() + " erfolgreich gelöscht", "Information",
+						"Account mit Email " + lectureContainer.getUserEmail() + " erfolgreich gelöscht", "Information",
 						JOptionPane.INFORMATION_MESSAGE);
 				onLogOut();
 			} else {

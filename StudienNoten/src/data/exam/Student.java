@@ -40,4 +40,7 @@ public class Student {
         this.password = password;
     }
 
+    public static boolean checkStatusStudent(String email) throws StoreException {
+        return store.checkAccountIsActivated(email);
+    }
 }
