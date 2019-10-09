@@ -270,6 +270,11 @@ public class MainFrame extends JFrame {
 						.getTitleAt(((JTabbedPane) e.getSource()).getSelectedIndex()) == "Other") {
 					lblInsgÜbungsblätter.setText("Andere Leistungen insgesamt");
 					insgÜbungsblätter.setText(Integer.toString(sheetContainer.getCountOtherType()));
+				}
+				if (((JTabbedPane) e.getSource())
+						.getTitleAt(((JTabbedPane) e.getSource()).getSelectedIndex()) == "Vorlesungen") {
+					lblInsgÜbungsblätter.setText("Insgesamt");
+					insgÜbungsblätter.setText(Integer.toString(sheetContainer.getSize()));
 				} else {
 					lblInsgÜbungsblätter.setText("Übungsblätter insgesamt");
 					insgÜbungsblätter.setText(Integer.toString(sheetContainer.getCountSheetType()));
@@ -435,9 +440,9 @@ public class MainFrame extends JFrame {
 		keyListenerComponents.add(durchschnittsnote);
 		keyListenerComponents.add(grade);
 		keyListenerComponents.add(lblDurchschnittsnote);
-		keyListenerComponents.add(btnAddLecture);
-		keyListenerComponents.add(btnDelLecture);
-		keyListenerComponents.add(btnModLecture);
+		keyListenerComponents.add(btnAddExam);
+		keyListenerComponents.add(btnDelExam);
+		keyListenerComponents.add(btnModExam);
 		keyListenerComponents.add(sheetsPanel);
 		keyListenerComponents.add(countSheet);
 		keyListenerComponents.add(insgÜbungsblätter);
@@ -537,6 +542,10 @@ public class MainFrame extends JFrame {
 
 	private void onAddExam() {
 		// Prüfung hinzufügen
+		if (lectureContainer.getSize() == 0) {
+			JOptionPane.showMessageDialog(this, "Error: Füge zuerst eine Vorlesung hinzu", "Information", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
 		AddExamFrame addDia = new AddExamFrame(this, "Neue Prüfung hinzufügen");
 		addDia.setVisible(true);
 		calcDurchschnitt();
@@ -557,6 +566,10 @@ public class MainFrame extends JFrame {
 
 	private void onAddSheet() {
 		// Sheet hinzufügen
+		if (lectureContainer.getSize() == 0) {
+			JOptionPane.showMessageDialog(this, "Error: Füge zuerst eine Vorlesung hinzu", "Information", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
 		AddSheetFrame addDia = new AddSheetFrame(this, "Neues Übungsblatt hinzufügen");
 		addDia.setVisible(true);
 		allSheets.load();
@@ -799,7 +812,7 @@ public class MainFrame extends JFrame {
 		try {
 			String tmpPassword = null;
 			JPanel panel = new JPanel();
-			JLabel label = new JLabel("Geben Sie das Passwort für Ihren Account ein:");
+			JLabel label = new JLabel("Gib das Passwort für deinen Account ein:");
 			JPasswordField passField = new JPasswordField(10);
 			panel.add(label);
 			panel.add(passField);
@@ -837,6 +850,7 @@ public class MainFrame extends JFrame {
 			allSheets.load();
 			allLectures.load();
 			allExams.load();
+			allSheetLecture.load();
 		} catch (StoreException e) {
 			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}

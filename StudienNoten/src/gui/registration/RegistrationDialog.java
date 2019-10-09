@@ -65,8 +65,8 @@ public class RegistrationDialog extends JDialog {
 		JButton btnSignUp = new JButton("Sign Up");
 		btnSignUp.setBackground(Color.GRAY);
 		btnSignUp.setForeground(Color.WHITE);
-		btnSignUp.setFont(new Font("Arial Nova Light", Font.PLAIN, 12));
-		btnSignUp.setBounds(70, 297, 200, 32);
+		btnSignUp.setFont(new Font("Arial Nova Light", Font.PLAIN, 20));
+		btnSignUp.setBounds(88, 297, 147, 32);
 		btnSignUp.setBorderPainted(false);
 		contentPane.add(btnSignUp);
 		btnSignUp.addActionListener(e -> onSignUp());
@@ -182,7 +182,7 @@ public class RegistrationDialog extends JDialog {
 						"Du wirst beim ersten Log-In aufgefordert, ihn einzugeben.", "Bestätigung", JOptionPane.INFORMATION_MESSAGE);
 				dispose();
 				new SignUpDialog();
-			} catch (StoreException | IllegalInputException | UnsupportedEncodingException | MessagingException e) {
+			} catch (StoreException | IllegalInputException | MessagingException | UnsupportedEncodingException e) {
 				JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}

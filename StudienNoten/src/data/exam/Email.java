@@ -65,11 +65,11 @@ public class Email {
         store = UserInformationStore.instance();
 
         if (isNewCode) {
-            betreff = "StudyAcc: Dein Activierungs-Code";
+            betreff = "StudyAcc: Dein Aktivierungs-Code";
             code = store.getUsercode();
         }
         else {
-            betreff = "StudyAcc: Dein Activierungs-Code";
+            betreff = "StudyAcc: Dein Aktivierungs-Code";
             code = Email.generateActivationCode();
             store.setActivationCode(code);
         }

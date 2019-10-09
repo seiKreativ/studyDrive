@@ -113,7 +113,7 @@ public class PasswordDialog extends JDialog {
 				return;
 			}
 			if (neuesPasswortField.getText().length() <= 2) {
-				JOptionPane.showMessageDialog(this, "Error: Passwortmuss mindestens drei Zeichen haben", "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Error: Passwort muss mindestens drei Zeichen haben", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			con.changePassword(neuesPasswortField.getText());
