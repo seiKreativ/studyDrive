@@ -72,6 +72,7 @@ public class TableOtherSheets extends JPanel {
 		tblTaskList.setShowVerticalLines(true);
 		tblTaskList.setCellSelectionEnabled(false);
 		tblTaskList.setRowSelectionAllowed(true);
+		
 
 		// Table Cell Renderer
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();

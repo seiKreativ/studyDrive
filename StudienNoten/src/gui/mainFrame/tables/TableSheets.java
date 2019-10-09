@@ -68,11 +68,14 @@ public class TableSheets extends JPanel {
 				}
 				return c;
 			}
+			
 		};
 		tblTaskList.setShowVerticalLines(true);
 		tblTaskList.setCellSelectionEnabled(false);
 		tblTaskList.setRowSelectionAllowed(true);
 
+		
+		
 		// Table Cell Renderer
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(JLabel.CENTER);

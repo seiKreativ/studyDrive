@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -55,15 +57,14 @@ public class PDFDialog extends JDialog {
 	private SheetContainer sheetCon;
 	private ExamContainer examCon;
 	private JFrame owner;
-	private JCheckBox chckbxKlausuren, chckbxÜbungsblätter, chckbxVorlesungen, chckbxAlleSemesterExam,
-			chckbxNichtBestandeneAusblenen, chckbxAlleVorlesungen, chckbxAlleSemesterLecture;
-	private JList<Integer> listSemesterExam, listSemesterLecture;
-	private JList<String> listLecturesSheet;
+	private JCheckBox cbExams, cbSheets, cbLectures, cbSelectAllSemExam,
+			cbDeselectFailedExams, cbAllLectures, cbSelectAllSemLecture;
+	private JList<Integer> semesterExamSelectList, semesterLectureSelectList;
+	private JList<String> lectureSheetSelectList;
 	private List<Integer> semExamList, semLecList;
 	private List<String> lecSheetList;
-	private JCheckBox chckbxAndereLeistungen;
+	private JCheckBox cbIncludeOther;
 
-	@SuppressWarnings("unchecked")
 	public PDFDialog(LectureContainer lecCon, SheetContainer sheetCon, ExamContainer examCon, JFrame owner)
 			throws IOException {
 		this.lecCon = lecCon;
@@ -77,22 +78,22 @@ public class PDFDialog extends JDialog {
 		contentPanel.setLayout(null);
 
 		// Exams
-		chckbxKlausuren = new JCheckBox("Klausuren");
-		chckbxKlausuren.setSelected(true);
-		chckbxKlausuren.setBounds(6, 7, 99, 23);
-		chckbxKlausuren.addActionListener((e) -> {
+		cbExams = new JCheckBox("Klausuren");
+		cbExams.setSelected(true);
+		cbExams.setBounds(6, 7, 99, 23);
+		cbExams.addActionListener((e) -> {
 			if (((JCheckBox) e.getSource()).isSelected()) {
-				listSemesterExam.setEnabled(true);
+				semesterExamSelectList.setEnabled(true);
 
-				chckbxAlleSemesterExam.setEnabled(true);
-				chckbxNichtBestandeneAusblenen.setEnabled(true);
+				cbSelectAllSemExam.setEnabled(true);
+				cbDeselectFailedExams.setEnabled(true);
 			} else {
-				listSemesterExam.setEnabled(false);
-				chckbxAlleSemesterExam.setEnabled(false);
-				chckbxNichtBestandeneAusblenen.setEnabled(false);
+				semesterExamSelectList.setEnabled(false);
+				cbSelectAllSemExam.setEnabled(false);
+				cbDeselectFailedExams.setEnabled(false);
 			}
 		});
-		contentPanel.add(chckbxKlausuren);
+		contentPanel.add(cbExams);
 
 		ArrayList<Integer> semesterExamList = new ArrayList<Integer>();
 		for (int i = 0; i < examCon.getSize(); i++) {
@@ -106,9 +107,9 @@ public class PDFDialog extends JDialog {
 		for (int s : semesterExamList) {
 			semesterExamListModel.addElement(Integer.valueOf(s));
 		}
-		listSemesterExam = new JList<Integer>(semesterExamListModel);
-		listSemesterExam.setSelectionBackground(Color.LIGHT_GRAY);
-		JScrollPane scrollpaneSemesterExam = new JScrollPane(listSemesterExam);
+		semesterExamSelectList = new JList<Integer>(semesterExamListModel);
+		semesterExamSelectList.setSelectionBackground(Color.LIGHT_GRAY);
+		JScrollPane scrollpaneSemesterExam = new JScrollPane(semesterExamSelectList);
 		scrollpaneSemesterExam.setBounds(113, 36, 63, 46);
 		contentPanel.add(scrollpaneSemesterExam);
 
@@ -116,40 +117,40 @@ public class PDFDialog extends JDialog {
 		lblSemesterExam.setBounds(32, 37, 73, 14);
 		contentPanel.add(lblSemesterExam);
 
-		chckbxAlleSemesterExam = new JCheckBox("alle Semester");
-		chckbxAlleSemesterExam.setBounds(203, 33, 99, 23);
-		chckbxAlleSemesterExam.addActionListener((e) -> {
+		cbSelectAllSemExam = new JCheckBox("alle Semester");
+		cbSelectAllSemExam.setBounds(203, 33, 99, 23);
+		cbSelectAllSemExam.addActionListener((e) -> {
 			if (!((JCheckBox) e.getSource()).isSelected()) {
-				listSemesterExam.setEnabled(true);
-				listSemesterExam.setSelectedIndex(1);
+				semesterExamSelectList.setEnabled(true);
+				semesterExamSelectList.setSelectedIndex(1);
 			} else {
-				listSemesterExam.setEnabled(false);
+				semesterExamSelectList.setEnabled(false);
 			}
 		});
-		contentPanel.add(chckbxAlleSemesterExam);
+		contentPanel.add(cbSelectAllSemExam);
 
-		chckbxNichtBestandeneAusblenen = new JCheckBox("nicht bestandene Klausuren ausblenden");
-		chckbxNichtBestandeneAusblenen.setBounds(204, 59, 226, 23);
-		contentPanel.add(chckbxNichtBestandeneAusblenen);
+		cbDeselectFailedExams = new JCheckBox("nicht bestandene Klausuren ausblenden");
+		cbDeselectFailedExams.setBounds(204, 59, 226, 23);
+		contentPanel.add(cbDeselectFailedExams);
 
 		// Sheets
-		chckbxÜbungsblätter = new JCheckBox("Übungsblätter");
-		chckbxÜbungsblätter.setSelected(true);
-		chckbxÜbungsblätter.setBounds(6, 83, 99, 23);
-		chckbxÜbungsblätter.addActionListener((e) -> {
+		cbSheets = new JCheckBox("Übungsblätter");
+		cbSheets.setSelected(true);
+		cbSheets.setBounds(6, 83, 99, 23);
+		cbSheets.addActionListener((e) -> {
 			if (((JCheckBox) e.getSource()).isSelected()) {
-				listLecturesSheet.setEnabled(true);
-				listSemesterExam.setSelectedIndex(1);
-				chckbxAlleVorlesungen.setEnabled(true);
-				chckbxAndereLeistungen.setEnabled(true);
+				lectureSheetSelectList.setEnabled(true);
+				semesterExamSelectList.setSelectedIndex(1);
+				cbAllLectures.setEnabled(true);
+				cbIncludeOther.setEnabled(true);
 			} else {
-				listLecturesSheet.setEnabled(false);
-				chckbxAlleVorlesungen.setEnabled(false);
-				chckbxAndereLeistungen.setEnabled(false);
+				lectureSheetSelectList.setEnabled(false);
+				cbAllLectures.setEnabled(false);
+				cbIncludeOther.setEnabled(false);
 
 			}
 		});
-		contentPanel.add(chckbxÜbungsblätter);
+		contentPanel.add(cbSheets);
 
 		JLabel lblLectureSheet = new JLabel("Vorlesung:");
 		lblLectureSheet.setBounds(32, 109, 73, 14);
@@ -166,39 +167,39 @@ public class PDFDialog extends JDialog {
 		for (String s : lectureSheetList) {
 			semesterSheetListModel.addElement(s);
 		}
-		listLecturesSheet = new JList<String>(semesterSheetListModel);
-		listLecturesSheet.setSelectionBackground(Color.LIGHT_GRAY);
-		JScrollPane scrollpaneLecturesSheet = new JScrollPane(listLecturesSheet);
+		lectureSheetSelectList = new JList<String>(semesterSheetListModel);
+		lectureSheetSelectList.setSelectionBackground(Color.LIGHT_GRAY);
+		JScrollPane scrollpaneLecturesSheet = new JScrollPane(lectureSheetSelectList);
 		scrollpaneLecturesSheet.setBounds(113, 108, 183, 46);
 		contentPanel.add(scrollpaneLecturesSheet);
 
-		chckbxAlleVorlesungen = new JCheckBox("alle Vorlesungen");
-		chckbxAlleVorlesungen.setBounds(302, 105, 128, 23);
-		chckbxAlleSemesterExam.addActionListener((e) -> {
+		cbAllLectures = new JCheckBox("alle Vorlesungen");
+		cbAllLectures.setBounds(302, 105, 128, 23);
+		cbSelectAllSemExam.addActionListener((e) -> {
 			if (!((JCheckBox) e.getSource()).isSelected()) {
-				listLecturesSheet.setEnabled(true);
-				listLecturesSheet.setSelectedIndex(1);
+				lectureSheetSelectList.setEnabled(true);
+				lectureSheetSelectList.setSelectedIndex(1);
 			} else {
-				listLecturesSheet.setEnabled(false);
+				lectureSheetSelectList.setEnabled(false);
 			}
 		});
-		contentPanel.add(chckbxAlleVorlesungen);
+		contentPanel.add(cbAllLectures);
 
 		// Lectures
-		chckbxVorlesungen = new JCheckBox("Vorlesungen");
-		chckbxVorlesungen.setSelected(true);
-		chckbxVorlesungen.setBounds(6, 155, 99, 23);
-		chckbxVorlesungen.addActionListener((e) -> {
+		cbLectures = new JCheckBox("Vorlesungen");
+		cbLectures.setSelected(true);
+		cbLectures.setBounds(6, 155, 99, 23);
+		cbLectures.addActionListener((e) -> {
 			if (((JCheckBox) e.getSource()).isSelected()) {
-				listSemesterLecture.setEnabled(true);
-				listSemesterExam.setSelectedIndex(1);
-				chckbxAlleSemesterLecture.setEnabled(true);
+				semesterLectureSelectList.setEnabled(true);
+				semesterExamSelectList.setSelectedIndex(1);
+				cbSelectAllSemLecture.setEnabled(true);
 			} else {
-				listSemesterLecture.setEnabled(false);
-				chckbxAlleSemesterLecture.setEnabled(false);
+				semesterLectureSelectList.setEnabled(false);
+				cbSelectAllSemLecture.setEnabled(false);
 			}
 		});
-		contentPanel.add(chckbxVorlesungen);
+		contentPanel.add(cbLectures);
 
 		JLabel lblSemesterLecture = new JLabel("Semester:");
 		lblSemesterLecture.setBounds(32, 185, 73, 14);
@@ -216,28 +217,28 @@ public class PDFDialog extends JDialog {
 		for (int s : semesterLectureList) {
 			semesterLectureListModel.addElement(Integer.valueOf(s));
 		}
-		listSemesterLecture = new JList<Integer>(semesterLectureListModel);
-		listSemesterLecture.setSelectionBackground(Color.LIGHT_GRAY);
-		JScrollPane scrollpaneSemesterLecture = new JScrollPane(listSemesterLecture);
+		semesterLectureSelectList = new JList<Integer>(semesterLectureListModel);
+		semesterLectureSelectList.setSelectionBackground(Color.LIGHT_GRAY);
+		JScrollPane scrollpaneSemesterLecture = new JScrollPane(semesterLectureSelectList);
 		scrollpaneSemesterLecture.setBounds(113, 184, 63, 44);
 		contentPanel.add(scrollpaneSemesterLecture);
 
-		chckbxAlleSemesterLecture = new JCheckBox("alle Semester");
-		chckbxAlleSemesterLecture.setBounds(203, 181, 99, 23);
-		chckbxAlleSemesterExam.addActionListener((e) -> {
+		cbSelectAllSemLecture = new JCheckBox("alle Semester");
+		cbSelectAllSemLecture.setBounds(203, 181, 99, 23);
+		cbSelectAllSemExam.addActionListener((e) -> {
 			if (!((JCheckBox) e.getSource()).isSelected()) {
-				listSemesterLecture.setEnabled(true);
-				listSemesterLecture.setSelectedIndex(1);
+				semesterLectureSelectList.setEnabled(true);
+				semesterLectureSelectList.setSelectedIndex(1);
 			} else {
-				listSemesterLecture.setEnabled(false);
+				semesterLectureSelectList.setEnabled(false);
 			}
 		});
 
-		contentPanel.add(chckbxAlleSemesterLecture);
+		contentPanel.add(cbSelectAllSemLecture);
 
-		chckbxAndereLeistungen = new JCheckBox("andere Leistungen");
-		chckbxAndereLeistungen.setBounds(302, 131, 128, 23);
-		contentPanel.add(chckbxAndereLeistungen);
+		cbIncludeOther = new JCheckBox("andere Leistungen");
+		cbIncludeOther.setBounds(302, 131, 128, 23);
+		contentPanel.add(cbIncludeOther);
 
 		{
 			JPanel buttonPane = new JPanel();
@@ -248,20 +249,20 @@ public class PDFDialog extends JDialog {
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				okButton.addActionListener((e) -> {
-					if (chckbxAlleSemesterExam.isSelected()) {
+					if (cbSelectAllSemExam.isSelected()) {
 						semExamList = semesterExamList;
 					} else {
-						semExamList = listSemesterExam.getSelectedValuesList();
+						semExamList = semesterExamSelectList.getSelectedValuesList();
 					}
-					if (chckbxAlleVorlesungen.isSelected()) {
+					if (cbAllLectures.isSelected()) {
 						lecSheetList = lectureSheetList;
 					} else {
-						lecSheetList = listLecturesSheet.getSelectedValuesList();
+						lecSheetList = lectureSheetSelectList.getSelectedValuesList();
 					}
-					if (chckbxAlleSemesterLecture.isSelected()) {
+					if (cbSelectAllSemLecture.isSelected()) {
 						semLecList = semesterLectureList;
 					} else {
-						semLecList = listSemesterLecture.getSelectedValuesList();
+						semLecList = semesterLectureSelectList.getSelectedValuesList();
 					}
 					makePdf();
 				});
@@ -280,8 +281,11 @@ public class PDFDialog extends JDialog {
 	private void makePdf() {
 		this.dispose();
 		JFileChooser choose = new JFileChooser();
+		choose.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		/* pdfFilter = new FileNameExtensionFilter("Pdf file(.pdf)", "pdf");
+		choose.setFileFilter(pdfFilter);*/
 		if (choose.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
-			try (FileOutputStream writer = new FileOutputStream(choose.getSelectedFile() + ".pdf")) {
+			try (FileOutputStream writer = new FileOutputStream(choose.getSelectedFile() + "\\StudyAcc-" + LocalDate.now().toString() + ".pdf")) {
 				Font header = new Font(FontFamily.HELVETICA, 20, Font.BOLD);
 				Font subHeader = new Font(FontFamily.HELVETICA, 16, Font.BOLD);
 				Font subHeader2 = new Font(FontFamily.HELVETICA, 13, Font.BOLD);
@@ -338,7 +342,7 @@ public class PDFDialog extends JDialog {
 				doc.add(Chunk.NEWLINE);
 
 				// Exam Table
-				if (examCon != null && chckbxKlausuren.isSelected()) {
+				if (examCon != null && cbExams.isSelected()) {
 
 					Paragraph exams = new Paragraph();
 					exams.setFont(subHeader);
@@ -364,7 +368,7 @@ public class PDFDialog extends JDialog {
 					for (int rows = 0; rows < examCon.getSize(); rows++) {
 						Exam e = examCon.getExamByIndex(rows);
 						if (semExamList.contains(e.getSemester())) {
-							if (!chckbxNichtBestandeneAusblenen.isSelected() || e.getNote() <= 4.0) {
+							if (!cbDeselectFailedExams.isSelected() || e.getNote() <= 4.0) {
 								examTable.addCell(
 										new PdfPCell(new Phrase(Integer.toString(e.getSemester()), tableCell)));
 								examTable.addCell(new PdfPCell(new Phrase(e.getName(), tableCell)));
@@ -380,7 +384,7 @@ public class PDFDialog extends JDialog {
 				}
 
 				// Sheet Table
-				if (sheetCon != null && chckbxÜbungsblätter.isSelected()) {
+				if (sheetCon != null && cbSheets.isSelected()) {
 
 					Paragraph sheets = new Paragraph();
 					sheets.setFont(subHeader);
@@ -442,7 +446,7 @@ public class PDFDialog extends JDialog {
 										new PdfPCell(new Phrase(Double.toString(s.getMaxPoints()), tableCell)));
 
 							} else {
-								if (chckbxAndereLeistungen.isSelected()) {
+								if (cbIncludeOther.isSelected()) {
 									otherTable.addCell(
 											new PdfPCell(new Phrase(Integer.toString(s.getSemester()), tableCell)));
 									otherTable.addCell(new PdfPCell(new Phrase(s.getName(), tableCell)));
@@ -470,7 +474,7 @@ public class PDFDialog extends JDialog {
 				}
 
 				// Lecture Tabl3#
-				if (lecCon != null && chckbxVorlesungen.isSelected()) {
+				if (lecCon != null && cbLectures.isSelected()) {
 
 					Paragraph lectures = new Paragraph();
 					lectures.setFont(subHeader);
@@ -481,7 +485,7 @@ public class PDFDialog extends JDialog {
 					PdfPTable lecTable = new PdfPTable(3);
 					// adding table headers
 
-					lecTable.setWidths(new float[] { 1, 4, 1 });
+					lecTable.setWidths(new float[] { 8, 1, 1 });
 
 					lecTable.setTotalWidth(PageSize.A4.getWidth() * 0.8f);
 
