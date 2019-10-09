@@ -32,7 +32,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import data.exam.IllegalInputException;
-import data.exam.PDFDatei;
+import data.exam.PDFDialog;
 import data.exam.exam.Exam;
 import data.exam.exam.ExamContainer;
 import data.exam.exam.ExamNotFoundException;
@@ -268,14 +268,23 @@ public class MainFrame extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				if (((JTabbedPane) e.getSource())
 						.getTitleAt(((JTabbedPane) e.getSource()).getSelectedIndex()) == "Other") {
+					btnModSheet.setEnabled(true);
+					btnAddSheet.setEnabled(true);
+					btnDelSheet.setEnabled(true);
 					lblInsgÜbungsblätter.setText("Andere Leistungen insgesamt");
 					insgÜbungsblätter.setText(Integer.toString(sheetContainer.getCountOtherType()));
 				}
 				if (((JTabbedPane) e.getSource())
 						.getTitleAt(((JTabbedPane) e.getSource()).getSelectedIndex()) == "Vorlesungen") {
 					lblInsgÜbungsblätter.setText("Insgesamt");
+					btnModSheet.setEnabled(false);
+					btnAddSheet.setEnabled(false);
+					btnDelSheet.setEnabled(false);
 					insgÜbungsblätter.setText(Integer.toString(sheetContainer.getSize()));
 				} else {
+					btnModSheet.setEnabled(true);
+					btnAddSheet.setEnabled(true);
+					btnDelSheet.setEnabled(true);
 					lblInsgÜbungsblätter.setText("Übungsblätter insgesamt");
 					insgÜbungsblätter.setText(Integer.toString(sheetContainer.getCountSheetType()));
 				}
@@ -516,7 +525,7 @@ public class MainFrame extends JFrame {
 		// hier wird noch das Fenster eingefügt um die scheiße auszuwählen
 		System.out.println("hello");
 		try {
-			new PDFDatei(lectureContainer, sheetContainer, examContainer, (JFrame) this);
+			new PDFDialog(lectureContainer, sheetContainer, examContainer, (JFrame) this);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
