@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import data.exam.IllegalInputException;
+import data.exam.exam.Exam;
 import data.exam.lecture.Lecture;
 import data.exam.lecture.LectureContainer;
 import data.exam.sheet.Sheet;
@@ -158,19 +159,20 @@ public class AddSheetFrame extends JDialog {
 			}
 			comboBoxLectures.setSelectedItem(null);
 		});
-		
+
+		for (Lecture l : lectureContainer) {
+			for (Sheet e : sheetContainer) {
+				comboBoxLectures.addItem(l.getName());
+			}
+		}
+		comboBoxLectures.setSelectedItem(null);
+
 		comboBoxLectures.addActionListener((e) -> {
-			if (comboBoxSem.getItemAt(0) == null) {
+			if (comboBoxSem.getSelectedItem() == null) {
 				ArrayList<Lecture> conLec = lectureContainer
 						.getLecturesByName((String) comboBoxLectures.getSelectedItem());
-				int itemCount = comboBoxSem.getItemCount();
-				comboBoxSem.setSelectedItem(null);
-				for (int i = 0; i < itemCount; i++) {
-					comboBoxSem.removeItemAt(0);
-				}
-				for (int j = 0; j < conLec.size(); j++) {
-					comboBoxSem.addItem(Integer.toString(conLec.get(j).getSemester()));
-				}
+				if (conLec.size() != 0)
+					comboBoxSem.setSelectedItem(String.valueOf(conLec.get(0).getSemester()));
 			}
 
 			ArrayList<Sheet> sheetList = sheetContainer.getSheetByName((String) comboBoxLectures.getSelectedItem(),

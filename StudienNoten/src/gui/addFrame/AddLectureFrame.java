@@ -187,7 +187,6 @@ public class AddLectureFrame extends JDialog {
 						Sheet eold = new Sheet(e.getLecture(), e.getNumber(), e.getPoints(), e.getMaxPoints(), e.getType());
 						e.setLecture(lecture);
 						sheetContainer.modify(eold, e);
-						System.out.println("Zu ändern: " + eold.toString() + " zu: " + e.toString());
 					}
 				}
 

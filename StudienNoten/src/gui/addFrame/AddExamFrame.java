@@ -81,6 +81,28 @@ public class AddExamFrame extends JDialog {
 		}
 		comboBoxSem.setSelectedItem(null);
 		comboBoxSem.setBounds(20, 36, 50, 20);
+
+		comboBoxLectures = new JComboBox<>();
+		comboBoxLectures.setBounds(93, 36, 380, 20);
+		contentPane.add(comboBoxLectures);
+
+		for (Lecture l : lectureContainer) {
+			for (Exam e : examContainer) {
+				if (!(e.getName().equals(l.getName()) && e.getSemester() == e.getSemester()))
+					comboBoxLectures.addItem(l.getName());
+			}
+		}
+		comboBoxLectures.setSelectedItem(null);
+
+		comboBoxLectures.addActionListener(e -> {
+			if (comboBoxSem.getSelectedItem() == null) {
+				ArrayList<Lecture> conLec = lectureContainer
+						.getLecturesByName((String) comboBoxLectures.getSelectedItem());
+				if (conLec.size() != 0)
+					comboBoxSem.setSelectedItem(String.valueOf(conLec.get(0).getSemester()));
+			}
+		});
+
 		comboBoxSem.addActionListener((e) -> {
 			@SuppressWarnings("unchecked")
 			int semTemp = Integer.parseInt((String) ((JComboBox<String>) e.getSource()).getSelectedItem());
@@ -106,10 +128,6 @@ public class AddExamFrame extends JDialog {
 			}
 		});
 		contentPane.add(comboBoxSem);
-
-		comboBoxLectures = new JComboBox<>();
-		comboBoxLectures.setBounds(93, 36, 380, 20);
-		contentPane.add(comboBoxLectures);
 
 		comboBoxNoten = new JComboBox<String>();
 		comboBoxNoten.setBackground(Color.LIGHT_GRAY);

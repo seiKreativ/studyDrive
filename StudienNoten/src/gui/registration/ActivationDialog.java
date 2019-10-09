@@ -138,7 +138,7 @@ public class ActivationDialog extends JFrame {
 		try {
 			Email.postNewActivationMail(lecCon.getUserEmail(), lecCon.getUserName(), true);
 			JOptionPane.showMessageDialog(this, "Email wurde gesendet", "Bestätigung", JOptionPane.INFORMATION_MESSAGE);
-		} catch (MessagingException | StoreException | UnsupportedEncodingException e) {
+		} catch (StoreException | MessagingException | UnsupportedEncodingException e) {
 			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}

@@ -100,7 +100,7 @@ public class PasswordForgetDialog extends JDialog {
 			}
 			else
 				JOptionPane.showMessageDialog(this, "Diese Email wurde nicht registriert", "Error", JOptionPane.ERROR_MESSAGE);
-		} catch (StoreException | UnsupportedEncodingException | MessagingException e) {
+		} catch (StoreException | MessagingException | UnsupportedEncodingException e) {
 			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
