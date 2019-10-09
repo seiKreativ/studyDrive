@@ -141,9 +141,12 @@ public class PDFDialog extends JDialog {
 				listLecturesSheet.setEnabled(true);
 				listSemesterExam.setSelectedIndex(1);
 				chckbxAlleVorlesungen.setEnabled(true);
+				chckbxAndereLeistungen.setEnabled(true);
 			} else {
 				listLecturesSheet.setEnabled(false);
 				chckbxAlleVorlesungen.setEnabled(false);
+				chckbxAndereLeistungen.setEnabled(false);
+
 			}
 		});
 		contentPanel.add(chckbxÜbungsblätter);
