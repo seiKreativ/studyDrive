@@ -23,7 +23,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -40,7 +39,6 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import data.exam.exam.Exam;
 import data.exam.exam.ExamContainer;
-import data.exam.lecture.Lecture;
 import data.exam.lecture.LectureContainer;
 import data.exam.sheet.Sheet;
 import data.exam.sheet.SheetContainer;
@@ -57,11 +55,11 @@ public class PDFDialog extends JDialog {
 	private SheetContainer sheetCon;
 	private ExamContainer examCon;
 	private JFrame owner;
-	private JCheckBox cbExams, cbSheets, cbLectures, cbSelectAllSemExam,
-			cbDeselectFailedExams, cbAllLectures, cbSelectAllSemLecture;
-	private JList<Integer> semesterExamSelectList, semesterLectureSelectList;
+	private JCheckBox cbExams, cbSheets, cbSelectAllSemExam,
+			cbDeselectFailedExams, cbAllLectures;
+	private JList<Integer> semesterExamSelectList;
 	private JList<String> lectureSheetSelectList;
-	private List<Integer> semExamList, semLecList;
+	private List<Integer> semExamList;
 	private List<String> lecSheetList;
 	private JCheckBox cbIncludeOther;
 
@@ -71,7 +69,7 @@ public class PDFDialog extends JDialog {
 		this.sheetCon = sheetCon;
 		this.examCon = examCon;
 		this.owner = owner;
-		setBounds(100, 100, 450, 307);
+		setBounds(100, 100, 450, 240);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -79,7 +77,7 @@ public class PDFDialog extends JDialog {
 
 		// Exams
 		cbExams = new JCheckBox("Klausuren");
-		cbExams.setSelected(true);
+		cbExams.setSelected(false);
 		cbExams.setBounds(6, 7, 99, 23);
 		cbExams.addActionListener((e) -> {
 			if (((JCheckBox) e.getSource()).isSelected()) {
@@ -108,6 +106,7 @@ public class PDFDialog extends JDialog {
 			semesterExamListModel.addElement(Integer.valueOf(s));
 		}
 		semesterExamSelectList = new JList<Integer>(semesterExamListModel);
+		semesterExamSelectList.setEnabled(false);
 		semesterExamSelectList.setSelectionBackground(Color.LIGHT_GRAY);
 		JScrollPane scrollpaneSemesterExam = new JScrollPane(semesterExamSelectList);
 		scrollpaneSemesterExam.setBounds(113, 36, 63, 46);
@@ -118,6 +117,7 @@ public class PDFDialog extends JDialog {
 		contentPanel.add(lblSemesterExam);
 
 		cbSelectAllSemExam = new JCheckBox("alle Semester");
+		cbSelectAllSemExam.setEnabled(false);
 		cbSelectAllSemExam.setBounds(203, 33, 99, 23);
 		cbSelectAllSemExam.addActionListener((e) -> {
 			if (!((JCheckBox) e.getSource()).isSelected()) {
@@ -130,12 +130,13 @@ public class PDFDialog extends JDialog {
 		contentPanel.add(cbSelectAllSemExam);
 
 		cbDeselectFailedExams = new JCheckBox("nicht bestandene Klausuren ausblenden");
+		cbDeselectFailedExams.setEnabled(false);
 		cbDeselectFailedExams.setBounds(204, 59, 226, 23);
 		contentPanel.add(cbDeselectFailedExams);
 
 		// Sheets
 		cbSheets = new JCheckBox("Übungsblätter");
-		cbSheets.setSelected(true);
+		cbSheets.setSelected(false);
 		cbSheets.setBounds(6, 83, 99, 23);
 		cbSheets.addActionListener((e) -> {
 			if (((JCheckBox) e.getSource()).isSelected()) {
@@ -168,12 +169,14 @@ public class PDFDialog extends JDialog {
 			semesterSheetListModel.addElement(s);
 		}
 		lectureSheetSelectList = new JList<String>(semesterSheetListModel);
+		lectureSheetSelectList.setEnabled(false);
 		lectureSheetSelectList.setSelectionBackground(Color.LIGHT_GRAY);
 		JScrollPane scrollpaneLecturesSheet = new JScrollPane(lectureSheetSelectList);
 		scrollpaneLecturesSheet.setBounds(113, 108, 183, 46);
 		contentPanel.add(scrollpaneLecturesSheet);
 
 		cbAllLectures = new JCheckBox("alle Vorlesungen");
+		cbAllLectures.setEnabled(false);
 		cbAllLectures.setBounds(302, 105, 128, 23);
 		cbSelectAllSemExam.addActionListener((e) -> {
 			if (!((JCheckBox) e.getSource()).isSelected()) {
@@ -185,58 +188,8 @@ public class PDFDialog extends JDialog {
 		});
 		contentPanel.add(cbAllLectures);
 
-		// Lectures
-		cbLectures = new JCheckBox("Vorlesungen");
-		cbLectures.setSelected(true);
-		cbLectures.setBounds(6, 155, 99, 23);
-		cbLectures.addActionListener((e) -> {
-			if (((JCheckBox) e.getSource()).isSelected()) {
-				semesterLectureSelectList.setEnabled(true);
-				semesterExamSelectList.setSelectedIndex(1);
-				cbSelectAllSemLecture.setEnabled(true);
-			} else {
-				semesterLectureSelectList.setEnabled(false);
-				cbSelectAllSemLecture.setEnabled(false);
-			}
-		});
-		contentPanel.add(cbLectures);
-
-		JLabel lblSemesterLecture = new JLabel("Semester:");
-		lblSemesterLecture.setBounds(32, 185, 73, 14);
-		contentPanel.add(lblSemesterLecture);
-
-		ArrayList<Integer> semesterLectureList = new ArrayList<Integer>();
-		for (int i = 0; i < lecCon.getSize(); i++) {
-			Lecture e = lecCon.getLectureByIndex(i);
-			if (!semesterLectureList.contains(e.getSemester())) {
-				semesterLectureList.add(e.getSemester());
-			}
-		}
-		Collections.sort(semesterLectureList);
-		DefaultListModel<Integer> semesterLectureListModel = new DefaultListModel<Integer>();
-		for (int s : semesterLectureList) {
-			semesterLectureListModel.addElement(Integer.valueOf(s));
-		}
-		semesterLectureSelectList = new JList<Integer>(semesterLectureListModel);
-		semesterLectureSelectList.setSelectionBackground(Color.LIGHT_GRAY);
-		JScrollPane scrollpaneSemesterLecture = new JScrollPane(semesterLectureSelectList);
-		scrollpaneSemesterLecture.setBounds(113, 184, 63, 44);
-		contentPanel.add(scrollpaneSemesterLecture);
-
-		cbSelectAllSemLecture = new JCheckBox("alle Semester");
-		cbSelectAllSemLecture.setBounds(203, 181, 99, 23);
-		cbSelectAllSemExam.addActionListener((e) -> {
-			if (!((JCheckBox) e.getSource()).isSelected()) {
-				semesterLectureSelectList.setEnabled(true);
-				semesterLectureSelectList.setSelectedIndex(1);
-			} else {
-				semesterLectureSelectList.setEnabled(false);
-			}
-		});
-
-		contentPanel.add(cbSelectAllSemLecture);
-
 		cbIncludeOther = new JCheckBox("andere Leistungen");
+		cbIncludeOther.setEnabled(false);
 		cbIncludeOther.setBounds(302, 131, 128, 23);
 		contentPanel.add(cbIncludeOther);
 
@@ -258,11 +211,6 @@ public class PDFDialog extends JDialog {
 						lecSheetList = lectureSheetList;
 					} else {
 						lecSheetList = lectureSheetSelectList.getSelectedValuesList();
-					}
-					if (cbSelectAllSemLecture.isSelected()) {
-						semLecList = semesterLectureList;
-					} else {
-						semLecList = semesterLectureSelectList.getSelectedValuesList();
 					}
 					makePdf();
 				});
@@ -411,11 +359,11 @@ public class PDFDialog extends JDialog {
 
 					sheetTable.setLockedWidth(true);
 
-					sheetTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
+					sheetTable.addCell(new PdfPCell(new Phrase("Sem.", tableColumnHeader)));
 					sheetTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
-					sheetTable.addCell(new PdfPCell(new Phrase("Number", tableColumnHeader)));
-					sheetTable.addCell(new PdfPCell(new Phrase("points", tableColumnHeader)));
-					sheetTable.addCell(new PdfPCell(new Phrase("points max.", tableColumnHeader)));
+					sheetTable.addCell(new PdfPCell(new Phrase("No.", tableColumnHeader)));
+					sheetTable.addCell(new PdfPCell(new Phrase("pts.", tableColumnHeader)));
+					sheetTable.addCell(new PdfPCell(new Phrase("pts. max.", tableColumnHeader)));
 
 					PdfPTable otherTable = new PdfPTable(4);
 					// adding table headers
@@ -428,8 +376,8 @@ public class PDFDialog extends JDialog {
 
 					otherTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
 					otherTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
-					otherTable.addCell(new PdfPCell(new Phrase("points", tableColumnHeader)));
-					otherTable.addCell(new PdfPCell(new Phrase("points max.", tableColumnHeader)));
+					otherTable.addCell(new PdfPCell(new Phrase("pts.", tableColumnHeader)));
+					otherTable.addCell(new PdfPCell(new Phrase("pts. max.", tableColumnHeader)));
 
 					// extracting data from the JTable and inserting it to PdfPTable
 					for (int rows = 0; rows < sheetCon.getSize(); rows++) {
@@ -472,7 +420,7 @@ public class PDFDialog extends JDialog {
 					}
 
 				}
-
+				/*
 				// Lecture Tabl3#
 				if (lecCon != null && cbLectures.isSelected()) {
 
@@ -508,7 +456,7 @@ public class PDFDialog extends JDialog {
 					doc.add(lecTable);
 					doc.add(Chunk.NEWLINE);
 
-				}
+				}*/
 
 				doc.close();
 
