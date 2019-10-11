@@ -6,10 +6,12 @@ import java.awt.FlowLayout;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -119,8 +121,8 @@ public class PDFDialog extends JDialog {
 
 		cbSelectAllSemExam = new JCheckBox("alle Semester");
 		cbSelectAllSemExam.setBounds(203, 33, 99, 23);
-		cbSelectAllSemExam.addActionListener((e) -> {
-			if (!((JCheckBox) e.getSource()).isSelected()) {
+		cbSelectAllSemExam.addItemListener((e) -> {
+			if (!(cbSelectAllSemExam.isSelected())) {
 				semesterExamSelectList.setEnabled(true);
 				semesterExamSelectList.setSelectedIndex(1);
 			} else {
@@ -159,8 +161,8 @@ public class PDFDialog extends JDialog {
 		ArrayList<String> lectureSheetList = new ArrayList<String>();
 		for (int i = 0; i < sheetCon.getSize(); i++) {
 			Sheet s = sheetCon.getSheetByIndex(i);
-			if (!lectureSheetList.contains(s.getName() + "(" + Integer.toString(s.getSemester()) + ")")) {
-				lectureSheetList.add(s.getName() + "(" + Integer.toString(s.getSemester()) + ")");
+			if (!lectureSheetList.contains(s.getName() + " (" + Integer.toString(s.getSemester()) + ")")) {
+				lectureSheetList.add(s.getName() + " (" + Integer.toString(s.getSemester()) + ")");
 			}
 		}
 		DefaultListModel<String> semesterSheetListModel = new DefaultListModel<String>();
@@ -175,7 +177,7 @@ public class PDFDialog extends JDialog {
 
 		cbAllLectures = new JCheckBox("alle Vorlesungen");
 		cbAllLectures.setBounds(302, 105, 128, 23);
-		cbSelectAllSemExam.addActionListener((e) -> {
+		cbAllLectures.addActionListener((e) -> {
 			if (!((JCheckBox) e.getSource()).isSelected()) {
 				lectureSheetSelectList.setEnabled(true);
 				lectureSheetSelectList.setSelectedIndex(1);
@@ -225,7 +227,7 @@ public class PDFDialog extends JDialog {
 
 		cbSelectAllSemLecture = new JCheckBox("alle Semester");
 		cbSelectAllSemLecture.setBounds(203, 181, 99, 23);
-		cbSelectAllSemExam.addActionListener((e) -> {
+		cbSelectAllSemLecture.addActionListener((e) -> {
 			if (!((JCheckBox) e.getSource()).isSelected()) {
 				semesterLectureSelectList.setEnabled(true);
 				semesterLectureSelectList.setSelectedIndex(1);
@@ -279,6 +281,13 @@ public class PDFDialog extends JDialog {
 	}
 
 	private void makePdf() {
+		if ((cbExams.isSelected() && !cbSelectAllSemExam.isSelected() && semesterExamSelectList.isSelectionEmpty()) ||
+				(cbSheets.isSelected() && !cbAllLectures.isSelected() && lectureSheetSelectList.isSelectionEmpty()) ||
+				(cbLectures.isSelected() && !cbSelectAllSemLecture.isSelected() && semesterLectureSelectList.isSelectionEmpty())) {
+			JOptionPane.showMessageDialog(this, "Wenn nicht \"alle Semester (bzw. Vorlesungen)\" \n" +
+					"ausgewählt ist, musst du in der Liste welche auswähen.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		this.dispose();
 		JFileChooser choose = new JFileChooser();
 		choose.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -365,19 +374,37 @@ public class PDFDialog extends JDialog {
 					examTable.addCell(new PdfPCell(new Phrase("Note", tableColumnHeader)));
 
 					// extracting data from the JTable and inserting it to PdfPTable
+					//Sortiert die exams:
+					Vector<Exam> examsVector = examCon.getExamsSortedBySemester();
+					int gesamtLP = 0;
 					for (int rows = 0; rows < examCon.getSize(); rows++) {
 						Exam e = examCon.getExamByIndex(rows);
 						if (semExamList.contains(e.getSemester())) {
-							if (!cbDeselectFailedExams.isSelected() || e.getNote() <= 4.0) {
+							if (e.getNote() <= 4.0)
+								gesamtLP = gesamtLP + e.getLeistungpunkte();
+							if (cbDeselectFailedExams.isSelected()) {
 								examTable.addCell(
 										new PdfPCell(new Phrase(Integer.toString(e.getSemester()), tableCell)));
 								examTable.addCell(new PdfPCell(new Phrase(e.getName(), tableCell)));
 								examTable.addCell(
 										new PdfPCell(new Phrase(Integer.toString(e.getLeistungpunkte()), tableCell)));
 								examTable.addCell(new PdfPCell(new Phrase(Double.toString(e.getNote()), tableCell)));
+							} else {
+								if (e.getNote() < 4.1) {
+									examTable.addCell(
+											new PdfPCell(new Phrase(Integer.toString(e.getSemester()), tableCell)));
+									examTable.addCell(new PdfPCell(new Phrase(e.getName(), tableCell)));
+									examTable.addCell(
+											new PdfPCell(new Phrase(Integer.toString(e.getLeistungpunkte()), tableCell)));
+									examTable.addCell(new PdfPCell(new Phrase(Double.toString(e.getNote()), tableCell)));
+								}
 							}
 						}
 					}
+					examTable.addCell(new PdfPCell(new Phrase("", tableCell)));
+					examTable.addCell(new PdfPCell(new Phrase("Gesamt", tableCell)));
+					examTable.addCell(new PdfPCell(new Phrase(Integer.toString(gesamtLP), tableCell)));
+					examTable.addCell(new PdfPCell(new Phrase(calcDurchschnitt(), tableCell)));
 					doc.add(examTable);
 					doc.add(Chunk.NEWLINE);
 
@@ -527,4 +554,22 @@ public class PDFDialog extends JDialog {
 		}
 
 	}
+
+	private String calcDurchschnitt() {
+		int sumLp = 0;
+		double sumNoten = 0;
+		for (int i = 0; i < examCon.getSize(); i++) {
+			System.out.println(semExamList.contains(examCon.getExamByIndex(i).getSemester()));
+			if (semExamList.contains(examCon.getExamByIndex(i).getSemester())) {
+				if (examCon.getExamByIndex(i).getNote() <= 4.0) {
+					sumLp += examCon.getExamByIndex(i).getLeistungpunkte();
+					sumNoten += examCon.getExamByIndex(i).getNote()
+							* examCon.getExamByIndex(i).getLeistungpunkte();
+				}
+			}
+		}
+		double durchschnitt = sumNoten / (double) sumLp;
+		return new DecimalFormat("0.00").format(durchschnitt).replaceAll(",", ".");
+	}
+
 }
