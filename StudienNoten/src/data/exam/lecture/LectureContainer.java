@@ -1,9 +1,11 @@
 package data.exam.lecture;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
 
+import data.exam.exam.Exam;
 import data.exam.exam.ExamContainer;
 import data.exam.sheet.SheetContainer;
 import store.UserInformationStore;
@@ -11,7 +13,7 @@ import store.StoreException;
 
 public class LectureContainer implements Iterable<Lecture> {
     private static LectureContainer unique = null;
-    private Vector<Lecture> lectures;
+    private static Vector<Lecture> lectures;
     private UserInformationStore store = null;
     private ExamContainer examContainer;
     private SheetContainer sheetContainer;
@@ -86,6 +88,18 @@ public class LectureContainer implements Iterable<Lecture> {
                 return e;
         }
         return null;
+    }
+
+    public static void setLecturesSortedBySemester() {
+        lectures.sort(new Comparator<Lecture>() {
+            @Override
+            public int compare(Lecture e1, Lecture e2) {
+                if (e1.getSemester() - e2.getSemester() == 0)
+                    return e1.getLeistungpunkte() - e2.getLeistungpunkte();
+                else
+                    return e1.getSemester() - e2.getSemester();
+            }
+        });
     }
     
     public ArrayList<Lecture> getLecturesByName(String name) {

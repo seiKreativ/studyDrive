@@ -10,7 +10,7 @@ import store.StoreException;
 
 public class ExamContainer implements Iterable<Exam> {
 	private static ExamContainer unique = null;
-	private Vector<Exam> exams;
+	private static Vector<Exam> exams;
 	private UserInformationStore store;
 
 	private ExamContainer() throws StoreException {
@@ -70,7 +70,7 @@ public class ExamContainer implements Iterable<Exam> {
 		return exams.get(pos);
 	}
 
-	public Vector<Exam> getExamsSortedBySemester() {
+	public static void setExamsSortedBySemester() {
 		exams.sort(new Comparator<Exam>() {
 			@Override
 			public int compare(Exam e1, Exam e2) {
@@ -80,7 +80,6 @@ public class ExamContainer implements Iterable<Exam> {
 					return e1.getSemester() - e2.getSemester();
 			}
 		});
-		return exams;
 	}
 
 	public Exam getExamByName(String name) {

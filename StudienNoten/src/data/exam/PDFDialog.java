@@ -8,10 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -65,6 +62,7 @@ public class PDFDialog extends JDialog {
 	private JList<String> lectureSheetSelectList;
 	private List<Integer> semExamList, semLecList;
 	private List<String> lecSheetList;
+	private ArrayList<Lecture> lecturesToSheetPdf = new ArrayList<>();
 	private JCheckBox cbIncludeOther;
 
 	public PDFDialog(LectureContainer lecCon, SheetContainer sheetCon, ExamContainer examCon, JFrame owner)
@@ -258,8 +256,16 @@ public class PDFDialog extends JDialog {
 					}
 					if (cbAllLectures.isSelected()) {
 						lecSheetList = lectureSheetList;
+						for (Lecture l : lecCon)
+							lecturesToSheetPdf.add(l);
 					} else {
 						lecSheetList = lectureSheetSelectList.getSelectedValuesList();
+						for (String lectureString : lectureSheetList) {
+							String[] data = lectureString.split(" \\(");
+							String lectureName = data[0];
+							int lectureSemester = Integer.parseInt(data[1].replaceAll("\\)", ""));
+							lecturesToSheetPdf.add(lecCon.getLectureByName(lectureName, lectureSemester));
+						}
 					}
 					if (cbSelectAllSemLecture.isSelected()) {
 						semLecList = semesterLectureList;
@@ -375,7 +381,7 @@ public class PDFDialog extends JDialog {
 
 					// extracting data from the JTable and inserting it to PdfPTable
 					//Sortiert die exams:
-					Vector<Exam> examsVector = examCon.getExamsSortedBySemester();
+					ExamContainer.setExamsSortedBySemester();
 					int gesamtLP = 0;
 					for (int rows = 0; rows < examCon.getSize(); rows++) {
 						Exam e = examCon.getExamByIndex(rows);
@@ -415,7 +421,10 @@ public class PDFDialog extends JDialog {
 
 					Paragraph sheets = new Paragraph();
 					sheets.setFont(subHeader);
-					sheets.add("Übungsblätter und andere Leistungen");
+					if (cbIncludeOther.isSelected())
+						sheets.add("Übungsblätter und andere Leistungen");
+					else
+						sheets.add("Übungsblätter");
 					sheets.setSpacingAfter(15);
 					doc.add(sheets);
 
@@ -459,32 +468,41 @@ public class PDFDialog extends JDialog {
 					otherTable.addCell(new PdfPCell(new Phrase("points max.", tableColumnHeader)));
 
 					// extracting data from the JTable and inserting it to PdfPTable
-					for (int rows = 0; rows < sheetCon.getSize(); rows++) {
-						Sheet s = sheetCon.getSheetByIndex(rows);
-						if (lecSheetList.contains(s.getName() + "(" + s.getSemester() + ")")) {
-							if (s.getType() == Sheet.SHEET_TYPE) {
-								sheetTable.addCell(
-										new PdfPCell(new Phrase(Integer.toString(s.getSemester()), tableCell)));
-								sheetTable.addCell(new PdfPCell(new Phrase(s.getName(), tableCell)));
-								sheetTable
-										.addCell(new PdfPCell(new Phrase(Integer.toString(s.getNumber()), tableCell)));
-								sheetTable.addCell(new PdfPCell(new Phrase(Double.toString(s.getPoints()), tableCell)));
-								sheetTable.addCell(
-										new PdfPCell(new Phrase(Double.toString(s.getMaxPoints()), tableCell)));
 
-							} else {
-								if (cbIncludeOther.isSelected()) {
-									otherTable.addCell(
-											new PdfPCell(new Phrase(Integer.toString(s.getSemester()), tableCell)));
-									otherTable.addCell(new PdfPCell(new Phrase(s.getName(), tableCell)));
-									otherTable.addCell(
-											new PdfPCell(new Phrase(Double.toString(s.getPoints()), tableCell)));
-									otherTable.addCell(
-											new PdfPCell(new Phrase(Double.toString(s.getMaxPoints()), tableCell)));
-								}
+					lecturesToSheetPdf.sort(new Comparator<Lecture>() {
+						@Override
+						public int compare(Lecture e1, Lecture e2) {
+							if (e1.getSemester() - e2.getSemester() == 0)
+								return e1.getLeistungpunkte() - e2.getLeistungpunkte();
+							else
+								return e1.getSemester() - e2.getSemester();
+						}
+					});
+
+					for (Lecture l : lecturesToSheetPdf) {
+						ArrayList<Sheet> toPrintSheets = getSheetsSortedByNumber(l, Sheet.SHEET_TYPE);
+						for (Sheet s : toPrintSheets) {
+							sheetTable.addCell(
+									new PdfPCell(new Phrase(Integer.toString(s.getSemester()), tableCell)));
+							sheetTable.addCell(new PdfPCell(new Phrase(s.getName(), tableCell)));
+							sheetTable
+									.addCell(new PdfPCell(new Phrase(Integer.toString(s.getNumber()), tableCell)));
+							sheetTable.addCell(new PdfPCell(new Phrase(Double.toString(s.getPoints()), tableCell)));
+							sheetTable.addCell(
+									new PdfPCell(new Phrase(Double.toString(s.getMaxPoints()), tableCell)));
+						}
+						if (cbIncludeOther.isSelected()) {
+							toPrintSheets = getSheetsSortedByNumber(l, Sheet.OTHER_TYPE);
+							for (Sheet s : toPrintSheets) {
+								otherTable.addCell(
+										new PdfPCell(new Phrase(Integer.toString(s.getSemester()), tableCell)));
+								otherTable.addCell(new PdfPCell(new Phrase(s.getName(), tableCell)));
+								otherTable.addCell(
+										new PdfPCell(new Phrase(Double.toString(s.getPoints()), tableCell)));
+								otherTable.addCell(
+										new PdfPCell(new Phrase(Double.toString(s.getMaxPoints()), tableCell)));
 							}
 						}
-
 					}
 
 					if (sheetTable.getRows().size() > 1) {
@@ -512,22 +530,23 @@ public class PDFDialog extends JDialog {
 					PdfPTable lecTable = new PdfPTable(3);
 					// adding table headers
 
-					lecTable.setWidths(new float[] { 8, 1, 1 });
+					lecTable.setWidths(new float[] { 2, 10, 1 });
 
 					lecTable.setTotalWidth(PageSize.A4.getWidth() * 0.8f);
 
 					lecTable.setLockedWidth(true);
 
-					lecTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
 					lecTable.addCell(new PdfPCell(new Phrase("Semester", tableColumnHeader)));
+					lecTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
 					lecTable.addCell(new PdfPCell(new Phrase("ECTS", tableColumnHeader)));
 
 					// extracting data from the JTable and inserting it to PdfPTable
+					LectureContainer.setLecturesSortedBySemester();
 					for (int rows = 0; rows < lecCon.getSize(); rows++) {
 						Lecture l = lecCon.getLectureByIndex(rows);
 						if (semLecList.contains(l.getSemester())) {
-							lecTable.addCell(new PdfPCell(new Phrase(l.getName(), tableCell)));
 							lecTable.addCell(new PdfPCell(new Phrase(Integer.toString(l.getSemester()), tableCell)));
+							lecTable.addCell(new PdfPCell(new Phrase(l.getName(), tableCell)));
 							lecTable.addCell(
 									new PdfPCell(new Phrase(Integer.toString(l.getLeistungpunkte()), tableCell)));
 						}
@@ -570,6 +589,21 @@ public class PDFDialog extends JDialog {
 		}
 		double durchschnitt = sumNoten / (double) sumLp;
 		return new DecimalFormat("0.00").format(durchschnitt).replaceAll(",", ".");
+	}
+
+	private ArrayList<Sheet> getSheetsSortedByNumber(Lecture l, int sheetType) {
+		ArrayList<Sheet> result = new ArrayList<>();
+		for (Sheet s : sheetCon) {
+			if (s.getLecture().equals(l) && s.getType() == sheetType)
+				result.add(s);
+		}
+		result.sort(new Comparator<Sheet>() {
+			@Override
+			public int compare(Sheet s1, Sheet s2) {
+				return s1.getNumber() - s2.getNumber();
+			}
+		});
+		return result;
 	}
 
 }
