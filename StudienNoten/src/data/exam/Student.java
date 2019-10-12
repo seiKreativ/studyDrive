@@ -29,8 +29,8 @@ public class Student {
     }
 
     private void setEmail(String email) throws IllegalInputException {
-        if (email.length() < 1)
-            throw new IllegalInputException("At least two chars");
+        if (email.length() < 1 && email.matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]+"))
+            throw new IllegalInputException("Email nicht korrekt");
         this.email = email;
     }
 
