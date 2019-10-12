@@ -8,13 +8,13 @@ import gui.registration.SignUpDialog;
 public class AppStarter {
 	public static void main(String args[]) {
 		
-		/*try {
+		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			
 		} catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
-		}*/
+		}
 		new SignUpDialog();
 	}
 }
