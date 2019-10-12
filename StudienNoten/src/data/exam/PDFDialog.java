@@ -690,3 +690,4 @@ public class PDFDialog extends JDialog {
 		return percentage * 100;
 	}
 }
+
