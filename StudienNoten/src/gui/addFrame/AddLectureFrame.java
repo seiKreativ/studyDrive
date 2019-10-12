@@ -159,15 +159,9 @@ public class AddLectureFrame extends JDialog {
 	private void onAdd() {
 		int newLp = Integer.parseInt((String)comboBoxLp.getSelectedItem());
 		try {
-			if (txtName.getText().length() < 4) {
-				throw new IllegalInputException("Name muss länger als 3 Buchstaben sein");
-			} 
 			Lecture lecture = new Lecture(Integer.parseInt((String)comboBoxSem.getSelectedItem()), txtName.getText(), newLp);
 
 			if (zuModLecture == null) {
-				if (lectureContainer.contains(lecture)) {
-					throw new IllegalInputException("Lecture existiert bereits");
-				}
 				lectureContainer.linkLecture(lecture);
 			} else {
 

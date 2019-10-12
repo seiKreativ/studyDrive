@@ -1,17 +1,21 @@
 package data.exam;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import store.StoreException;
 import store.UserInformationStore;
@@ -49,6 +53,46 @@ public class Email {
 
         msg.setSubject( "SudyAcc: Neues Passwort" );
         msg.setContent( message, "text/plain" );
+
+        Transport.send( msg );
+    }
+
+    public static void postPdfMail(String filename) throws MessagingException, UnsupportedEncodingException, StoreException {
+
+        store = UserInformationStore.instance();
+        String name = store.getUserName();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        String uhrzeit = sdf.format(new Date());
+
+        String message = "Hallo " + name +",\n" +
+                "\n" +
+                "im Anhang findest du die um " + uhrzeit + " Uhr generierte \u00dcbersicht \u00fcber deine " +
+                "Noten (bzw. Vorlesungen/\u00dcbungsbl\u00e4tter). \n" +
+                "\n" +
+                "Viele Gr\u00fc\u00dfe, \n" +
+                "\n" +
+                "dein Team von StudyAcc";
+
+        MimeMultipart content = new MimeMultipart( "mixed" );
+
+        MimeBodyPart text = new MimeBodyPart();
+        text.setText( message );
+        content.addBodyPart( text );
+
+        BodyPart messageBodyPart = new MimeBodyPart();
+        messageBodyPart.setDataHandler(
+                new DataHandler( new FileDataSource( filename ) ) );
+        messageBodyPart.setFileName( new File(filename).getName() );
+        content.addBodyPart( messageBodyPart );
+
+        Message msg = new MimeMessage(Email.getGMailSession());
+        msg.setFrom(new InternetAddress("study0acc@gmail.com", "StudyAcc"));
+        InternetAddress addressTo = new InternetAddress( store.getUserEmail() );
+        msg.setRecipient( Message.RecipientType.TO, addressTo );
+
+        msg.setSubject( "SudyAcc: Generierte \u00dcbersicht" );
+        msg.setText(message);
+        msg.setContent(content);
 
         Transport.send( msg );
     }

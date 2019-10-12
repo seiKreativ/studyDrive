@@ -6,10 +6,12 @@ import java.awt.FlowLayout;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
 
+import javax.mail.MessagingException;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -57,7 +59,7 @@ public class PDFDialog extends JDialog {
 	private ExamContainer examCon;
 	private JFrame owner;
 	private JCheckBox cbExams, cbSheets, cbLectures, cbSelectAllSemExam,
-			cbDeselectFailedExams, cbAllLectures, cbSelectAllSemLecture;
+			cbDeselectFailedExams, cbAllLectures, cbSelectAllSemLecture, cbMail;
 	private JList<Integer> semesterExamSelectList, semesterLectureSelectList;
 	private JList<String> lectureSheetSelectList;
 	private List<Integer> semExamList, semLecList;
@@ -240,10 +242,15 @@ public class PDFDialog extends JDialog {
 		cbIncludeOther.setBounds(302, 131, 128, 23);
 		contentPanel.add(cbIncludeOther);
 
+		cbMail = new JCheckBox("Zusätzlich Datei per Mail senden");
+		contentPanel.add(cbMail);
+
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			cbMail = new JCheckBox("Zusätzlich Datei per Mail senden");
+			buttonPane.add(cbMail, FlowLayout.LEFT);
 			{
 				JButton okButton = new JButton("OK");
 				okButton.setActionCommand("OK");
@@ -299,8 +306,10 @@ public class PDFDialog extends JDialog {
 		choose.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		/* pdfFilter = new FileNameExtensionFilter("Pdf file(.pdf)", "pdf");
 		choose.setFileFilter(pdfFilter);*/
+		String filename;
 		if (choose.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
-			try (FileOutputStream writer = new FileOutputStream(choose.getSelectedFile() + "\\StudyAcc-" + LocalDate.now().toString() + ".pdf")) {
+			filename = choose.getSelectedFile() + "\\StudyAcc-" + LocalDate.now().toString() + ".pdf";
+			try (FileOutputStream writer = new FileOutputStream(filename)) {
 				Font header = new Font(FontFamily.HELVETICA, 20, Font.BOLD);
 				Font subHeader = new Font(FontFamily.HELVETICA, 16, Font.BOLD);
 				Font subHeader2 = new Font(FontFamily.HELVETICA, 13, Font.BOLD);
@@ -325,7 +334,7 @@ public class PDFDialog extends JDialog {
 				// Profile
 				Paragraph profile = new Paragraph();
 				profile.setFont(subHeader);
-				profile.add("Profile");
+				profile.add("Profil");
 				profile.setSpacingAfter(10);
 				doc.add(profile);
 
@@ -368,13 +377,13 @@ public class PDFDialog extends JDialog {
 					PdfPTable examTable = new PdfPTable(4);
 					// adding table headers
 
-					examTable.setWidths(new float[] { 1, 4, 1, 1 });
+					examTable.setWidths(new float[] { 2, 19, 3, 3 });
 
 					examTable.setTotalWidth(PageSize.A4.getWidth() * 0.8f);
 					;
 					examTable.setLockedWidth(true);
 
-					examTable.addCell(new PdfPCell(new Phrase("Semester", tableColumnHeader)));
+					examTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
 					examTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
 					examTable.addCell(new PdfPCell(new Phrase("ECTS", tableColumnHeader)));
 					examTable.addCell(new PdfPCell(new Phrase("Note", tableColumnHeader)));
@@ -428,6 +437,11 @@ public class PDFDialog extends JDialog {
 					sheets.setSpacingAfter(15);
 					doc.add(sheets);
 
+					Paragraph insgesamtTableHeader = new Paragraph();
+					insgesamtTableHeader.setFont(subHeader2);
+					insgesamtTableHeader.add("Insgesamt");
+					insgesamtTableHeader.setSpacingAfter(15);
+
 					Paragraph sheetsTableHeader = new Paragraph();
 					sheetsTableHeader.setFont(subHeader2);
 					sheetsTableHeader.add("Übungsblätter");
@@ -438,10 +452,25 @@ public class PDFDialog extends JDialog {
 					otherTableHeader.add("Andere Leistungen");
 					otherTableHeader.setSpacingAfter(15);
 
+					PdfPTable insgesamtTable = new PdfPTable(5);
+					// adding table headers
+
+					insgesamtTable.setWidths(new float[] { 2, 16, 3, 3, 3 });
+
+					insgesamtTable.setTotalWidth(PageSize.A4.getWidth() * 0.8f);
+
+					insgesamtTable.setLockedWidth(true);
+
+					insgesamtTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
+					insgesamtTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
+					insgesamtTable.addCell(new PdfPCell(new Phrase("Punkte", tableColumnHeader)));
+					insgesamtTable.addCell(new PdfPCell(new Phrase("Max", tableColumnHeader)));
+					insgesamtTable.addCell(new PdfPCell(new Phrase("Prozent", tableColumnHeader)));
+
 					PdfPTable sheetTable = new PdfPTable(5);
 					// adding table headers
 
-					sheetTable.setWidths(new float[] { 1, 8, 1, 2, 2 });
+					sheetTable.setWidths(new float[] { 2, 16, 3, 3, 3 });
 
 					sheetTable.setTotalWidth(PageSize.A4.getWidth() * 0.8f);
 
@@ -449,14 +478,14 @@ public class PDFDialog extends JDialog {
 
 					sheetTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
 					sheetTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
-					sheetTable.addCell(new PdfPCell(new Phrase("Number", tableColumnHeader)));
-					sheetTable.addCell(new PdfPCell(new Phrase("points", tableColumnHeader)));
-					sheetTable.addCell(new PdfPCell(new Phrase("points max.", tableColumnHeader)));
+					sheetTable.addCell(new PdfPCell(new Phrase("Nummer", tableColumnHeader)));
+					sheetTable.addCell(new PdfPCell(new Phrase("Punkte", tableColumnHeader)));
+					sheetTable.addCell(new PdfPCell(new Phrase("Max", tableColumnHeader)));
 
 					PdfPTable otherTable = new PdfPTable(4);
 					// adding table headers
 
-					otherTable.setWidths(new float[] { 1, 8, 2, 2 });
+					otherTable.setWidths(new float[] { 2, 19, 3, 3 });
 
 					otherTable.setTotalWidth(PageSize.A4.getWidth() * 0.8f);
 
@@ -464,8 +493,8 @@ public class PDFDialog extends JDialog {
 
 					otherTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
 					otherTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
-					otherTable.addCell(new PdfPCell(new Phrase("points", tableColumnHeader)));
-					otherTable.addCell(new PdfPCell(new Phrase("points max.", tableColumnHeader)));
+					otherTable.addCell(new PdfPCell(new Phrase("Punkte", tableColumnHeader)));
+					otherTable.addCell(new PdfPCell(new Phrase("Max", tableColumnHeader)));
 
 					// extracting data from the JTable and inserting it to PdfPTable
 
@@ -480,6 +509,27 @@ public class PDFDialog extends JDialog {
 					});
 
 					for (Lecture l : lecturesToSheetPdf) {
+						boolean existierendeSheets = false;
+						for (Sheet s : sheetCon) {
+							if (cbIncludeOther.isSelected()) {
+								if (s.getLecture().equals(l))
+									existierendeSheets = true;
+							} else {
+								if (s.getLecture().equals(l) && s.getType() == Sheet.SHEET_TYPE)
+									existierendeSheets = true;
+							}
+						}
+						if (existierendeSheets) {
+							insgesamtTable.addCell(
+									new PdfPCell(new Phrase(Integer.toString(l.getSemester()), tableCell)));
+							insgesamtTable.addCell(new PdfPCell(new Phrase(l.getName(), tableCell)));
+							insgesamtTable
+									.addCell(new PdfPCell(new Phrase(new DecimalFormat("0.00").format(getPoints(l)).replaceAll(",", "."), tableCell)));
+							insgesamtTable
+									.addCell(new PdfPCell(new Phrase(new DecimalFormat("0.00").format(getMaxPoints(l)).replaceAll(",", "."), tableCell)));
+							insgesamtTable.addCell(
+									new PdfPCell(new Phrase(new DecimalFormat("0.00").format(getPercentage(l)).replaceAll(",", "."), tableCell)));
+						}
 						ArrayList<Sheet> toPrintSheets = getSheetsSortedByNumber(l, Sheet.SHEET_TYPE);
 						for (Sheet s : toPrintSheets) {
 							sheetTable.addCell(
@@ -505,6 +555,11 @@ public class PDFDialog extends JDialog {
 						}
 					}
 
+					if (insgesamtTable.getRows().size() > 1) {
+						doc.add(insgesamtTableHeader);
+						doc.add(insgesamtTable);
+						doc.add(Chunk.NEWLINE);
+					}
 					if (sheetTable.getRows().size() > 1) {
 						doc.add(sheetsTableHeader);
 						doc.add(sheetTable);
@@ -530,13 +585,13 @@ public class PDFDialog extends JDialog {
 					PdfPTable lecTable = new PdfPTable(3);
 					// adding table headers
 
-					lecTable.setWidths(new float[] { 2, 10, 1 });
+					lecTable.setWidths(new float[] { 2, 22, 3 });
 
 					lecTable.setTotalWidth(PageSize.A4.getWidth() * 0.8f);
 
 					lecTable.setLockedWidth(true);
 
-					lecTable.addCell(new PdfPCell(new Phrase("Semester", tableColumnHeader)));
+					lecTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
 					lecTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
 					lecTable.addCell(new PdfPCell(new Phrase("ECTS", tableColumnHeader)));
 
@@ -562,12 +617,18 @@ public class PDFDialog extends JDialog {
 				JOptionPane.showMessageDialog(owner, "Error while saving the file");
 			} catch (StoreException e1) {
 				JOptionPane.showMessageDialog(owner, "The data could not be fetched");
-			} catch (FileNotFoundException e2) {
-				JOptionPane.showMessageDialog(owner, "File could not be found");
 			} catch (IOException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
+				JOptionPane.showMessageDialog(owner, "File could not be found");
 			}
+
+			if (cbMail.isSelected()) {
+				try {
+					Email.postPdfMail(filename);
+				} catch (MessagingException | StoreException | UnsupportedEncodingException e) {
+					JOptionPane.showMessageDialog(owner, "Error: " + e.getMessage());
+				}
+			}
+
 		} else {
 			JOptionPane.showMessageDialog(owner, "Nothing selected");
 		}
@@ -606,4 +667,26 @@ public class PDFDialog extends JDialog {
 		return result;
 	}
 
+	private double getPoints(Lecture l) {
+		double points = 0;
+		for (Sheet s : sheetCon) {
+			if (s.getLecture().equals(l))
+				points = points + s.getPoints();
+		}
+		return points;
+	}
+
+	private double getMaxPoints(Lecture l) {
+		double maxPoints = 0;
+		for (Sheet s : sheetCon) {
+			if (s.getLecture().equals(l))
+				maxPoints = maxPoints + s.getMaxPoints();
+		}
+		return maxPoints;
+	}
+
+	private double getPercentage(Lecture l) {
+		double percentage = getPoints(l) / getMaxPoints(l);
+		return percentage * 100;
+	}
 }
