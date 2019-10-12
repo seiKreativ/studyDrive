@@ -1,5 +1,7 @@
 package data.exam.exam;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -8,7 +10,7 @@ import store.StoreException;
 
 public class ExamContainer implements Iterable<Exam> {
 	private static ExamContainer unique = null;
-	private Vector<Exam> exams;
+	private static Vector<Exam> exams;
 	private UserInformationStore store;
 
 	private ExamContainer() throws StoreException {
@@ -66,6 +68,18 @@ public class ExamContainer implements Iterable<Exam> {
 
 	public Exam getExamByIndex(int pos) {
 		return exams.get(pos);
+	}
+
+	public static void setExamsSortedBySemester() {
+		exams.sort(new Comparator<Exam>() {
+			@Override
+			public int compare(Exam e1, Exam e2) {
+				if (e1.getSemester() - e2.getSemester() == 0)
+					return e1.getLeistungpunkte() - e2.getLeistungpunkte();
+				else
+					return e1.getSemester() - e2.getSemester();
+			}
+		});
 	}
 
 	public Exam getExamByName(String name) {

@@ -514,6 +514,8 @@ public class MainFrame extends JFrame {
 						sheetTabbedPane.setSelectedIndex(1);
 					if (e.getKeyCode() == KeyEvent.VK_C && tabbedPane.getSelectedIndex() == 1)
 						sheetTabbedPane.setSelectedIndex(2);
+					if (e.getKeyCode() == KeyEvent.VK_P && e.isControlDown())
+						onPrintPdf();
 				}
 			});
 		}

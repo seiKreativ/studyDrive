@@ -28,8 +28,8 @@ public class Lecture {
     }
 
     public void setName(String name2) throws IllegalInputException{
-        if (name2.length() < 1) {
-            throw new IllegalInputException("Name not correct");
+        if (name2.length() < 1 || name2.contains("(")) {
+            throw new IllegalInputException("Mindestens zwei Buchstaben, keine Klammern");
         }
         this.name = name2;
     }
