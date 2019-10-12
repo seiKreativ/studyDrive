@@ -3,16 +3,19 @@ package data.exam;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.mail.MessagingException;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -24,7 +27,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -49,18 +51,14 @@ import store.StoreException;
 
 public class PDFDialog extends JDialog {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4665437924800154541L;
 	private final JPanel contentPanel = new JPanel();
 	private LectureContainer lecCon;
 	private SheetContainer sheetCon;
 	private ExamContainer examCon;
 	private JFrame owner;
-	private JCheckBox cbExams, cbSheets, cbLectures, cbSelectAllSemExam,
-			cbDeselectFailedExams, cbAllLectures, cbSelectAllSemLecture, cbMail;
-	private JList<Integer> semesterExamSelectList, semesterLectureSelectList;
+	private JCheckBox cbExams, cbSheets, cbSelectAllSemExam, cbDeselectFailedExams, cbAllLectures, cbMail;
+	private JList<Integer> semesterExamSelectList;
 	private JList<String> lectureSheetSelectList;
 	private List<Integer> semExamList, semLecList;
 	private List<String> lecSheetList;
@@ -73,7 +71,7 @@ public class PDFDialog extends JDialog {
 		this.sheetCon = sheetCon;
 		this.examCon = examCon;
 		this.owner = owner;
-		setBounds(100, 100, 450, 307);
+		setBounds(100, 100, 450, 293);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -81,12 +79,11 @@ public class PDFDialog extends JDialog {
 
 		// Exams
 		cbExams = new JCheckBox("Klausuren");
-		cbExams.setSelected(true);
+		cbExams.setSelected(false);
 		cbExams.setBounds(6, 7, 99, 23);
 		cbExams.addActionListener((e) -> {
 			if (((JCheckBox) e.getSource()).isSelected()) {
 				semesterExamSelectList.setEnabled(true);
-
 				cbSelectAllSemExam.setEnabled(true);
 				cbDeselectFailedExams.setEnabled(true);
 			} else {
@@ -110,6 +107,33 @@ public class PDFDialog extends JDialog {
 			semesterExamListModel.addElement(Integer.valueOf(s));
 		}
 		semesterExamSelectList = new JList<Integer>(semesterExamListModel);
+		semesterExamSelectList.setSelectionModel(new DefaultListSelectionModel() {
+		    private int i0 = -1;
+		    private int i1 = -1;
+		    
+		    @Override
+		    public void setSelectionInterval(int index0, int index1) {
+		        if(i0 == index0 && i1 == index1){
+		            if(getValueIsAdjusting()){
+		                 setValueIsAdjusting(false);
+		                 setSelection(index0, index1);
+		            }
+		        }else{
+		            i0 = index0;
+		            i1 = index1;
+		            setValueIsAdjusting(false);
+		            setSelection(index0, index1);
+		        }
+		    }
+		    private void setSelection(int index0, int index1){
+		        if(super.isSelectedIndex(index0)) {
+		            super.removeSelectionInterval(index0, index1);
+		        }else {
+		            super.addSelectionInterval(index0, index1);
+		        }
+		    }
+		});
+		semesterExamSelectList.setEnabled(false);
 		semesterExamSelectList.setSelectionBackground(Color.LIGHT_GRAY);
 		JScrollPane scrollpaneSemesterExam = new JScrollPane(semesterExamSelectList);
 		scrollpaneSemesterExam.setBounds(113, 36, 63, 46);
@@ -120,24 +144,27 @@ public class PDFDialog extends JDialog {
 		contentPanel.add(lblSemesterExam);
 
 		cbSelectAllSemExam = new JCheckBox("alle Semester");
+		cbSelectAllSemExam.setEnabled(false);
 		cbSelectAllSemExam.setBounds(203, 33, 99, 23);
 		cbSelectAllSemExam.addItemListener((e) -> {
 			if (!(cbSelectAllSemExam.isSelected())) {
 				semesterExamSelectList.setEnabled(true);
-				semesterExamSelectList.setSelectedIndex(1);
+				semesterExamSelectList.setSelectedIndices(null);
 			} else {
+				semesterExamSelectList.setSelectionInterval(0, examCon.getSize());
 				semesterExamSelectList.setEnabled(false);
 			}
 		});
 		contentPanel.add(cbSelectAllSemExam);
 
 		cbDeselectFailedExams = new JCheckBox("nicht bestandene Klausuren ausblenden");
+		cbDeselectFailedExams.setEnabled(false);
 		cbDeselectFailedExams.setBounds(204, 59, 226, 23);
 		contentPanel.add(cbDeselectFailedExams);
 
 		// Sheets
 		cbSheets = new JCheckBox("Übungsblätter");
-		cbSheets.setSelected(true);
+		cbSheets.setSelected(false);
 		cbSheets.setBounds(6, 83, 99, 23);
 		cbSheets.addActionListener((e) -> {
 			if (((JCheckBox) e.getSource()).isSelected()) {
@@ -170,42 +197,51 @@ public class PDFDialog extends JDialog {
 			semesterSheetListModel.addElement(s);
 		}
 		lectureSheetSelectList = new JList<String>(semesterSheetListModel);
+		lectureSheetSelectList.setSelectionModel(new DefaultListSelectionModel() {
+		    private int i0 = -1;
+		    private int i1 = -1;
+		    
+		    @Override
+		    public void setSelectionInterval(int index0, int index1) {
+		        if(i0 == index0 && i1 == index1){
+		            if(getValueIsAdjusting()){
+		                 setValueIsAdjusting(false);
+		                 setSelection(index0, index1);
+		            }
+		        }else{
+		            i0 = index0;
+		            i1 = index1;
+		            setValueIsAdjusting(false);
+		            setSelection(index0, index1);
+		        }
+		    }
+		    private void setSelection(int index0, int index1){
+		        if(super.isSelectedIndex(index0)) {
+		            super.removeSelectionInterval(index0, index1);
+		        }else {
+		            super.addSelectionInterval(index0, index1);
+		        }
+		    }
+		});
+		lectureSheetSelectList.setEnabled(false);
 		lectureSheetSelectList.setSelectionBackground(Color.LIGHT_GRAY);
 		JScrollPane scrollpaneLecturesSheet = new JScrollPane(lectureSheetSelectList);
-		scrollpaneLecturesSheet.setBounds(113, 108, 183, 46);
+		scrollpaneLecturesSheet.setBounds(113, 108, 183, 77);
 		contentPanel.add(scrollpaneLecturesSheet);
 
 		cbAllLectures = new JCheckBox("alle Vorlesungen");
+		cbAllLectures.setEnabled(false);
 		cbAllLectures.setBounds(302, 105, 128, 23);
 		cbAllLectures.addActionListener((e) -> {
 			if (!((JCheckBox) e.getSource()).isSelected()) {
 				lectureSheetSelectList.setEnabled(true);
-				lectureSheetSelectList.setSelectedIndex(1);
+				lectureSheetSelectList.setSelectedIndices(null);
 			} else {
+				lectureSheetSelectList.setSelectionInterval(0, sheetCon.getSize());
 				lectureSheetSelectList.setEnabled(false);
 			}
 		});
 		contentPanel.add(cbAllLectures);
-
-		// Lectures
-		cbLectures = new JCheckBox("Vorlesungen");
-		cbLectures.setSelected(true);
-		cbLectures.setBounds(6, 155, 99, 23);
-		cbLectures.addActionListener((e) -> {
-			if (((JCheckBox) e.getSource()).isSelected()) {
-				semesterLectureSelectList.setEnabled(true);
-				semesterExamSelectList.setSelectedIndex(1);
-				cbSelectAllSemLecture.setEnabled(true);
-			} else {
-				semesterLectureSelectList.setEnabled(false);
-				cbSelectAllSemLecture.setEnabled(false);
-			}
-		});
-		contentPanel.add(cbLectures);
-
-		JLabel lblSemesterLecture = new JLabel("Semester:");
-		lblSemesterLecture.setBounds(32, 185, 73, 14);
-		contentPanel.add(lblSemesterLecture);
 
 		ArrayList<Integer> semesterLectureList = new ArrayList<Integer>();
 		for (int i = 0; i < lecCon.getSize(); i++) {
@@ -219,37 +255,22 @@ public class PDFDialog extends JDialog {
 		for (int s : semesterLectureList) {
 			semesterLectureListModel.addElement(Integer.valueOf(s));
 		}
-		semesterLectureSelectList = new JList<Integer>(semesterLectureListModel);
-		semesterLectureSelectList.setSelectionBackground(Color.LIGHT_GRAY);
-		JScrollPane scrollpaneSemesterLecture = new JScrollPane(semesterLectureSelectList);
-		scrollpaneSemesterLecture.setBounds(113, 184, 63, 44);
-		contentPanel.add(scrollpaneSemesterLecture);
-
-		cbSelectAllSemLecture = new JCheckBox("alle Semester");
-		cbSelectAllSemLecture.setBounds(203, 181, 99, 23);
-		cbSelectAllSemLecture.addActionListener((e) -> {
-			if (!((JCheckBox) e.getSource()).isSelected()) {
-				semesterLectureSelectList.setEnabled(true);
-				semesterLectureSelectList.setSelectedIndex(1);
-			} else {
-				semesterLectureSelectList.setEnabled(false);
-			}
-		});
-
-		contentPanel.add(cbSelectAllSemLecture);
 
 		cbIncludeOther = new JCheckBox("andere Leistungen");
+		cbIncludeOther.setEnabled(false);
+		cbIncludeOther.setSelected(true);
 		cbIncludeOther.setBounds(302, 131, 128, 23);
 		contentPanel.add(cbIncludeOther);
 
 		cbMail = new JCheckBox("Zusätzlich Datei per Mail senden");
+		cbMail.setSize(210, 20);
+		cbMail.setLocation(6, 196);
 		contentPanel.add(cbMail);
 
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
-			cbMail = new JCheckBox("Zusätzlich Datei per Mail senden");
 			buttonPane.add(cbMail, FlowLayout.LEFT);
 			{
 				JButton okButton = new JButton("OK");
@@ -274,11 +295,6 @@ public class PDFDialog extends JDialog {
 							lecturesToSheetPdf.add(lecCon.getLectureByName(lectureName, lectureSemester));
 						}
 					}
-					if (cbSelectAllSemLecture.isSelected()) {
-						semLecList = semesterLectureList;
-					} else {
-						semLecList = semesterLectureSelectList.getSelectedValuesList();
-					}
 					makePdf();
 				});
 				getRootPane().setDefaultButton(okButton);
@@ -294,18 +310,21 @@ public class PDFDialog extends JDialog {
 	}
 
 	private void makePdf() {
-		if ((cbExams.isSelected() && !cbSelectAllSemExam.isSelected() && semesterExamSelectList.isSelectionEmpty()) ||
-				(cbSheets.isSelected() && !cbAllLectures.isSelected() && lectureSheetSelectList.isSelectionEmpty()) ||
-				(cbLectures.isSelected() && !cbSelectAllSemLecture.isSelected() && semesterLectureSelectList.isSelectionEmpty())) {
-			JOptionPane.showMessageDialog(this, "Wenn nicht \"alle Semester (bzw. Vorlesungen)\" \n" +
-					"ausgewählt ist, musst du in der Liste welche auswähen.", "Error", JOptionPane.ERROR_MESSAGE);
+		if ((cbExams.isSelected() && !cbSelectAllSemExam.isSelected() && semesterExamSelectList.isSelectionEmpty())
+				|| (cbSheets.isSelected() && !cbAllLectures.isSelected() && lectureSheetSelectList.isSelectionEmpty())) {
+			JOptionPane.showMessageDialog(this,
+					"Wenn nicht \"alle Semester (bzw. Vorlesungen)\" \n"
+							+ "ausgewählt ist, musst du in der Liste welche auswähen.",
+					"Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		this.dispose();
 		JFileChooser choose = new JFileChooser();
 		choose.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		/* pdfFilter = new FileNameExtensionFilter("Pdf file(.pdf)", "pdf");
-		choose.setFileFilter(pdfFilter);*/
+		/*
+		 * pdfFilter = new FileNameExtensionFilter("Pdf file(.pdf)", "pdf");
+		 * choose.setFileFilter(pdfFilter);
+		 */
 		String filename;
 		if (choose.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
 			filename = choose.getSelectedFile() + "\\StudyAcc-" + LocalDate.now().toString() + ".pdf";
@@ -389,7 +408,7 @@ public class PDFDialog extends JDialog {
 					examTable.addCell(new PdfPCell(new Phrase("Note", tableColumnHeader)));
 
 					// extracting data from the JTable and inserting it to PdfPTable
-					//Sortiert die exams:
+					// Sortiert die exams:
 					ExamContainer.setExamsSortedBySemester();
 					int gesamtLP = 0;
 					for (int rows = 0; rows < examCon.getSize(); rows++) {
@@ -398,28 +417,36 @@ public class PDFDialog extends JDialog {
 							if (e.getNote() <= 4.0)
 								gesamtLP = gesamtLP + e.getLeistungpunkte();
 							if (cbDeselectFailedExams.isSelected()) {
-								examTable.addCell(
-										new PdfPCell(new Phrase(Integer.toString(e.getSemester()), tableCell)));
+								PdfPCell semCellExam = new PdfPCell(new Phrase(Integer.toString(e.getSemester()), tableCell));
+								semCellExam.setHorizontalAlignment(Element.ALIGN_CENTER);
+								examTable.addCell(semCellExam);
 								examTable.addCell(new PdfPCell(new Phrase(e.getName(), tableCell)));
-								examTable.addCell(
-										new PdfPCell(new Phrase(Integer.toString(e.getLeistungpunkte()), tableCell)));
-								examTable.addCell(new PdfPCell(new Phrase(Double.toString(e.getNote()), tableCell)));
+								PdfPCell lpCellExam = new PdfPCell(new Phrase(Integer.toString(e.getLeistungpunkte()), tableCell));
+								lpCellExam.setHorizontalAlignment(Element.ALIGN_CENTER);
+								examTable.addCell(lpCellExam);
+								PdfPCell markCellExam = new PdfPCell(new Phrase(Double.toString(e.getNote()), tableCell));
+								markCellExam.setHorizontalAlignment(Element.ALIGN_CENTER);
+								examTable.addCell(markCellExam);
 							} else {
 								if (e.getNote() < 4.1) {
-									examTable.addCell(
-											new PdfPCell(new Phrase(Integer.toString(e.getSemester()), tableCell)));
+									PdfPCell semCellExam = new PdfPCell(new Phrase(Integer.toString(e.getSemester()), tableCell));
+									semCellExam.setHorizontalAlignment(Element.ALIGN_CENTER);
+									examTable.addCell(semCellExam);
 									examTable.addCell(new PdfPCell(new Phrase(e.getName(), tableCell)));
-									examTable.addCell(
-											new PdfPCell(new Phrase(Integer.toString(e.getLeistungpunkte()), tableCell)));
-									examTable.addCell(new PdfPCell(new Phrase(Double.toString(e.getNote()), tableCell)));
+									PdfPCell lpCellExam = new PdfPCell(new Phrase(Integer.toString(e.getLeistungpunkte()), tableCell));
+									lpCellExam.setHorizontalAlignment(Element.ALIGN_CENTER);
+									examTable.addCell(lpCellExam);
+									PdfPCell markCellExam = new PdfPCell(new Phrase(Double.toString(e.getNote()), tableCell));
+									markCellExam.setHorizontalAlignment(Element.ALIGN_CENTER);
+									examTable.addCell(markCellExam);
 								}
 							}
 						}
 					}
 					examTable.addCell(new PdfPCell(new Phrase("", tableCell)));
-					examTable.addCell(new PdfPCell(new Phrase("Gesamt", tableCell)));
-					examTable.addCell(new PdfPCell(new Phrase(Integer.toString(gesamtLP), tableCell)));
-					examTable.addCell(new PdfPCell(new Phrase(calcDurchschnitt(), tableCell)));
+					examTable.addCell(new PdfPCell(new Phrase("Gesamt", tableColumnHeader)));
+					examTable.addCell(new PdfPCell(new Phrase(Integer.toString(gesamtLP), tableColumnHeader)));
+					examTable.addCell(new PdfPCell(new Phrase(calcDurchschnitt(), tableColumnHeader)));
 					doc.add(examTable);
 					doc.add(Chunk.NEWLINE);
 
@@ -520,37 +547,56 @@ public class PDFDialog extends JDialog {
 							}
 						}
 						if (existierendeSheets) {
-							insgesamtTable.addCell(
-									new PdfPCell(new Phrase(Integer.toString(l.getSemester()), tableCell)));
+							PdfPCell semCellSheet = new PdfPCell(new Phrase(Integer.toString(l.getSemester()), tableCell));
+							semCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+							insgesamtTable.addCell(semCellSheet);
 							insgesamtTable.addCell(new PdfPCell(new Phrase(l.getName(), tableCell)));
-							insgesamtTable
-									.addCell(new PdfPCell(new Phrase(new DecimalFormat("0.00").format(getPoints(l)).replaceAll(",", "."), tableCell)));
-							insgesamtTable
-									.addCell(new PdfPCell(new Phrase(new DecimalFormat("0.00").format(getMaxPoints(l)).replaceAll(",", "."), tableCell)));
-							insgesamtTable.addCell(
-									new PdfPCell(new Phrase(new DecimalFormat("0.00").format(getPercentage(l)).replaceAll(",", "."), tableCell)));
+							PdfPCell ptsCellSheet = new PdfPCell(new Phrase(
+									new DecimalFormat("0.00").format(getPoints(l)).replaceAll(",", "."), tableCell));
+							ptsCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+							insgesamtTable.addCell(ptsCellSheet);
+							PdfPCell ptsMaxCellSheet = new PdfPCell(new Phrase(new DecimalFormat("0.00").format(getMaxPoints(l)).replaceAll(",", "."),
+									tableCell));
+							ptsMaxCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+							insgesamtTable.addCell(ptsMaxCellSheet);
+							PdfPCell prcCellSheet = new PdfPCell(new Phrase(new DecimalFormat("0.00").format(getPercentage(l)).replaceAll(",", ".") + "%",
+									tableCell));
+							prcCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+							insgesamtTable.addCell(prcCellSheet);
 						}
 						ArrayList<Sheet> toPrintSheets = getSheetsSortedByNumber(l, Sheet.SHEET_TYPE);
 						for (Sheet s : toPrintSheets) {
-							sheetTable.addCell(
-									new PdfPCell(new Phrase(Integer.toString(s.getSemester()), tableCell)));
+							PdfPCell semCellSheet = new PdfPCell(new Phrase(Integer.toString(s.getSemester()), tableCell));
+							semCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+							sheetTable.addCell(semCellSheet);
 							sheetTable.addCell(new PdfPCell(new Phrase(s.getName(), tableCell)));
-							sheetTable
-									.addCell(new PdfPCell(new Phrase(Integer.toString(s.getNumber()), tableCell)));
-							sheetTable.addCell(new PdfPCell(new Phrase(Double.toString(s.getPoints()), tableCell)));
-							sheetTable.addCell(
-									new PdfPCell(new Phrase(Double.toString(s.getMaxPoints()), tableCell)));
+							PdfPCell numCellSheet = new PdfPCell(new Phrase(Integer.toString(s.getNumber()), tableCell));
+							numCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+							sheetTable.addCell(numCellSheet);
+							PdfPCell ptsCellSheet = new PdfPCell(new Phrase(
+									new DecimalFormat("0.00").format(s.getPoints()).replaceAll(",", "."), tableCell));
+							ptsCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+							sheetTable.addCell(ptsCellSheet);
+							PdfPCell ptsMaxCellSheet = new PdfPCell(new Phrase(new DecimalFormat("0.00").format(s.getMaxPoints()).replaceAll(",", "."),
+									tableCell));
+							ptsMaxCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+							sheetTable.addCell(ptsMaxCellSheet);
 						}
 						if (cbIncludeOther.isSelected()) {
 							toPrintSheets = getSheetsSortedByNumber(l, Sheet.OTHER_TYPE);
 							for (Sheet s : toPrintSheets) {
-								otherTable.addCell(
-										new PdfPCell(new Phrase(Integer.toString(s.getSemester()), tableCell)));
+								PdfPCell semCellSheet = new PdfPCell(new Phrase(Integer.toString(s.getSemester()), tableCell));
+								semCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+								otherTable.addCell(semCellSheet);
 								otherTable.addCell(new PdfPCell(new Phrase(s.getName(), tableCell)));
-								otherTable.addCell(
-										new PdfPCell(new Phrase(Double.toString(s.getPoints()), tableCell)));
-								otherTable.addCell(
-										new PdfPCell(new Phrase(Double.toString(s.getMaxPoints()), tableCell)));
+								PdfPCell ptsCellSheet = new PdfPCell(new Phrase(
+										new DecimalFormat("0.00").format(s.getPoints()).replaceAll(",", "."), tableCell));
+								ptsCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+								otherTable.addCell(ptsCellSheet);
+								PdfPCell ptsMaxCellSheet = new PdfPCell(new Phrase(new DecimalFormat("0.00").format(s.getMaxPoints()).replaceAll(",", "."),
+										tableCell));
+								ptsMaxCellSheet.setHorizontalAlignment(Element.ALIGN_CENTER);
+								otherTable.addCell(ptsMaxCellSheet);
 							}
 						}
 					}
@@ -573,7 +619,7 @@ public class PDFDialog extends JDialog {
 
 				}
 
-				// Lecture Tabl3#
+				/*
 				if (lecCon != null && cbLectures.isSelected()) {
 
 					Paragraph lectures = new Paragraph();
@@ -608,8 +654,9 @@ public class PDFDialog extends JDialog {
 					}
 					doc.add(lecTable);
 					doc.add(Chunk.NEWLINE);
+					
 
-				}
+				}*/
 
 				doc.close();
 
@@ -643,8 +690,7 @@ public class PDFDialog extends JDialog {
 			if (semExamList.contains(examCon.getExamByIndex(i).getSemester())) {
 				if (examCon.getExamByIndex(i).getNote() <= 4.0) {
 					sumLp += examCon.getExamByIndex(i).getLeistungpunkte();
-					sumNoten += examCon.getExamByIndex(i).getNote()
-							* examCon.getExamByIndex(i).getLeistungpunkte();
+					sumNoten += examCon.getExamByIndex(i).getNote() * examCon.getExamByIndex(i).getLeistungpunkte();
 				}
 			}
 		}
@@ -690,4 +736,3 @@ public class PDFDialog extends JDialog {
 		return percentage * 100;
 	}
 }
-
