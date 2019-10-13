@@ -71,7 +71,7 @@ public class Email {
                 "\n" +
                 "Viele Gr\u00fc\u00dfe, \n" +
                 "\n" +
-                "dein Team von StudyAcc";
+                "dein Team von StudyAcc \n";
 
         MimeMultipart content = new MimeMultipart( "mixed" );
 
