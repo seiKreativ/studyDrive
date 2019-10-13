@@ -63,8 +63,7 @@ public class TableExams extends JPanel {
 				Component c = super.prepareRenderer(renderer, row, col);
 				String status = (String) getValueAt(row, 3);
 				if (Double.parseDouble(status) > 4.0) {
-					c.setBackground(Color.RED);
-					c.setForeground(Color.WHITE);
+					c.setForeground(Color.RED);
 				} else {
 					c.setBackground(super.getBackground());
 					c.setForeground(super.getForeground());
