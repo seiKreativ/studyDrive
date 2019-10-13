@@ -402,10 +402,10 @@ public class PDFDialog extends JDialog {
 					;
 					examTable.setLockedWidth(true);
 
-					examTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
+					examTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
 					examTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
-					examTable.addCell(new PdfPCell(new Phrase("ECTS", tableColumnHeader)));
-					examTable.addCell(new PdfPCell(new Phrase("Note", tableColumnHeader)));
+					examTable.addCell(new PdfPCell(new Phrase("ECTS", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
+					examTable.addCell(new PdfPCell(new Phrase("Note", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
 
 					// extracting data from the JTable and inserting it to PdfPTable
 					// Sortiert die exams:
@@ -445,8 +445,8 @@ public class PDFDialog extends JDialog {
 					}
 					examTable.addCell(new PdfPCell(new Phrase("", tableCell)));
 					examTable.addCell(new PdfPCell(new Phrase("Gesamt", tableColumnHeader)));
-					examTable.addCell(new PdfPCell(new Phrase(Integer.toString(gesamtLP), tableColumnHeader)));
-					examTable.addCell(new PdfPCell(new Phrase(calcDurchschnitt(), tableColumnHeader)));
+					examTable.addCell(new PdfPCell(new Phrase(Integer.toString(gesamtLP), tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
+					examTable.addCell(new PdfPCell(new Phrase(calcDurchschnitt(), tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
 					doc.add(examTable);
 					doc.add(Chunk.NEWLINE);
 
@@ -488,11 +488,11 @@ public class PDFDialog extends JDialog {
 
 					insgesamtTable.setLockedWidth(true);
 
-					insgesamtTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
+					insgesamtTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
 					insgesamtTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
-					insgesamtTable.addCell(new PdfPCell(new Phrase("Punkte", tableColumnHeader)));
-					insgesamtTable.addCell(new PdfPCell(new Phrase("Max", tableColumnHeader)));
-					insgesamtTable.addCell(new PdfPCell(new Phrase("Prozent", tableColumnHeader)));
+					insgesamtTable.addCell(new PdfPCell(new Phrase("Punkte", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
+					insgesamtTable.addCell(new PdfPCell(new Phrase("Max", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
+					insgesamtTable.addCell(new PdfPCell(new Phrase("Prozent", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
 
 					PdfPTable sheetTable = new PdfPTable(5);
 					// adding table headers
@@ -503,11 +503,11 @@ public class PDFDialog extends JDialog {
 
 					sheetTable.setLockedWidth(true);
 
-					sheetTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
+					sheetTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
 					sheetTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
-					sheetTable.addCell(new PdfPCell(new Phrase("Nummer", tableColumnHeader)));
-					sheetTable.addCell(new PdfPCell(new Phrase("Punkte", tableColumnHeader)));
-					sheetTable.addCell(new PdfPCell(new Phrase("Max", tableColumnHeader)));
+					sheetTable.addCell(new PdfPCell(new Phrase("Nummer", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
+					sheetTable.addCell(new PdfPCell(new Phrase("Punkte", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
+					sheetTable.addCell(new PdfPCell(new Phrase("Max", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
 
 					PdfPTable otherTable = new PdfPTable(4);
 					// adding table headers
@@ -518,10 +518,10 @@ public class PDFDialog extends JDialog {
 
 					otherTable.setLockedWidth(true);
 
-					otherTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader)));
+					otherTable.addCell(new PdfPCell(new Phrase("Sem", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
 					otherTable.addCell(new PdfPCell(new Phrase("Vorlesung", tableColumnHeader)));
-					otherTable.addCell(new PdfPCell(new Phrase("Punkte", tableColumnHeader)));
-					otherTable.addCell(new PdfPCell(new Phrase("Max", tableColumnHeader)));
+					otherTable.addCell(new PdfPCell(new Phrase("Punkte", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
+					otherTable.addCell(new PdfPCell(new Phrase("Max", tableColumnHeader))).setHorizontalAlignment(Element.ALIGN_CENTER);
 
 					// extracting data from the JTable and inserting it to PdfPTable
 
@@ -686,7 +686,6 @@ public class PDFDialog extends JDialog {
 		int sumLp = 0;
 		double sumNoten = 0;
 		for (int i = 0; i < examCon.getSize(); i++) {
-			System.out.println(semExamList.contains(examCon.getExamByIndex(i).getSemester()));
 			if (semExamList.contains(examCon.getExamByIndex(i).getSemester())) {
 				if (examCon.getExamByIndex(i).getNote() <= 4.0) {
 					sumLp += examCon.getExamByIndex(i).getLeistungpunkte();
