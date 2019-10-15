@@ -525,7 +525,6 @@ public class MainFrame extends JFrame {
 
 	private void onPrintPdf() {
 		// hier wird noch das Fenster eingefügt um die scheiße auszuwählen
-		System.out.println("hello");
 		try {
 			new PDFDialog(lectureContainer, sheetContainer, examContainer, (JFrame) this);
 		} catch (IOException e) {
