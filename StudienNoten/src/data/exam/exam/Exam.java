@@ -7,6 +7,7 @@ public class Exam {
 
 	private Lecture lecture;
 	private double note;
+	private double anteil = 1;
 	
 	public Exam(Lecture lecture, double note) throws IllegalInputException {
 			this.setLecture(lecture);
@@ -25,6 +26,15 @@ public class Exam {
 		this.note = note2; 
 	}
 
+	public void setAnteil(double anteil) throws IllegalInputException {
+		if (1 <= anteil && anteil <= 0)
+			throw new IllegalInputException("Anteil in Prozent zwischen 1 und 0");
+		this.anteil = anteil;
+	}
+
+	public double getAnteil() {
+		return this.anteil;
+	}
 	public String getName(){ return lecture.getName(); }
 	public int getLeistungpunkte(){ return lecture.getLeistungpunkte(); }
 	public int getSemester() { return lecture.getSemester(); }

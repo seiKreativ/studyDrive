@@ -6,6 +6,7 @@ public class Lecture {
 
     private int semester, leistungsPunkte;
     private String name;
+    private int anzahlExams = 1;
 
     public Lecture(int semester, String name, int leistungsPunkte) throws IllegalInputException {
         this.setName(name);
@@ -32,6 +33,14 @@ public class Lecture {
             throw new IllegalInputException("Mindestens zwei Buchstaben, keine Klammern");
         }
         this.name = name2;
+    }
+
+    public void setAnzahlExams(int anzahlExams) {
+        this.anzahlExams = anzahlExams;
+    }
+
+    public int getAnzahlExams() {
+        return anzahlExams;
     }
 
     public String getName(){ return this.name; }

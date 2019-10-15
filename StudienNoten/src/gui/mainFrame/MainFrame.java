@@ -516,6 +516,8 @@ public class MainFrame extends JFrame {
 						sheetTabbedPane.setSelectedIndex(2);
 					if (e.getKeyCode() == KeyEvent.VK_P && e.isControlDown())
 						onPrintPdf();
+					if (e.getKeyCode() == KeyEvent.VK_L && e.isControlDown())
+						onLogOut();
 				}
 			});
 		}

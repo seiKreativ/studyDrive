@@ -346,7 +346,7 @@ public class UserInformationStore implements DataManagement {
 	@Override
 	public void addExam(Exam e) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "INSERT INTO exams VALUES (" + e.getSemester() + ",'" + e.getName() + "', "+ e.getNote() + ", '" + email + "');";
+			String befehl = "INSERT INTO exams VALUES (" + e.getSemester() + ",'" + e.getName() + "', "+ e.getNote() + ", '" + email + "', " + e.getAnteil() + ");";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding exam " + e1.getMessage(), e1);
@@ -366,7 +366,7 @@ public class UserInformationStore implements DataManagement {
     @Override
     public void modifyExam(Exam eold, Exam enew) throws StoreException {
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "update exams set mark = " + enew.getNote() + ", semester = " + enew.getSemester() + ", name = '" + enew.getName() + "' " +
+			String befehl = "update exams set mark = " + enew.getNote() + ", semester = " + enew.getSemester() + ", name = '" + enew.getName() + "', anteil =  " + enew.getAnteil() + " " +
 					"WHERE username = '" + email + "' AND semester = " + eold.getSemester() + " AND name = '"+ eold.getName() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e) {
@@ -377,7 +377,7 @@ public class UserInformationStore implements DataManagement {
 	@Override
 	public void addLecture(Lecture e) throws StoreException{
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "INSERT INTO userlecture VALUES ('" + email + "','" + e.getName() + "', " + e.getSemester() + ", " + e.getLeistungpunkte() + ");";
+			String befehl = "INSERT INTO userlecture VALUES ('" + email + "','" + e.getName() + "', " + e.getSemester() + ", " + e.getLeistungpunkte() + ", " + e.getAnzahlExams() + ");";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e1) {
 			throw new StoreException("Error while adding lecture " + e1.getMessage(), e1);
@@ -397,7 +397,7 @@ public class UserInformationStore implements DataManagement {
 	@Override
 	public void modifyLecture(Lecture eold, Lecture enew) throws StoreException{
 		try (Statement abfrage = con.createStatement()) {
-			String befehl = "update userlecture set credits = " + enew.getLeistungpunkte() + ", semester = " + enew.getSemester() + ", lecture = '" + enew.getName() + "' " +
+			String befehl = "update userlecture set credits = " + enew.getLeistungpunkte() + ", semester = " + enew.getSemester() + ", lecture = '" + enew.getName() + "', countExams = " + enew.getAnzahlExams() + " " +
 					"WHERE email = '" + email + "' AND semester = " + eold.getSemester() + " AND lecture = '"+ eold.getName() + "';";
 			abfrage.executeUpdate(befehl);
 		} catch (SQLException e) {
