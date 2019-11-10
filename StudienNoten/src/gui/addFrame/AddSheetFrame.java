@@ -186,7 +186,7 @@ public class AddSheetFrame extends JDialog {
 			for (int i = 1; i <= 13; i++) {
 				boolean isExisting = false;
 				for (Sheet s : sheetList) {
-					if (s.getNumber() == i) {
+					if (s.getNumber() == i && s.getType() == Sheet.SHEET_TYPE) {
 						isExisting = true;
 					}
 				}
